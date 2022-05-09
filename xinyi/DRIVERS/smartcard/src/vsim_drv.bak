@@ -1,0 +1,80 @@
+#include "smartcard.h"
+#include "xy_clk_config.h"
+#include "factory_nv.h"
+#include "oss_nv.h"
+#include "xy_utils.h"
+#include "rf_drv.h"
+#include "sim_csp.h"
+
+/**********************************************************************************************************************
+*该文件用于客户二次开发VSIM功能，以代替真实的SIM卡；由于该文件会与smartcard.c冲突，所以两个源代码不能同时编译
+**********************************************************************************************************************/
+
+uint8_t  vsim_init()
+{
+	return  1;
+}
+
+void  vsim_uninit()
+{
+}
+
+
+/** SIM卡驱动的入口，内部实现命令的解析处理和结果应答
+ * pApduBuf 	 业务上层发送的命令内容
+ * pRxBuffer	 SIM卡驱动返回的应答结果内容
+ * uLen		     入参时代表pApduBuf长度；出参时代表pRxBuffer长度
+ */
+void SC7816_command(uint8_t *pApduBuf,uint8_t *pRxBuffer,uint32_t *uLen)
+{
+	//芯翼驱动定制命令格式，执行上电下电动作，若VSIM有相关初始化和去初始化动作，可以在此插入
+	if(*uLen == 1)
+	{
+		switch(pApduBuf[0])
+    	{
+	    	case  Pw_on: 
+		    {			
+				if(vsim_init() == 1)
+				{
+					pRxBuffer[0] = 0x90;
+		            pRxBuffer[1] = 0x00;
+		            *uLen = 2;
+				}
+				else
+				{
+					pRxBuffer[0] = 0x63;
+	                pRxBuffer[1] = 0x01;
+					*uLen=2;
+				}
+				break;
+			}
+			case  Pw_off:    
+		    {
+
+				vsim_uninit();
+		    	
+		        pRxBuffer[0] = 0x90;
+		        pRxBuffer[1] = 0x00;
+		        *uLen = 2;
+
+		        break;
+		    }
+			//异常分支
+			default:
+			{
+				pRxBuffer[0] = 0x63;
+		        pRxBuffer[1] = 0x01;
+		        *uLen = 2;
+
+		        break;
+			}
+		}
+	}
+	else	
+    {
+    	//用户自行根据入参的命令格式实现卡协议相关流程
+	}
+}
+
+
+

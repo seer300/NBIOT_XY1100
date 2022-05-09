@@ -1,0 +1,620 @@
+; do Display Task
+GOSUB display_hardfault
+ENDDO
+
+
+display_hardfault:
+(
+	&R0Len=0xA
+	&R1Len=0xA
+	&R2Len=0xA
+	&R3Len=0xA
+	&R12Len=0xA
+	&LRLen=0xC
+	&PCLen=0xC
+	&xPSRLen=0xA
+	&BoxWidth=1+2
+	&MemberGap=0x1
+	&DialogFileName="hardfault_dialog.dlg"
+	
+	;PRIVATE &DrawLine &StartLen
+	PRIVATE &StartLen &StartLenDec &pxCurrentTimer
+	
+	&DrawLine=0x0
+	&StartLen=0x0
+	
+	OPEN #1 &DialogFileName /Create
+	CLOSE #1
+	
+	GOSUB dialog_show_hardfault_title &DrawLine
+	
+	&DrawLine=&DrawLine+0x1
+	GOSUB dialog_show_hardfault_one_line &DrawLine
+	
+	&DrawLine=&DrawLine+0x1
+	GOSUB dialog_show_hardfault_others &DrawLine
+	
+	;DIALOG.END
+	
+	;WinPOS ,,,,,, task_window
+	;AREA.Delete task_window
+	;AREA.Create task_window ;create a named area that is invisible
+	;AREA.Select task_window ;select this area for output
+	;DIALOG.AREA task_window &DialogFileName
+	DIALOG.View &DialogFileName
+	RM &DialogFileName
+	
+	RETURN
+)
+
+
+dialog_show_hardfault_title:
+(
+	ENTRY &AcceptParameter
+	
+	PRIVATE &DrawLineNum
+	&DrawLineNum=FORMAT.Decimal(2,&AcceptParameter)
+	
+	PRIVATE &CurrentSize &CurrentBoxPosition &CurrentBoxLen &BoxWidthNum
+	
+	&CurrentSize=0
+	&BoxWidthNum=FORMAT.Decimal(2,&BoxWidth)
+	
+	OPEN #1 &DialogFileName /Write
+	
+	WRITE #1 "; '&+' allows you to pass the local macro to a dialog"
+	WRITE #1 "; block that is embedded in a *.cmm file"
+	WRITE #1 ";"
+	WRITE #1 "NAME ""WINDOW_HARDFAULT"""
+	WRITE #1 "HEADER ""HARDFAULT LIST"""
+	WRITE #1 ";"
+	
+	WRITE #1 "; Register R0"
+	&CurrentBoxPosition=FORMAT.Decimal(2,&CurrentSize)
+	&CurrentBoxLen=FORMAT.Decimal(2,&R0Len)
+	&CurrentSize=&CurrentSize+&R0Len+0x1
+	WRITE #1 "POS &CurrentBoxPosition. &DrawLineNum. &CurrentBoxLen. &BoxWidthNum."
+	WRITE #1 "BOX ""R0"""
+	
+	WRITE #1 "; Register R1"
+	&CurrentBoxPosition=FORMAT.Decimal(2,&CurrentSize)
+	&CurrentBoxLen=FORMAT.Decimal(2,&R1Len)
+	&CurrentSize=&CurrentSize+&R1Len+0x1
+	WRITE #1 "POS &CurrentBoxPosition. &DrawLineNum. &CurrentBoxLen. &BoxWidthNum."
+	WRITE #1 "BOX ""R1"""
+	
+	WRITE #1 "; Register R2"
+	&CurrentBoxPosition=FORMAT.Decimal(2,&CurrentSize)
+	&CurrentBoxLen=FORMAT.Decimal(2,&R2Len)
+	&CurrentSize=&CurrentSize+&R2Len+0x1
+	WRITE #1 "POS &CurrentBoxPosition. &DrawLineNum. &CurrentBoxLen. &BoxWidthNum."
+	WRITE #1 "BOX ""R2"""
+	
+	WRITE #1 "; Register R3"
+	&CurrentBoxPosition=FORMAT.Decimal(2,&CurrentSize)
+	&CurrentBoxLen=FORMAT.Decimal(2,&R3Len)
+	&CurrentSize=&CurrentSize+&R3Len+0x1
+	WRITE #1 "POS &CurrentBoxPosition. &DrawLineNum. &CurrentBoxLen. &BoxWidthNum."
+	WRITE #1 "BOX ""R3"""
+	
+	WRITE #1 "; Register R12"
+	&CurrentBoxPosition=FORMAT.Decimal(2,&CurrentSize)
+	&CurrentBoxLen=FORMAT.Decimal(2,&R12Len)
+	&CurrentSize=&CurrentSize+&R12Len+0x1
+	WRITE #1 "POS &CurrentBoxPosition. &DrawLineNum. &CurrentBoxLen. &BoxWidthNum."
+	WRITE #1 "BOX ""R12"""
+	
+	WRITE #1 "; Register LR"
+	&CurrentBoxPosition=FORMAT.Decimal(2,&CurrentSize)
+	&CurrentBoxLen=FORMAT.Decimal(2,&LRLen)
+	&CurrentSize=&CurrentSize+&LRLen+0x1
+	WRITE #1 "POS &CurrentBoxPosition. &DrawLineNum. &CurrentBoxLen. &BoxWidthNum."
+	WRITE #1 "BOX ""LR"""
+	
+	WRITE #1 "; Register PC"
+	&CurrentBoxPosition=FORMAT.Decimal(2,&CurrentSize)
+	&CurrentBoxLen=FORMAT.Decimal(2,&PCLen)
+	&CurrentSize=&CurrentSize+&PCLen+0x1
+	WRITE #1 "POS &CurrentBoxPosition. &DrawLineNum. &CurrentBoxLen. &BoxWidthNum."
+	WRITE #1 "BOX ""PC"""
+	
+	WRITE #1 "; Register xPSR"
+	&CurrentBoxPosition=FORMAT.Decimal(2,&CurrentSize)
+	&CurrentBoxLen=FORMAT.Decimal(2,&xPSRLen)
+	&CurrentSize=&CurrentSize+&xPSRLen+0x1
+	WRITE #1 "POS &CurrentBoxPosition. &DrawLineNum. &CurrentBoxLen. &BoxWidthNum."
+	WRITE #1 "BOX ""xPSR"""
+	
+	WRITE #1 ";"
+	WRITE #1 ";"
+	
+	CLOSE #1
+	
+	RETURN
+)
+
+
+dialog_show_hardfault_one_line:
+(
+	ENTRY &AcceptParameter
+	
+	PRIVATE &DrawLineNum
+	&DrawLineNum=FORMAT.Decimal(2,&AcceptParameter)
+	
+	PRIVATE &R0 &R1 &R2 &R3 &R12 &LR &PC &xPSR
+	GOSUB get_hardfault_push_register
+	ENTRY &R0 &R1 &R2 &R3 &R12 &LR &PC &xPSR
+	
+	PRIVATE &CurrentMemberPosition &CurrentMemberLen &CurrentSize
+	
+	&CurrentSize=0
+	
+	OPEN #1 &DialogFileName /Write
+	
+	&CurrentMemberPosition=FORMAT.Decimal(2,&CurrentSize+&MemberGap)
+	&CurrentMemberLen=FORMAT.Decimal(2,&R0Len-2*&MemberGap)
+	&CurrentSize=&CurrentSize+&R0Len+1
+	WRITE #1 "; push register R0"
+	WRITE #1 "POS &CurrentMemberPosition. &DrawLineNum. &CurrentMemberLen. 1."
+	WRITE #1 "TEXT ""&R0"""
+	
+	&CurrentMemberPosition=FORMAT.Decimal(2,&CurrentSize+&MemberGap)
+	&CurrentMemberLen=FORMAT.Decimal(2,&R1Len-2*&MemberGap)
+	&CurrentSize=&CurrentSize+&R1Len+1
+	WRITE #1 "; push register R1"
+	WRITE #1 "POS &CurrentMemberPosition. &DrawLineNum. &CurrentMemberLen. 1."
+	WRITE #1 "TEXT ""&R1"""
+	
+	&CurrentMemberPosition=FORMAT.Decimal(2,&CurrentSize+&MemberGap)
+	&CurrentMemberLen=FORMAT.Decimal(2,&R2Len-2*&MemberGap)
+	&CurrentSize=&CurrentSize+&R2Len+1
+	WRITE #1 "; push register R2"
+	WRITE #1 "POS &CurrentMemberPosition. &DrawLineNum. &CurrentMemberLen. 1."
+	WRITE #1 "TEXT ""&R2"""
+	
+	&CurrentMemberPosition=FORMAT.Decimal(2,&CurrentSize+&MemberGap)
+	&CurrentMemberLen=FORMAT.Decimal(2,&R3Len-2*&MemberGap)
+	&CurrentSize=&CurrentSize+&R3Len+1
+	WRITE #1 "; push register R3"
+	WRITE #1 "POS &CurrentMemberPosition. &DrawLineNum. &CurrentMemberLen. 1"
+	WRITE #1 "TEXT ""&R3"""
+	
+	&CurrentMemberPosition=FORMAT.Decimal(2,&CurrentSize+&MemberGap)
+	&CurrentMemberLen=FORMAT.Decimal(2,&R12Len-2*&MemberGap)
+	&CurrentSize=&CurrentSize+&R12Len+1
+	WRITE #1 "; push register R12"
+	WRITE #1 "POS &CurrentMemberPosition. &DrawLineNum. &CurrentMemberLen. 1."
+	WRITE #1 "TEXT ""&R12"""
+	
+	&CurrentMemberPosition=FORMAT.Decimal(2,&CurrentSize+&MemberGap)
+	&CurrentMemberLen=FORMAT.Decimal(2,&LRLen-2*&MemberGap)
+	&CurrentSize=&CurrentSize+&LRLen+1
+	WRITE #1 "; push register LR"
+	WRITE #1 "POS &CurrentMemberPosition. &DrawLineNum. &CurrentMemberLen. 1."
+	WRITE #1 "BUTTON ""&LR"""
+	WRITE #1 "("
+	WRITE #1 "	Break.Set &LR"
+	WRITE #1 "	Break.List"
+	WRITE #1 ")"
+	
+	&CurrentMemberPosition=FORMAT.Decimal(2,&CurrentSize+&MemberGap)
+	&CurrentMemberLen=FORMAT.Decimal(2,&PCLen-2*&MemberGap)
+	&CurrentSize=&CurrentSize+&PCLen+1
+	WRITE #1 "; push register PC"
+	WRITE #1 "POS &CurrentMemberPosition. &DrawLineNum. &CurrentMemberLen. 1."
+	WRITE #1 "BUTTON ""&PC"""
+	WRITE #1 "("
+	WRITE #1 "	Break.Set &PC"
+	WRITE #1 "	Break.List"
+	WRITE #1 ")"
+	
+	&CurrentMemberPosition=FORMAT.Decimal(2,&CurrentSize+&MemberGap)
+	&CurrentMemberLen=FORMAT.Decimal(2,&xPSRLen-2*&MemberGap)
+	&CurrentSize=&CurrentSize+&xPSRLen+1
+	WRITE #1 "; push register xPSR"
+	WRITE #1 "POS &CurrentMemberPosition. &DrawLineNum. &CurrentMemberLen. 1."
+	WRITE #1 "TEXT ""&xPSR"""
+	
+	WRITE #1 ";"
+	WRITE #1 ";"
+	
+	CLOSE #1
+	
+	RETURN
+)
+
+
+dialog_show_hardfault_others:
+(
+	ENTRY &AcceptParameter
+	
+	PRIVATE &DrawLine &DrawLineNum &LineSize &LineSizeNum
+	
+	&DrawLine=&AcceptParameter
+	&LineSize=&R0Len+1+&R1Len+1+&R2Len+1+&R3Len+1+&R12Len+1+&LRLen+1+&PCLen+1+&xPSRLen
+	&LineSizeNum=FORMAT.Decimal(2,&LineSize)
+	
+	OPEN #1 &DialogFileName /Write
+	
+	PRIVATE &MFSR &BFSR &UFSR &HFSR &DFSR &MMAR &BFAR &AFAR
+	GOSUB get_hardfault_core_status
+	ENTRY &MFSR &BFSR &UFSR &HFSR &DFSR &MMAR &BFAR &AFAR
+	
+	&DrawLine=&DrawLine+1
+	&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+	WRITE #1 "; core fault register"
+	WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+	WRITE #1 "TEXT ""MFSR:&MFSR   BFSR:&BFSR   UFSR:&UFSR   HFSR:&HFSR   DFSR:&DFSR   MMAR:&MMAR   BFAR:&BFAR   AFAR:&AFAR"""
+	
+	PRIVATE &TmpCompare1 &TmpCompare2 &TmpCompare3
+	
+	&TmpCompare1=&HFSR&0x40000000
+	&TmpCompare2=&HFSR&0x80000000
+	&TmpCompare3=&HFSR&0x2
+	
+	IF &TmpCompare1==0x40000000
+	(
+		IF &MFSR!=0x0
+		(
+			PRIVATE &FaultReason
+			&FaultReason="Indicate hard fault is taken because of memory management fault"
+		
+			&DrawLine=&DrawLine+1
+			&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+			WRITE #1 "; core fault register"
+			WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+			WRITE #1 "TEXT ""HradFault Occurred Reason:  &FaultReason"""
+			
+			PRIVATE &MFSRCompare1 &MFSRCompare2 &MFSRCompare3 &MFSRCompare4 &MFSRCompare5
+			&MFSRCompare1=&MFSR&0x80
+			&MFSRCompare2=&MFSR&0x10
+			&MFSRCompare3=&MFSR&0x08
+			&MFSRCompare4=&MFSR&0x02
+			&&MFSRCompare5=&MFSR&0x01
+			
+			IF &MFSRCompare1!=0x0
+			(
+				&DrawLine=&DrawLine+1
+				&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+				WRITE #1 "; MMARVALID bit"
+				WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+				WRITE #1 "TEXT ""MFSR: Indicate MMAR is valid, and MMAR is &MMAR"""
+			)
+			ELSE
+			(
+				&DrawLine=&DrawLine+1
+				&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+				WRITE #1 "; BFARVALID bit"
+				WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+				WRITE #1 "TEXT ""MFSR: Indicate MMAR is invalid"""
+			)
+			
+			IF &MFSRCompare2!=0x0
+			(
+				&DrawLine=&DrawLine+1
+				&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+				WRITE #1 "; MSTKERR bit"
+				WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+				WRITE #1 "TEXT ""MFSR: Stacking error"""
+			)
+			
+			IF &MFSRCompare3!=0x0
+			(
+				&DrawLine=&DrawLine+1
+				&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+				WRITE #1 "; MUNSTKERR bit"
+				WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+				WRITE #1 "TEXT ""MFSR: Unstacking error"""
+			)
+			
+			IF &MFSRCompare4!=0x0
+			(
+				&DrawLine=&DrawLine+1
+				&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+				WRITE #1 "; DACCVIOL bit"
+				WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+				WRITE #1 "TEXT ""MFSR: Data access violation"""
+			)
+			
+			IF &MFSRCompare5!=0x0
+			(
+				&DrawLine=&DrawLine+1
+				&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+				WRITE #1 "; IACCVIOL bit"
+				WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+				WRITE #1 "TEXT ""MFSR: Instruction access violation"""
+			)
+		)
+		ELSE IF &BFSR!=0x0
+		(
+			PRIVATE &FaultReason
+			&FaultReason="Indicate hard fault is taken because of bus fault"
+		
+			&DrawLine=&DrawLine+1
+			&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+			WRITE #1 "; core fault register"
+			WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+			WRITE #1 "TEXT ""HradFault Occurred Reason:  &FaultReason"""
+			
+			PRIVATE &BFSRCompare1 &BFSRCompare2 &BFSRCompare3 &BFSRCompare4 &BFSRCompare5 &BFSRCompare6
+			&BFSRCompare1=&BFSR&0x80
+			&BFSRCompare2=&BFSR&0x10
+			&BFSRCompare3=&BFSR&0x08
+			&BFSRCompare4=&BFSR&0x04
+			&BFSRCompare5=&BFSR&0x02
+			&BFSRCompare6=&BFSR&0x01
+			
+			IF &BFSRCompare1!=0x0
+			(
+				&DrawLine=&DrawLine+1
+				&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+				WRITE #1 "; BFARVALID bit"
+				WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+				WRITE #1 "TEXT ""BFSR: Indicate BFAR is valid, and BFAR is &BFAR"""
+			)
+			ELSE
+			(
+				&DrawLine=&DrawLine+1
+				&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+				WRITE #1 "; BFARVALID bit"
+				WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+				WRITE #1 "TEXT ""BFSR: Indicate BFAR is invalid"""
+			)
+			
+			IF &BFSRCompare2!=0x0
+			(
+				&DrawLine=&DrawLine+1
+				&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+				WRITE #1 "; STKERR bit"
+				WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+				WRITE #1 "TEXT ""BFSR: Stacking error"""
+			)
+			
+			IF &BFSRCompare3!=0x0
+			(
+				&DrawLine=&DrawLine+1
+				&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+				WRITE #1 "; UNSTKERR bit"
+				WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+				WRITE #1 "TEXT ""BFSR: Unstacking error"""
+			)
+			
+			IF &BFSRCompare4!=0x0
+			(
+				&DrawLine=&DrawLine+1
+				&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+				WRITE #1 "; IMPRECISERR bit"
+				WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+				WRITE #1 "TEXT ""BFSR: Imprecise data access violation"""
+			)
+			
+			IF &BFSRCompare5!=0x0
+			(
+				&DrawLine=&DrawLine+1
+				&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+				WRITE #1 "; PRECISERR bit"
+				WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+				WRITE #1 "TEXT ""BFSR: Precise data access violation"""
+			)
+			
+			IF &BFSRCompare6!=0x0
+			(
+				&DrawLine=&DrawLine+1
+				&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+				WRITE #1 "; IBUSERR bit"
+				WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+				WRITE #1 "TEXT ""BFSR: Instruction access violation"""
+			)
+		)
+		ELSE IF &UFSR!=0x0
+		(
+			PRIVATE &FaultReason
+			&FaultReason="Indicate hard fault is taken because of usage fault"
+		
+			&DrawLine=&DrawLine+1
+			&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+			WRITE #1 "; core fault register"
+			WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+			WRITE #1 "TEXT ""HradFault Occurred Reason:  &FaultReason"""
+			
+			PRIVATE &UFSRCompare1 &UFSRCompare2 &UFSRCompare3 &UFSRCompare4 &UFSRCompare5 &UFSRCompare6
+			&UFSRCompare1=&UFSR&0x0200
+			&UFSRCompare2=&UFSR&0x0100
+			&UFSRCompare3=&UFSR&0x0008
+			&UFSRCompare4=&UFSR&0x0004
+			&UFSRCompare5=&UFSR&0x0002
+			&UFSRCompare6=&UFSR&0x0001
+			
+			IF &UFSRCompare1!=0x0
+			(
+				&DrawLine=&DrawLine+1
+				&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+				WRITE #1 "; DIVBYZERO bit"
+				WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+				WRITE #1 "TEXT ""UFSR: Indicate divide by zero will take place (can only be set if DIV_0_TRP is set)"""
+			)
+			
+			IF &UFSRCompare2!=0x0
+			(
+				&DrawLine=&DrawLine+1
+				&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+				WRITE #1 "; UNALIGNED bit"
+				WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+				WRITE #1 "TEXT ""UFSR: Indicate unaligned access will take place (can only be set if UNALIGN_TRP is set)"""
+			)
+			
+			IF &UFSRCompare3!=0x0
+			(
+				&DrawLine=&DrawLine+1
+				&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+				WRITE #1 "; NOCP bit"
+				WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+				WRITE #1 "TEXT ""UFSR: Attempt to execute a coprocessor instruction"""
+			)
+			
+			IF &UFSRCompare4!=0x0
+			(
+				&DrawLine=&DrawLine+1
+				&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+				WRITE #1 "; INVPC bit"
+				WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+				WRITE #1 "TEXT ""UFSR: Attempt to do exception with bad value in EXC_RETURN number"""
+			)
+			
+			IF &UFSRCompare5!=0x0
+			(
+				&DrawLine=&DrawLine+1
+				&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+				WRITE #1 "; INVSTATE bit"
+				WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+				WRITE #1 "TEXT ""UFSR: Attempt to switch to invalid state (e.g., ARM)"""
+			)
+			
+			IF &UFSRCompare6!=0x0
+			(
+				&DrawLine=&DrawLine+1
+				&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+				WRITE #1 "; UNDEFINSTR bit"
+				WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+				WRITE #1 "TEXT ""UFSR: Attempt to execute an undefined instruction"""
+			)
+		)
+		ELSE
+		(
+			PRIVATE &FaultReason
+			&FaultReason="ERROR STATUS"
+		
+			&DrawLine=&DrawLine+1
+			&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+			WRITE #1 "; core fault register"
+			WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+			WRITE #1 "TEXT ""HradFault Occurred Reason:  &FaultReason"""
+		)
+	)
+	ELSE IF &TmpCompare2==0x80000000
+	(
+		PRIVATE &FaultReason
+		&FaultReason="Indicate hard fault is triggered by debug event"
+		
+		&DrawLine=&DrawLine+1
+		&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+		WRITE #1 "; core fault register"
+		WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+		WRITE #1 "TEXT ""HradFault Occurred Reason:  &FaultReason"""
+		
+		IF &DFSR!=0
+		(
+			PRIVATE &DFSRCompare1 &DFSRCompare2 &DFSRCompare3 &DFSRCompare4 &DFSRCompare5
+			&DFSRCompare1=&DFSR&0x10
+			&DFSRCompare2=&DFSR&0x08
+			&DFSRCompare3=&DFSR&0x04
+			&DFSRCompare4=&DFSR&0x02
+			&DFSRCompare5=&DFSR&0x01
+			
+			IF &DFSRCompare1!=0x0
+			(
+				&DrawLine=&DrawLine+1
+				&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+				WRITE #1 "; EXTERNAL bit"
+				WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+				WRITE #1 "TEXT ""DFSR: EDBGRQ signal asserted"""
+			)
+			
+			IF &DFSRCompare2!=0x0
+			(
+				&DrawLine=&DrawLine+1
+				&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+				WRITE #1 "; VCATCH bit"
+				WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+				WRITE #1 "TEXT ""DFSR: Vector fetch occurred"""
+			)
+			
+			IF &DFSRCompare3!=0x0
+			(
+				&DrawLine=&DrawLine+1
+				&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+				WRITE #1 "; DWTTRAP bit"
+				WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+				WRITE #1 "TEXT ""DFSR: DWT match occurred"""
+			)
+			
+			IF &DFSRCompare4!=0x0
+			(
+				&DrawLine=&DrawLine+1
+				&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+				WRITE #1 "; BKPT bit"
+				WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+				WRITE #1 "TEXT ""DFSR: BKPT instruction executed"""
+			)
+			
+			IF &DFSRCompare5!=0x0
+			(
+				&DrawLine=&DrawLine+1
+				&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+				WRITE #1 "; HALTED bit"
+				WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+				WRITE #1 "TEXT ""DFSR: Halt requested in NVIC"""
+			)
+		)
+	)
+	ELSE IF &TmpCompare3==0x2
+	(
+		PRIVATE &FaultReason
+		&FaultReason="Indicate hard fault is caused by failed vector fetch"
+		
+		&DrawLine=&DrawLine+1
+		&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+		WRITE #1 "; core fault register"
+		WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+		WRITE #1 "TEXT ""HradFault Occurred Reason:  &FaultReason"""
+	)
+	ELSE
+	(
+		PRIVATE &FaultReason
+		&FaultReason="No HardFault Occurred"
+		
+		&DrawLine=&DrawLine+1
+		&DrawLineNum=FORMAT.Decimal(2,&DrawLine)
+		WRITE #1 "; core fault register"
+		WRITE #1 "POS 0. &DrawLineNum. &LineSizeNum. 1."
+		WRITE #1 "TEXT ""HradFault Occurred Reason:  &FaultReason"""
+	)
+	
+	CLOSE #1
+	
+	RETURN
+)
+
+
+get_hardfault_push_register:
+(
+	PRIVATE &R0 &R1 &R2 &R3 &R12 &LR &PC &xPSR
+	
+	&R0=v.value(m3_push_reg->R0)
+	&R1=v.value(m3_push_reg->R1)
+	&R2=v.value(m3_push_reg->R2)
+	&R3=v.value(m3_push_reg->R3)
+	&R12=v.value(m3_push_reg->R12)
+	&LR=v.value(m3_push_reg->LR)
+	&PC=v.value(m3_push_reg->PC)
+	&xPSR=v.value(m3_push_reg->xPSR)
+	
+	RETURN &R0 &R1 &R2 &R3 &R12 &LR &PC &xPSR
+)
+
+
+get_hardfault_core_status:
+(
+	PRIVATE &MFSR &BFSR &UFSR &HFSR &DFSR &MMAR &BFAR &AFAR
+	
+	&MFSR=v.value(m3_fault.MFSR)
+	&BFSR=v.value(m3_fault.BFSR)
+	&UFSR=v.value(m3_fault.UFSR)
+	&HFSR=v.value(m3_fault.HFSR)
+	&DFSR=v.value(m3_fault.DFSR)
+	&MMAR=v.value(m3_fault.MMAR)
+	&BFAR=v.value(m3_fault.BFAR)
+	&AFAR=v.value(m3_fault.AFAR)
+	
+	RETURN &MFSR &BFSR &UFSR &HFSR &DFSR &MMAR &BFAR &AFAR
+)

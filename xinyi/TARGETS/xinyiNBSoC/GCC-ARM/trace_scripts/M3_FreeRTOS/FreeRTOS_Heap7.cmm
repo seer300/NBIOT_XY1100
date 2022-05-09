@@ -1,0 +1,140 @@
+; do Display Heap
+GOSUB display_heap
+ENDDO
+
+display_heap:
+(
+	WINPOS 30% 10% 55% 60%
+	
+	AREA.Delete heap_used_window
+	AREA.Create heap_used_window 2000. 2000.
+	;AREA.Select heap_used_window
+	AREA.View heap_used_window
+	
+	GOSUB display_used_heap_list
+	GOSUB display_free_heap_list
+	RETURN
+)
+
+
+display_used_heap_list:
+(
+	PRIVATE &HeapUsed &NextBlock
+	
+	&HeapUsed=v.value(&xHeapUsed)
+	&NextBlock=v.value(((BlockLink_t *)&HeapUsed)->pxNextBlock)
+	
+	PRIVATE &CurrentRegion &ActualBlockSize &AlignWastedSize &UsedFlag &File &Line
+	
+	PRIVATE &Sequence
+	&Sequence=0
+	
+	PRINT " "
+	PRINT "Heap Used List:"
+	
+	WHILE &NextBlock!=0
+	(
+		GOSUB get_one_Block_msg &NextBlock
+		ENTRY &CurrentRegion &ActualBlockSize &AlignWastedSize &UsedFlag &File &Line
+		
+		&Sequence=&Sequence+1
+		
+		PRINT FORMAT.Decimal(4,&Sequence)+"  Region: "+FORMAT.Decimal(1,&CurrentRegion)+"  BlockAddr: &NextBlock"+"  ActualBlockSize: "+FORMAT.Decimal(7,&ActualBlockSize)+"  AlignWastedSize: "+FORMAT.Decimal(3,&AlignWastedSize)+FORMAT.STRing("  FileName: "+&File,18,' ')+"  LineNum: "+FORMAT.Decimal(5,&Line)
+		
+		&NextBlock=v.value(((BlockLink_t *)&NextBlock)->pxNextBlock)
+		
+		IF &Sequence>=0x5DC
+		(
+			GOTO exit_heap_used_list_loop
+		)
+	)
+	
+exit_heap_used_list_loop:
+	
+	RETURN
+)
+
+display_free_heap_list:
+(
+	PRIVATE &HeapFree &NextBlock
+	
+	PRIVATE &Sequence
+	
+	&Sequence=0
+	
+	PRIVATE &CurrentRegion &ActualBlockSize &AlignWastedSize &UsedFlag &File &Line
+	
+	PRINT " "
+	PRINT "Heap Free List:"
+	
+	&HeapFree=v.value(pxStart[0])
+	&NextBlock=&HeapFree
+	
+start_heap_free_list_loop:
+	(
+		GOSUB get_one_Block_msg &NextBlock
+		ENTRY &CurrentRegion &ActualBlockSize &AlignWastedSize &UsedFlag &File &Line
+		
+		&Sequence=&Sequence+1
+		
+		PRINT FORMAT.Decimal(4,&Sequence)+"  Region: "+FORMAT.Decimal(1,&CurrentRegion)+"  BlockAddr: &NextBlock"+"  ActualBlockSize: "+FORMAT.Decimal(7,&ActualBlockSize)+"  AlignWastedSize: "+FORMAT.Decimal(3,&AlignWastedSize)+FORMAT.STRing("  FileName: "+&File,18,' ')+"  LineNum: "+FORMAT.Decimal(5,&Line)
+		
+		&NextBlock=v.value(((BlockLink_t *)&NextBlock)->pxNextBlock)
+		
+		IF &Sequence>=0x190
+		(
+			GOTO exit_heap_free_list_loop
+		)
+		
+		IF &NextBlock!=v.value(pxStart[0])
+		(
+			GOTO start_heap_free_list_loop
+		)
+	)
+
+exit_heap_free_list_loop:
+	
+	RETURN
+)
+
+get_one_Block_msg:
+(
+	ENTRY &AcceptParameter
+	
+	PRIVATE &CurrentBlock
+	&CurrentBlock=&AcceptParameter
+	
+	PRIVATE &NumberOfHeapRegions &CurrentRegion
+	&NumberOfHeapRegions=v.value(sizeof(pxStart))/v.value(sizeof(pxStart[0]))
+	
+	&CurrentRegion=0x0
+	
+	IF &NumberOfHeapRegions!=0
+	(
+		RePeaT &NumberOfHeapRegions
+		(
+			IF &CurrentBlock>=v.value(pxStart[&CurrentRegion])
+			(
+				&CurrentRegion=&CurrentRegion+1
+			)
+			ELSE
+			(
+				GOTO exit_get_one_Block_msg_loop
+			)
+		)
+exit_get_one_Block_msg_loop:
+
+	)
+	
+	PRIVATE &ActualBlockSize &AlignWastedSize &UsedFlag &File &Line
+	PRIVATE &FileAddress
+	
+	&ActualBlockSize=V.VALUE(((BlockLink_t *)&CurrentBlock)->xActualBlockSize)
+	&AlignWastedSize=V.VALUE(((BlockLink_t *)&CurrentBlock)->xAlignWastedSize)
+	&UsedFlag=V.VALUE(((BlockLink_t *)&CurrentBlock)->xUsedFlag)
+	&FileAddress=V.VALUE(((BlockLink_t *)&CurrentBlock)->pcFile)
+	&File=Data.STRing(D:&FileAddress)
+	&Line=V.VALUE(((BlockLink_t *)&CurrentBlock)->xLine)
+	
+	RETURN &CurrentRegion &ActualBlockSize &AlignWastedSize &UsedFlag "&File" &Line
+)

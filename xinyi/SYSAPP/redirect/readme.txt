@@ -1,0 +1,1 @@
+重定义C库的malloc、free、printf等

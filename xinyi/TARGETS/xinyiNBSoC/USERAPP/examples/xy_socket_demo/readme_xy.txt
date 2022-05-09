@@ -1,0 +1,2 @@
+1、xy_async_socket_demo.c是异步socket套接字客户端接口实现的demo，配合TCPIP\net_tool\xy_async_socket_api使用
+2、xy_standard_socket_demo.c是使用标准socket套接字客户端接口实现的demo，即同步socket
