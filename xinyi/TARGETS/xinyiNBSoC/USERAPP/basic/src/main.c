@@ -23,27 +23,31 @@
 #if ABUP_FOTA
 #include "abup_fota.h"
 #endif
-#if DEMO_TEST
-#include "xy_demo.h"
-#endif
 
-#if DEMO_TEST
+#include "xy_demo.h"
+
+
+
 extern void user_led_demo_init(void);
-#endif
+
+extern void hal_gpio_out_work_task_init();
+
 
 
 /** 
 * @brief   用户外设总线等初始化入口，内部不能执行flash的擦写接口
 */
 void user_peripheral_init()
-{
-
+{		
 	if(*(uint32_t*)(BACKUP_MEM_RF_MODE) != 0)
 		return;
-		
-#if DEMO_TEST
+	
+#if 1//DEMO_TEST	
 	if((g_softap_fac_nv != NULL) && (!(g_softap_fac_nv->peri_remap_enable & 0x0100)) && (g_softap_fac_nv->led_pin <= HAL_GPIO_PIN_NUM_63))
-		user_led_demo_init();
+		{
+				
+			user_led_demo_init();
+		}
 #endif
 	
 }
@@ -57,6 +61,8 @@ void user_task_init()
 
 	if(*(uint32_t*)(BACKUP_MEM_RF_MODE) != 0)
 		return;
+
+	hal_gpio_out_work_task_init();
 	
 #if DEMO_TEST
  	if(g_softap_fac_nv->demotest > 0)
@@ -111,10 +117,10 @@ int main(void)
 
 	system_init();
 
-	user_peripheral_init();
-
 	sys_app_init();
 
+	user_peripheral_init();
+	
 	user_task_init();
 	
 	xy_srand((uint32_t)(HWREG(UTC_BASE + UTC_CLK_CNT)+HWREG(SYS_UP_REASON+32-4)));

@@ -681,8 +681,8 @@ int at_QMTDISC_req(char *at_buf, char **prsp_cmd)
 		return AT_END;
 	}
 	else if (g_req_type == AT_CMD_TEST) {
-		*prsp_cmd = xy_malloc(24);
-		snprintf(*prsp_cmd, 24, "\r\n+QMTDISC: (0-4)\r\n\r\nOK\r\n");
+		*prsp_cmd = xy_malloc(32);
+		snprintf(*prsp_cmd, 32, "\r\n+QMTDISC: (0-4)\r\n\r\nOK\r\n");
 		return AT_END;
 	}
 	else {

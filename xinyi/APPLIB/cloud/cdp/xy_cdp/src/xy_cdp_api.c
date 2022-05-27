@@ -53,7 +53,8 @@ int cdp_register(int lifetime, int timeout)
 
     if(!is_cdp_running())
     {
-        if(lifetime < 120 || lifetime > LWM2M_DEFAULT_LIFETIME * 30)
+      //  if(lifetime < 120 || lifetime > LWM2M_DEFAULT_LIFETIME * 30)
+        if(lifetime < 15 || lifetime > LWM2M_DEFAULT_LIFETIME * 30)
         {
             xy_printf("[cdp_register]:cdp server lifetime is error!");
 			cdp_lifetime = 0;

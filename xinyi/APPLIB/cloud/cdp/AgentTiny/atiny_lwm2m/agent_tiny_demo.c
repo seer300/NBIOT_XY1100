@@ -668,7 +668,9 @@ int new_message_indication(char *data, int data_len)
     char *rsp_cmd = NULL;
     char *data_copy = NULL;
 
-	if(data != NULL && data_len >= MAX_REPORT_DATA_LEN)
+//	if(data != NULL && data_len >= MAX_REPORT_DATA_LEN)
+	if(data != NULL && data_len > MAX_REPORT_DATA_LEN)   // modify the max num 
+
 	{
 		softap_printf(USER_LOG, WARN_LOG, "recv data len too large,len=%d\r\n",data_len);
 		return 0;

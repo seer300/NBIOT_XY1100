@@ -194,6 +194,8 @@ int at_NCFG_req(char *at_buf, char **prsp_cmd)
 			g_softap_fac_nv->cdp_lifetime = 900;
 		else
 			g_softap_fac_nv->cdp_lifetime = lifetime;
+		
+		cdp_lifetime = g_softap_fac_nv->cdp_lifetime;
 		SAVE_FAC_PARAM(cdp_lifetime);
 	}
 	else if(g_req_type == AT_CMD_TEST)

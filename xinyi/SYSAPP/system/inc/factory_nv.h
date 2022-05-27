@@ -503,7 +503,7 @@ typedef struct {
 	uint32_t dm_inteval_time;   //##0## 中移DM的注册周期,default 1440 minutes(24 hours)  
 
 
-	uint8_t pmu_ioldo_sel;      //##0##
+	uint8_t pmu_ioldo_sel;      //##0## 修改引脚电压         wsl
 	uint8_t cdp_dtls_switch;    //##0## CDP使用DTLS的开关;1,open
 	uint8_t cdp_dtls_nat_type;  //##0## unused
 	uint8_t cdp_dtls_max_timeout;//##0## unused

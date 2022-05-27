@@ -2042,7 +2042,7 @@ void AtcAp_OutputUniversalTime(LNB_NAS_LOCAL_TIME_STRU* pLocalTime)
 	if (D_ATC_FLAG_TRUE == pLocalTime->ucUtAndLtzFlg)
 	{
 		g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(g_AtcApInfo.stAtRspInfo.aucAtcRspBuf 
-            + g_AtcApInfo.stAtRspInfo.usRspLen),(const unsigned char *)"20%d%d/%d%d/%d%d,%d%d:%d%d:%d%d",
+            + g_AtcApInfo.stAtRspInfo.usRspLen),(const unsigned char *)"\"20%d%d/%d%d/%d%d,%d%d:%d%d:%d%d\"",
     			pLocalTime->aucUtAndLtz[0] & 0x0F,
     			(pLocalTime->aucUtAndLtz[0] & 0xF0) >> 4,
     			pLocalTime->aucUtAndLtz[1] & 0x0F,
@@ -2080,13 +2080,13 @@ static void AtcAp_OutputTimeZone_Sub(unsigned char* pucData, unsigned char ucCtz
     if (0 == (pLocalTime->ucLocalTimeZone & 0x08))
     {/* bit8: 0-positive 1-negative */
         ucLocalTimeZone += ucDayLightTime;
-        g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf, (const unsigned char *)"\r\n%s:+%d%d", pucData,
+        g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf, (const unsigned char *)"\r\n%s:\"+%d%d\"", pucData,
             (ucLocalTimeZone / 10), (ucLocalTimeZone % 10));
     }
     else
     {
         ucLocalTimeZone -= ucDayLightTime;
-        g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf, (const unsigned char *)"\r\n%s:-%d%d", pucData,
+        g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf, (const unsigned char *)"\r\n%s:\"-%d%d\"", pucData,
             (ucLocalTimeZone / 10), (ucLocalTimeZone % 10));
     }
     if ((2 == ucCtzrReport) || (3 == ucCtzrReport)

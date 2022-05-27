@@ -1,5 +1,29 @@
 #pragma once
 
+#define MODULE_130  0
+
+
+#if  MODULE_130
+
+#define MODULE 		"SLM130X"
+#define TVERSION 	"T02"
+#define SDATE		"S0221"
+#define SDKVERSION	"0.2.0.C21"
+#define MVERSION	"M003"
+#define SI_NUM		HAL_GPIO_PIN_NUM_13
+#else
+
+#define MODULE 		"SLM160X"
+#define TVERSION 	"T01"
+#define SDATE		"S0221"
+#define SDKVERSION	"0.2.0.C21"
+#define MVERSION	"M003"
+#define SI_NUM		HAL_GPIO_PIN_NUM_11
+#define LED_NUM		HAL_GPIO_PIN_NUM_10
+
+#endif
+
+
 /*******************************************************************************
  *						Global function declarations 					       *
  ******************************************************************************/
@@ -18,6 +42,7 @@ int at_CGMI_req(char *at_buf, char **prsp_cmd);
 int at_ATI_req(char *at_buf,char **prsp_cmd);
 int at_QGMR_req(char *at_buf,char **prsp_cmd);
 int at_QVERTIME_req(char *at_buf,char **prsp_cmd);
+int at_SGSW_req(char *at_buf,char **prsp_cmd);
 
 
 

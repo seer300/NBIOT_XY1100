@@ -40,6 +40,8 @@
  *						Local function implementations						   *
  ******************************************************************************/
 extern int at_ReqAndRsp_to_ps(char *req_at, char *info_fmt, int timeout, ...);
+uint8_t* getNewBuildInfo(void);
+
 static void get_req_to_dsp(char *at_buf)
 {
 	int ret = -1;
@@ -1702,14 +1704,16 @@ int at_CGMI_req(char *at_buf, char **prsp_cmd)
 		
 		head = (char*)g_softap_fac_nv->modul_ver;
 		end = strchr(head,'-');
-		*prsp_cmd = xy_zalloc(30);
+		*prsp_cmd = xy_zalloc(128);
 		if(end == NULL)
 		{
-			snprintf(*prsp_cmd, 30, "\r\n%s\r\n\r\nOK\r\n", g_softap_fac_nv->modul_ver);
+			//snprintf(*prsp_cmd, 30, "\r\n%s\r\n\r\nOK\r\n", g_softap_fac_nv->modul_ver);			
+			sprintf(*prsp_cmd, "MeiG \r\nMeiG_"MODULE"\r\nRevision:XY1100\r\n\r\nOK\r\n");
 			return AT_END;		
 		}
 		memcpy(manufa_code,head,end-head);
-		snprintf(*prsp_cmd, 30, "\r\n%s\r\n\r\nOK\r\n", manufa_code);
+		//snprintf(*prsp_cmd, 30, "\r\n%s\r\n\r\nOK\r\n", manufa_code);
+		sprintf(*prsp_cmd, "\r\nMeiG \r\nMeiG_"MODULE"\r\nRevision:XY1100\r\n\r\nOK\r\n");
 	}
 	else if (g_req_type == AT_CMD_TEST)
 	{
@@ -1779,12 +1783,14 @@ int at_CGMM_req(char *at_buf, char **prsp_cmd)
 		*prsp_cmd = xy_zalloc(30);
 		if(!strchr((const char *)(g_softap_fac_nv->modul_ver),'-'))
 		{
-			snprintf(*prsp_cmd, 30, "\r\n%s\r\n\r\nOK\r\n", g_softap_fac_nv->modul_ver);
+			//snprintf(*prsp_cmd, 30, "\r\n%s\r\n\r\nOK\r\n", g_softap_fac_nv->modul_ver);
+			sprintf(*prsp_cmd, "MeiG_"MODULE"\r\n\r\nOK\r\n");
 			return AT_END;		
 		}
 		head = strchr((const char *)(g_softap_fac_nv->modul_ver),'-')+1;
 		memcpy(module_type,head,strlen(head));
-		snprintf(*prsp_cmd, 30, "\r\n%s\r\n\r\nOK\r\n", module_type);
+		//snprintf(*prsp_cmd, 30, "\r\n%s\r\n\r\nOK\r\n", module_type);
+		sprintf(*prsp_cmd, "\r\nMeiG_"MODULE"\r\n\r\nOK\r\n");
 	}
 	else if (g_req_type == AT_CMD_TEST)
 	{
@@ -1797,6 +1803,9 @@ int at_CGMM_req(char *at_buf, char **prsp_cmd)
 
 int at_CMVER_req(char *at_buf, char **prsp_cmd)
 {
+
+	unsigned char    compTime[9]={0};
+    memcpy(compTime, getNewBuildInfo(),9);
 #if (!VER_QUCTL260)	
 	if(g_req_type == AT_CMD_REQ)
 	{
@@ -1821,7 +1830,8 @@ int at_CMVER_req(char *at_buf, char **prsp_cmd)
 	{
 		*prsp_cmd = xy_zalloc(60);
 #if VER_QUCTL260
-		snprintf(*prsp_cmd, 60, "\r\nVersion:%s\r\n\r\nOK\r\n", g_softap_fac_nv->versionExt);
+		//snprintf(*prsp_cmd, 60, "\r\nVersion:%s\r\n\r\nOK\r\n", g_softap_fac_nv->versionExt);
+		snprintf(*prsp_cmd, 60, "\r\nRevision:"MODULE"_%sS%c%c%c%c\r\n\r\nOK\r\n", TVERSION,compTime[4],compTime[5],compTime[6],compTime[7]);
 #else
 		snprintf(*prsp_cmd, 60, "\r\nSoftware Version:%s\r\n\r\nOK\r\n", g_softap_fac_nv->versionExt);
 #endif
@@ -1910,6 +1920,10 @@ int at_NPSMR_req(char *at_buf, char **prsp_cmd)
 int at_ATI_req(char *at_buf, char **prsp_cmd)
 {
 	(void)at_buf;
+
+	 unsigned char   compTime[9]={0};
+	 memcpy(compTime, getNewBuildInfo(),9);	
+	
 #if VER_QUCTL260
 	if (g_req_type == AT_CMD_ACTIVE)
 #else
@@ -1920,7 +1934,8 @@ int at_ATI_req(char *at_buf, char **prsp_cmd)
 #ifdef PRODUCT_VER
 		*prsp_cmd = xy_zalloc(128);
 #if VER_QUECTEL || VER_QUCTL260
-		snprintf(*prsp_cmd, 128, "\r\nXY1100\r\n%s\r\nRevision:%s\r\n\r\nOK\r\n", MODULE_VER, PRODUCT_VER);
+	//	snprintf(*prsp_cmd, 128, "\r\nXY1100\r\n%s\r\nRevision:%s\r\n\r\nOK\r\n", MODULE_VER, PRODUCT_VER);
+		snprintf(*prsp_cmd, 128, "\r\nMeiG \r\n"MODULE"\r\nRevision:"MODULE"_%sS%c%c%c%c_02\r\nOK\r\n", TVERSION, compTime[4],compTime[5],compTime[6],compTime[7]);		
 #else
 		snprintf(*prsp_cmd, 128, "XY1100\r\n%s\r\nRevision:%s\r\n\r\nOK\r\n", MODULE_VER, PRODUCT_VER);
 #endif //VER_QUECTEL
@@ -1969,3 +1984,65 @@ int at_QVERTIME_req(char *at_buf, char **prsp_cmd)
 		*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
 	return AT_END;
 }
+
+
+int at_SGSW_req(char *at_buf, char **prsp_cmd)
+{
+	(void)at_buf;
+	unsigned char   compTime[9]={0};
+    memcpy(compTime, getNewBuildInfo(),9);
+	
+	if (g_req_type == AT_CMD_REQ || g_req_type == AT_CMD_ACTIVE)
+	{
+
+		*prsp_cmd = xy_zalloc(128);
+       // snprintf(*prsp_cmd,128,"MeiG\r\n%s\r\n%s_%s%s",MODULE,MODULE,TVERSION,SDATE);
+        sprintf(*prsp_cmd, "\r\n%s.%s%sS%c%c%c%c_%s_XY1100\r\n\r\nOK\r\n",MODULE,SDKVERSION,TVERSION,compTime[4],compTime[5],compTime[6],compTime[7],MVERSION);
+	}
+	else
+	{
+		*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
+	}
+
+	return AT_END;
+}
+
+
+uint8_t* getNewBuildInfo(void)
+{
+    static uint8_t date_origin_format_buf[9] = {0};       
+    int month = 0;              
+    int i = 0;            
+    static const char *static_month_buf[] = 
+    {
+        "Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"
+     };
+     const uint8_t *cp_date = __DATE__;   // get origin format :month date year
+     for (i = 0; i < 4; i++) 
+     {
+         date_origin_format_buf[i] = *(cp_date + 7 + i);
+      }
+      for(i = 0; i < 12; i++) 
+      {             
+        if((static_month_buf[i][0] == (cp_date[0])) &&
+           (static_month_buf[i][1] == (cp_date[1])) &&
+           (static_month_buf[i][2] == (cp_date[2]))) {
+            month = i+1;
+            break;
+        }
+      }        
+        date_origin_format_buf[4] = month / 10 % 10 + '0';
+        date_origin_format_buf[5] = month % 10 + '0';
+             
+        if (cp_date[4] == ' ') {
+            date_origin_format_buf[6] = '0';
+        } else {
+            date_origin_format_buf[6] = cp_date[4];
+        }
+        date_origin_format_buf[7] = cp_date[5];
+
+   // sprintf(outInfo,"%s %s",VERSION_INFO_NEW,date_origin_format_buf);
+   //  sprintf(outInfo,"%s",date_origin_format_buf);
+    return date_origin_format_buf;
+}
+

@@ -140,8 +140,10 @@ unsigned char AtcAp_CGDCONT_T_LNB_Process(unsigned char *pEventBuffer)
 *******************************************************************************/
 unsigned char AtcAp_CFUN_T_LNB_Process(unsigned char *pEventBuffer)
 {
-    g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,
-        (const unsigned char *)"\r\n+CFUN:(0,1,5),(0,1)\r\n");
+   // g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,
+   //     (const unsigned char *)"\r\n+CFUN:(0,1,5),(0,1)\r\n");
+   	 g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,
+     (const unsigned char *)"\r\n+CFUN:(0,1,4),(0)\r\n");				//wsl modify
     AtcAp_SendDataInd();
     AtcAp_SendOkRsp();
 
@@ -878,8 +880,8 @@ unsigned char AtcAp_CNMPSD_T_LNB_Process(unsigned char *pEventBuffer)
 
 unsigned char AtcAp_CPINR_T_LNB_Process(unsigned char *pEventBuffer)
 {
-    AtcAp_StrPrintf_AtcRspBuf("\r\n+CPINR:(SIM PIN,SIM PUK,SIM PIN2,SIM PUK2)\r\n");
-    AtcAp_SendDataInd();
+  //  AtcAp_StrPrintf_AtcRspBuf("\r\n+CPINR:(SIM PIN,SIM PUK,SIM PIN2,SIM PUK2)\r\n");   //wsl not use on document
+  //  AtcAp_SendDataInd();
     
     AtcAp_SendOkRsp();
     
@@ -1293,8 +1295,10 @@ void AtcAp_MsgProc_CIMI_Cnf(unsigned char* pRecvMsg)
     g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,
          (const unsigned char *)"\r\n%s\r\n", ptCimiCnf->stImsi.aucImsi);
 #else
+   // g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,
+   //  (const unsigned char *)"\r\n+CIMI:%s\r\n", ptCimiCnf->stImsi.aucImsi);
     g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,
-     (const unsigned char *)"\r\n+CIMI:%s\r\n", ptCimiCnf->stImsi.aucImsi);
+     (const unsigned char *)"\r\n%s\r\n", ptCimiCnf->stImsi.aucImsi);
 #endif
     AtcAp_SendDataInd();
 }
@@ -3036,6 +3040,7 @@ void AtcAp_MsgProc_CPINR_Cnf(unsigned char* pRecvMsg)
         {
             AtcAp_StrPrintf_AtcRspBuf("+CPINR:%s,%d,10\r\n", "SIM PUK", pPinRetriesCnf->aPinRetires[index].ucRetriesNum);
         }
+#if 0	//not need on document		
         if(pPinRetriesCnf->aPinRetires[index].ucPinType == D_ATC_CPINR_TYPE_PIN2)
         {
             AtcAp_StrPrintf_AtcRspBuf("+CPINR:%s,%d,3\r\n", "SIM PIN2", pPinRetriesCnf->aPinRetires[index].ucRetriesNum);
@@ -3044,6 +3049,7 @@ void AtcAp_MsgProc_CPINR_Cnf(unsigned char* pRecvMsg)
         {
             AtcAp_StrPrintf_AtcRspBuf("+CPINR:%s,%d,10\r\n", "SIM PUK2", pPinRetriesCnf->aPinRetires[index].ucRetriesNum);
         }
+#endif		
     }
     AtcAp_SendDataInd();
 }

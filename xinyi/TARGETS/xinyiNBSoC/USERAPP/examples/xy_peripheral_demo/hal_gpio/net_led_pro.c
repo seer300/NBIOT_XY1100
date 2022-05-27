@@ -17,6 +17,7 @@
 
 #include "xy_api.h"
 #include "xy_atc_interface.h"
+#include "at_xy_cmd.h"
 
 struct led_msg {
 	int		msg_id;
@@ -32,7 +33,11 @@ void callback1(void)
 	if((g_softap_fac_nv != NULL) && (!(g_softap_fac_nv->peri_remap_enable & 0x0100)) && (g_softap_fac_nv->led_pin <= HAL_GPIO_PIN_NUM_63))
 	{
 		//LED SetOFF
+#if  MODULE_130		
 		HAL_GPIO_WritePin(g_softap_fac_nv->led_pin,HAL_GPIO_PIN_RESET);
+#else
+		HAL_GPIO_WritePin(LED_NUM,HAL_GPIO_PIN_RESET);
+#endif
 	}
 	osTimerStart(timer2, 0);
 }
@@ -42,7 +47,11 @@ void callback2(void)
 	if((g_softap_fac_nv != NULL) && (!(g_softap_fac_nv->peri_remap_enable & 0x0100)) && (g_softap_fac_nv->led_pin <= HAL_GPIO_PIN_NUM_63))
 	{
 		//LED SetON
+#if MODULE_130		
 		HAL_GPIO_WritePin(g_softap_fac_nv->led_pin,HAL_GPIO_PIN_SET);
+#else
+		HAL_GPIO_WritePin(LED_NUM,HAL_GPIO_PIN_SET);
+#endif
 	}
 	osTimerStart(timer1, 0);
 }
@@ -54,7 +63,11 @@ void net_light_led(uint32_t timer1_time, uint32_t timer2_time)
 	if((g_softap_fac_nv != NULL) && (!(g_softap_fac_nv->peri_remap_enable & 0x0100)) && (g_softap_fac_nv->led_pin <= HAL_GPIO_PIN_NUM_63))
 	{
 		//LED SetOFF
+#if MODULE_130		
 		HAL_GPIO_WritePin(g_softap_fac_nv->led_pin,HAL_GPIO_PIN_RESET);
+#else
+		HAL_GPIO_WritePin(LED_NUM,HAL_GPIO_PIN_RESET);
+#endif
 	}
 
 	//xy_assert(timer1 == NULL && timer2 == NULL);
@@ -97,7 +110,11 @@ void deinit(void)
 	if((g_softap_fac_nv != NULL) && (!(g_softap_fac_nv->peri_remap_enable & 0x0100)) && (g_softap_fac_nv->led_pin <= HAL_GPIO_PIN_NUM_63))
 	{
 		//LED SetOFF
+#if MODULE_130		
 		HAL_GPIO_WritePin(g_softap_fac_nv->led_pin,HAL_GPIO_PIN_RESET);
+#else
+		HAL_GPIO_WritePin(LED_NUM,HAL_GPIO_PIN_RESET);
+#endif
 	}
 	
 	xy_assert(timer1 != NULL && timer2 != NULL);
@@ -249,7 +266,12 @@ void user_led_demo_init(void)
 	
 	if((g_softap_fac_nv != NULL) && (g_softap_fac_nv->led_pin <= HAL_GPIO_PIN_NUM_63))
 	{
+#if MODULE_130	
 		gpio_init.Pin		= (g_softap_fac_nv->led_pin);
+#else
+		gpio_init.Pin		= LED_NUM;
+
+#endif
 		gpio_init.Mode		= GPIO_MODE_OUTPUT_PP;
 		gpio_init.Pull		= GPIO_NOPULL;
 		HAL_GPIO_Init(&gpio_init);

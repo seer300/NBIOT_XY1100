@@ -838,7 +838,8 @@ int at_QLWSREGIND_req(char *at_buf, char **prsp_cmd)
 	        }
 	        else
 	        {
-	            if(lifetime < 120 || lifetime > LWM2M_DEFAULT_LIFETIME *30)
+	          //  if(lifetime < 120 || lifetime > LWM2M_DEFAULT_LIFETIME *30)
+	            if(lifetime < 15 || lifetime > LWM2M_DEFAULT_LIFETIME *30)
 	            {
 	                *prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
 	                return AT_END;

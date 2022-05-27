@@ -607,7 +607,7 @@ void atiny_event_notify(atiny_event_e event, const char* arg, int len)
             break;
         case ATINY_DATA_UNSUBSCRIBLE:
 			//平台下发取消订阅后,不自动去注册,用户需要主动去注册再注册
-            //cdp_deregister_flag = 1;
+            cdp_deregister_flag = 1;		//开启自动去注册功能
             rpt_type = *((atiny_report_type_e*)arg);
             if (rpt_type == APP_DATA)
             {
@@ -615,7 +615,8 @@ void atiny_event_notify(atiny_event_e event, const char* arg, int len)
 					g_send_status = 5;//发送CON包，收到重置或从平台主动取消订阅
             }
 #if VER_QUCTL260
-            snprintf(rsp_cmd, buf_len, "\r\n+QLWEVTIND: 9\r\n");
+          //  snprintf(rsp_cmd, buf_len, "\r\n+QLWEVTIND: 9\r\n");
+            snprintf(rsp_cmd, buf_len, "\r\n+QLWEVTIND: 10\r\n");
 #else
 			snprintf(rsp_cmd, buf_len, "\r\n+QLWEVTIND:9\r\n");
 #endif

@@ -380,7 +380,7 @@ struct at_serv_proc_e at_basic_req[] = {
     {"AT+XYSEND", at_XYSEND_req},
     {"AT+XYRECV", at_XYRECV_req},
 #endif
-
+	{"AT+SGSW", at_SGSW_req},     //add new command wsl 20220330
 	{0, 0} //can not delete!!!
 };
 
