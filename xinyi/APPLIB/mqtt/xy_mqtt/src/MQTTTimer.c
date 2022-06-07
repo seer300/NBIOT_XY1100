@@ -94,19 +94,20 @@ int TimerLeftMS(Timer* timer)
 
 int xy_mqtt_read(Network* n, unsigned char* buffer, int len, int timeout_ms)
 {
-    struct timeval interval = {timeout_ms / 1000, (timeout_ms % 1000) * 1000};
-    if (interval.tv_sec < 0 || (interval.tv_sec == 0 && interval.tv_usec <= 0))
-    {
-        interval.tv_sec = 0;
-        interval.tv_usec = 100;
-    }
-
+	char flag = 0;
+	struct timeval interval = {timeout_ms / 1000, (timeout_ms % 1000) * 1000};
+	
     setsockopt(n->my_socket, SOL_SOCKET, SO_RCVTIMEO, (char *)&interval, sizeof(struct timeval));
 
+	if (!timeout_ms)
+	{
+		flag = MSG_DONTWAIT;
+	}
+	
     int bytes = 0;
     while (bytes < len)
     {
-        int rc = recv(n->my_socket, &buffer[bytes], (size_t)(len - bytes), 0);
+        int rc = recv(n->my_socket, &buffer[bytes], (size_t)(len - bytes), flag);
         if (rc == -1)
         {
             if (errno != EAGAIN && errno != EWOULDBLOCK)

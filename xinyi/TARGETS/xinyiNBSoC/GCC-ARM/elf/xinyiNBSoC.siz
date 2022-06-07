@@ -55,7 +55,7 @@
    1935	   1448	      0	   3383	    d37	../object/SYSAPP/at_cmd/src/at_cmd.o.flash
    5070	     18	      5	   5093	   13e5	../object/SYSAPP/at_cmd/src/at_hardware_cmd.o.flash
    2628	      0	     12	   2640	    a50	../object/SYSAPP/at_cmd/src/at_passthrough.o.flash
-   4405	      6	     23	   4434	   1152	../object/SYSAPP/at_cmd/src/at_ps_cmd.o.flash
+   4450	     10	     19	   4479	   117f	../object/SYSAPP/at_cmd/src/at_ps_cmd.o.flash
    3398	      0	      8	   3406	    d4e	../object/SYSAPP/at_cmd/src/at_system_cmd.o.flash
    5704	      4	     12	   5720	   1658	../object/SYSAPP/at_cmd/src/at_tcpip_cmd.o.flash
    9059	      0	     16	   9075	   2373	../object/SYSAPP/at_cmd/src/at_test_cmd.o.flash
@@ -84,7 +84,7 @@
    2473	      0	     13	   2486	    9b6	../object/SYSAPP/flash/src/xy_flash.o.flash
      94	      0	      0	     94	     5e	../object/SYSAPP/lpm/src/low_power.o.ram
     226	      0	      8	    234	     ea	../object/SYSAPP/lpm/src/lpm_adapt.o.ram
-   7151	      0	     78	   7229	   1c3d	../object/SYSAPP/lpm/src/lpm_func.o.ram
+   6902	      0	     78	   6980	   1b44	../object/SYSAPP/lpm/src/lpm_func.o.ram
     123	      0	      0	    123	     7b	../object/SYSAPP/redirect/src/malloc.o.ram
      52	      0	      0	     52	     34	../object/SYSAPP/redirect/src/printf.o.ram
    1420	      0	      0	   1420	    58c	../object/SYSAPP/rtc_tmr/src/rtc_adapt.o.ram
@@ -102,14 +102,14 @@
     379	      0	     10	    389	    185	../object/SYSAPP/system/src/xy_hwi.o.ram
     103	      0	      0	    103	     67	../object/SYSAPP/system/src/xy_lib_stub.o.flash
     971	      0	      0	    971	    3cb	../object/SYSAPP/system/src/xy_mem.o.ram
-   2660	      0	     61	   2721	    aa1	../object/SYSAPP/system/src/xy_passthrough.o.flash
+   2710	      0	     61	   2771	    ad3	../object/SYSAPP/system/src/xy_passthrough.o.flash
     440	      0	     12	    452	    1c4	../object/SYSAPP/system/src/xy_printf.o.flash
     485	      0	      8	    493	    1ed	../object/SYSAPP/system/src/xy_proxy.o.flash
     828	      8	      8	    844	    34c	../object/SYSAPP/system/src/xy_system.o.flash
     952	      0	      8	    960	    3c0	../object/SYSAPP/system/src/xy_utils.o.flash
     561	      0	      8	    569	    239	../object/SYSAPP/system/src/xy_watchdog.o.flash
    2968	     40	      4	   3012	    bc4	../object/APPLIB/cloud/cdp/AgentTiny/atiny_lwm2m/agent_tiny_cmd_ioctl.o.flash
-   6902	      0	     49	   6951	   1b27	../object/APPLIB/cloud/cdp/AgentTiny/atiny_lwm2m/agent_tiny_demo.o.flash
+   6914	      0	     49	   6963	   1b33	../object/APPLIB/cloud/cdp/AgentTiny/atiny_lwm2m/agent_tiny_demo.o.flash
    2662	      0	     21	   2683	    a7b	../object/APPLIB/cloud/cdp/AgentTiny/atiny_lwm2m/agenttiny.o.flash
     920	      0	     12	    932	    3a4	../object/APPLIB/cloud/cdp/AgentTiny/atiny_lwm2m/atiny_rpt.o.flash
    1246	      0	      4	   1250	    4e2	../object/APPLIB/cloud/cdp/AgentTiny/atiny_lwm2m/connection.o.flash
@@ -287,12 +287,12 @@
    6802	      0	     52	   6854	   1ac6	../object/APPLIB/lwip/lwip-2.1.2/core/tcp_in.o.flash
    8642	      0	      0	   8642	   21c2	../object/APPLIB/lwip/lwip-2.1.2/core/tcp_out.o.flash
    1240	      0	     16	   1256	    4e8	../object/APPLIB/lwip/lwip-2.1.2/core/timeouts.o.flash
-   4231	      0	      2	   4233	   1089	../object/APPLIB/lwip/lwip-2.1.2/core/udp.o.flash
+   4239	      0	      2	   4241	   1091	../object/APPLIB/lwip/lwip-2.1.2/core/udp.o.flash
       0	      0	      0	      0	      0	../object/APPLIB/lwip/lwip-2.1.2/netif/ethernet.o.flash
       0	      0	      0	      0	      0	../object/APPLIB/lwip/lwip_port/os/ethernetif.o.flash
     388	      0	      0	    388	    184	../object/APPLIB/lwip/lwip_port/os/sys_arch.o.flash
-   1662	      0	     16	   1678	    68e	../object/APPLIB/lwip/xy_adapter/src/net_app_resume.o.flash
-   4246	     18	     52	   4316	   10dc	../object/APPLIB/lwip/xy_adapter/src/ps_netif_api.o.flash
+   1569	      0	     16	   1585	    631	../object/APPLIB/lwip/xy_adapter/src/net_app_resume.o.flash
+   4282	     18	     52	   4352	   1100	../object/APPLIB/lwip/xy_adapter/src/ps_netif_api.o.flash
    3200	     56	      0	   3256	    cb8	../object/APPLIB/lwip/xy_adapter/src/xy_net_api.o.flash
     484	      0	      0	    484	    1e4	../object/APPLIB/perf/xy_perf/src/at_perf.o.flash
    1155	      0	      4	   1159	    487	../object/APPLIB/perf/xy_perf/src/xyperf.o.flash
@@ -406,11 +406,11 @@
    1164	      0	      0	   1164	    48c	../object/APPLIB/Dtls/xy_dtls/src/tls_interface.o.flash
     444	      0	      0	    444	    1bc	../object/APPLIB/Dtls/xy_dtls/src/xy_aes.o.flash
     490	      0	      0	    490	    1ea	../object/APPLIB/Dtls/xy_dtls/src/xy_mbedtls_net_sockets.o.flash
-   4556	      0	      8	   4564	   11d4	../object/APPLIB/at_socket/src/at_socket_bc26.o.flash
+   4841	      0	      8	   4849	   12f1	../object/APPLIB/at_socket/src/at_socket_bc26.o.flash
    6123	      0	      0	   6123	   17eb	../object/APPLIB/at_socket/src/at_socket_cmd.o.flash
    3595	     12	     34	   3641	    e39	../object/APPLIB/at_socket/src/at_socket_context.o.flash
     593	      0	      0	    593	    251	../object/APPLIB/at_socket/src/at_socket_ram.o.ram
-   1234	      0	      0	   1234	    4d2	../object/APPLIB/at_socket/src/at_socket_rcv.o.flash
+   1227	      0	      0	   1227	    4cb	../object/APPLIB/at_socket/src/at_socket_rcv.o.flash
    6501	     12	     23	   6536	   1988	../object/APPLIB/cJSON/cJSON.o.flash
    1661	      0	      4	   1665	    681	../object/APPLIB/http/atcmd/at_http.o.flash
    1124	      0	      0	   1124	    464	../object/APPLIB/http/atcmd/http_socket.o.flash
@@ -431,19 +431,19 @@
     188	      0	      0	    188	     bc	../object/APPLIB/mqtt/MQTTPacket/src/MQTTUnsubscribeServer.o.flash
    1470	      0	      0	   1470	    5be	../object/APPLIB/mqtt/utils/sha256.o.flash
     689	      0	      0	    689	    2b1	../object/APPLIB/mqtt/xy_mqtt/src/MQTTClient.o.flash
-    783	      0	      0	    783	    30f	../object/APPLIB/mqtt/xy_mqtt/src/MQTTTimer.o.flash
+    771	      0	      0	    771	    303	../object/APPLIB/mqtt/xy_mqtt/src/MQTTTimer.o.flash
    7692	      0	     18	   7710	   1e1e	../object/APPLIB/mqtt/xy_mqtt/src/at_mqtt.o.flash
-   5839	      0	      2	   5841	   16d1	../object/APPLIB/mqtt/xy_mqtt/src/at_xy_mqtt.o.flash
-   8389	      0	    896	   9285	   2445	../object/APPLIB/mqtt/xy_mqtt/src/at_xy_mqtt_proc.o.flash
+   5841	      0	      2	   5843	   16d3	../object/APPLIB/mqtt/xy_mqtt/src/at_xy_mqtt.o.flash
+   8417	      0	    896	   9313	   2461	../object/APPLIB/mqtt/xy_mqtt/src/at_xy_mqtt_proc.o.flash
    1789	      0	      4	   1793	    701	../object/APPLIB/mqtt/xy_mqtt/src/xy_mqtt_api.o.flash
     445	      0	      0	    445	    1bd	../object/APPLIB/xy_ps/atc_ps/src/at_3GPP_cmd_demo.o.flash
     454	      0	      0	    454	    1c6	../object/APPLIB/xy_ps/atc_ps/src/atc_analysis.o.flash
-   4770	      0	      0	   4770	   12a2	../object/APPLIB/xy_ps/atc_ps/src/atc_cmd_basic.o.flash
-   8913	      0	      0	   8913	   22d1	../object/APPLIB/xy_ps/atc_ps/src/atc_cmd_other.o.flash
-  20968	      0	      4	  20972	   51ec	../object/APPLIB/xy_ps/atc_ps/src/atc_cmd_proc.o.flash
+   4778	      0	      0	   4778	   12aa	../object/APPLIB/xy_ps/atc_ps/src/atc_cmd_basic.o.flash
+   8923	      0	      0	   8923	   22db	../object/APPLIB/xy_ps/atc_ps/src/atc_cmd_other.o.flash
+  21507	      0	      4	  21511	   5407	../object/APPLIB/xy_ps/atc_ps/src/atc_cmd_proc.o.flash
     680	      0	      0	    680	    2a8	../object/APPLIB/xy_ps/atc_ps/src/atc_cmd_sms.o.flash
    1753	      0	      0	   1753	    6d9	../object/APPLIB/xy_ps/atc_ps/src/atc_msg_proc.o.flash
-  17394	      0	      0	  17394	   43f2	../object/APPLIB/xy_ps/atc_ps/src/atc_ps_com.o.flash
+  17472	      0	      0	  17472	   4440	../object/APPLIB/xy_ps/atc_ps/src/atc_ps_com.o.flash
    1358	      8	      0	   1366	    556	../object/APPLIB/xy_ps/atc_ps/src/atc_ps_main.o.flash
    3604	      0	      0	   3604	    e14	../object/APPLIB/xy_ps/atc_ps/src/atc_ps_rom.o.flash
    2790	      0	     57	   2847	    b1f	../object/APPLIB/xy_ps/src/xy_ps_api.o.flash

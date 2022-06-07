@@ -290,7 +290,9 @@ err_t send_ip_packet_to_ps_net(struct netif *netif, struct pbuf *p)
 		g_udp_seq++;	
 	}
 
-	ip_packet_information_print(user_ipdata, p->tot_len, 0);
+    softap_printf(USER_LOG, WARN_LOG, "ip to ps seq:%d", ipdata_info->sequence);
+
+    ip_packet_information_print(user_ipdata, p->tot_len, 0);
 
 #if XY_WIRESHARK
 	wireshark_forward_format_print(user_ipdata, p->tot_len, 0);

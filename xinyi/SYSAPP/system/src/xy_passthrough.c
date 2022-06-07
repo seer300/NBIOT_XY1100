@@ -16,6 +16,9 @@
 #include "at_global_def.h"
 #include "at_passthrough.h"
 #include "inter_core_msg.h"
+#if AT_SOCKET
+#include "at_socket_context.h"
+#endif
 #if TENCENT_VER
 #include "xy_tencent_mqtt_client.h"
 #endif
@@ -210,7 +213,9 @@ void cloud_fixed_len_data_proc(char* buf, uint32_t data_len)
 		if (check_channel_fifo() == 0)
 			return;
 		g_app_passthr.callback_ret = g_app_passthr.proc(passthr_rcv_buff, passthr_fixed_buff_len, g_app_passthr.param);
-		xy_exitPassthroughMode();
+        if (g_app_passthr.app_type == APP_SOCKET)
+            return;
+        xy_exitPassthroughMode();
 	}
 }
 
@@ -315,14 +320,20 @@ void cloud_unfixed_len_data_proc(char *buf, uint32_t data_len)
 	if(passthr_rcvd_len > g_app_passthr.max_len)
 	{
 		g_app_passthr.callback_ret = g_app_passthr.proc(passthr_rcv_buff, g_app_passthr.max_len, g_app_passthr.param);
-	}
+        if (g_app_passthr.app_type == APP_SOCKET)
+            return;
+    }
 	else if(buf[data_len - 1] == PASSTHR_CTRLZ)
 	{
 		g_app_passthr.callback_ret = g_app_passthr.proc(passthr_rcv_buff, passthr_rcvd_len - 1, g_app_passthr.param);
+        if (g_app_passthr.app_type == APP_SOCKET)
+            return;
 	}
 	else if(passthr_rcvd_len == g_app_passthr.max_len)
 	{
 		g_app_passthr.callback_ret = g_app_passthr.proc(passthr_rcv_buff, g_app_passthr.max_len, g_app_passthr.param);
+        if (g_app_passthr.app_type == APP_SOCKET)
+            return;
 	}
   	else if(buf[data_len - 1] == PASSTHR_ESC)
 		goto END;
@@ -590,12 +601,28 @@ void xy_exitPassthroughMode()
     xy_standby_unlock();
 	if (g_app_passthr.app_type != APP_INVILAD)
 	{
-		if(g_app_passthr.callback_ret == XY_OK)
+        if (g_app_passthr.app_type == APP_SOCKET && g_app_passthr.callback_ret == XY_OK)
+        {   
+#if AT_SOCKET
+            socket_context_t *ctx = (socket_context_t *)g_app_passthr.param;
+            if (ctx->zero_flag == 1)
+            {
+                ctx->zero_flag = 0;
+                send_asyn_rsp_to_ext("\r\nOK\r\n\r\nSEND OK\r\n");
+            }
+            else
+#endif 
+            {
+                send_asyn_rsp_to_ext("\r\nOK\r\n");
+            }
+        
+        }
+		else if(g_app_passthr.callback_ret == XY_OK)
 			send_asyn_rsp_to_ext("\r\nOK\r\n");
 		else
 		{
 			char *passthr_cmd = NULL;
-			passthr_cmd = AT_ERR_BUILD(ATERR_NOT_ALLOWED);
+			passthr_cmd = BC26_AT_ERR_BUILD();
 			send_asyn_rsp_to_ext(passthr_cmd);
 			if(passthr_cmd != NULL)
 				xy_free(passthr_cmd);

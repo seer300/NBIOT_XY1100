@@ -140,10 +140,8 @@ unsigned char AtcAp_CGDCONT_T_LNB_Process(unsigned char *pEventBuffer)
 *******************************************************************************/
 unsigned char AtcAp_CFUN_T_LNB_Process(unsigned char *pEventBuffer)
 {
-   // g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,
-   //     (const unsigned char *)"\r\n+CFUN:(0,1,5),(0,1)\r\n");
-   	 g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,
-     (const unsigned char *)"\r\n+CFUN:(0,1,4),(0)\r\n");				//wsl modify
+    g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,
+        (const unsigned char *)"\r\n+CFUN:(0,1,5),(0)\r\n");
     AtcAp_SendDataInd();
     AtcAp_SendOkRsp();
 
@@ -1106,7 +1104,7 @@ unsigned char AtcAp_ECURC_T_LNB_Process(unsigned char *pEventBuffer)
 
 unsigned char AtcAp_QENG_T_LNB_Process(unsigned char *pEventBuffer)
 {
-    AtcAp_StrPrintf_AtcRspBuf((const char *)"\r\n+QENG:(0)\r\n");
+    AtcAp_StrPrintf_AtcRspBuf((const char *)"\r\n+QENG:(0,3)\r\n");
     AtcAp_SendDataInd();
     AtcAp_SendOkRsp();
 
@@ -3993,58 +3991,86 @@ void AtcAp_MsgProc_ECURC_R_Cnf(unsigned char* pRecvMsg)
 void AtcAp_MsgProc_QENG_Cnf(unsigned char* pRecvMsg)
 {
     ATC_MSG_QENG_CNF_STRU*  pQengCnf =(ATC_MSG_QENG_CNF_STRU*) pRecvMsg;
-    unsigned char              aucSelectPlmn[7] = { 0 };
+    unsigned char              aucMCC[4] = { 0 };
+    unsigned char              aucMNC[5] = { 0 };
     unsigned char  ucIdx = 0;
     unsigned short u16Rsrp;
     unsigned short u16Rsrq;
-    
-    g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(g_AtcApInfo.stAtRspInfo.aucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen), 
-                    (const unsigned char *)"\r\n+QENG:0,");
-    AtcAp_StrPrintf_AtcRspBuf("%u,",pQengCnf->stRadio.last_earfcn_value);
-    AtcAp_StrPrintf_AtcRspBuf("0,%u,",pQengCnf->stRadio.last_pci_value);
-    AtcAp_StrPrintf_AtcRspBuf("%c%08X%c,",D_ATC_N_QUOTATION, pQengCnf->stRadio.last_cell_ID, D_ATC_N_QUOTATION);
-    AtcAp_StrPrintf_AtcRspBuf("%d,",pQengCnf->stRadio.rsrp / 10);
-    AtcAp_StrPrintf_AtcRspBuf("%d,",pQengCnf->stRadio.rsrq / 10);
-    AtcAp_StrPrintf_AtcRspBuf("%d,",pQengCnf->stRadio.rssi / 10);
-    AtcAp_StrPrintf_AtcRspBuf("%d,",pQengCnf->stRadio.last_snr_value / 10);
-    AtcAp_StrPrintf_AtcRspBuf("%d,",pQengCnf->stRadio.band);
-    AtcAp_StrPrintf_AtcRspBuf("%c%04X%c,", D_ATC_N_QUOTATION, pQengCnf->stRadio.current_tac, D_ATC_N_QUOTATION);
-    AtcAp_StrPrintf_AtcRspBuf("%u,",pQengCnf->stRadio.last_ECL_value);
-    AtcAp_StrPrintf_AtcRspBuf("%d,",pQengCnf->stRadio.current_tx_power_level / 10);
-    AtcAp_StrPrintf_AtcRspBuf("%d",pQengCnf->stRadio.operation_mode);
-    
-    if(pQengCnf->stCell.stCellList.ucCellNum > 1)
+    unsigned char     abEMM_State[][11]= { "NULL", "DEREG", "REG INIT", "REG", "DEREG INIT", "TAU INIT", "SR INIT", "UNKNOWN"};
+    unsigned char     abEMM_Mode[][10]= {"IDLE","PSM","CONNECTED","UNKNOWN"};
+    unsigned char     abPLMN_State[][10]= {"NO PLMN", "SEARCHING", "SELECTED", "UNKNOWN"};
+    unsigned char     abPLMN_Type[][8]= { "HPLMN", "EHPLMN", "VPLMN", "UPLMN", "OPLMN", "UNKNOWN"};
+
+    if(pQengCnf->ucQengValue == 0)
     {
-        for (ucIdx = 1; ucIdx < pQengCnf->stCell.stCellList.ucCellNum; ucIdx++)
+        g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(g_AtcApInfo.stAtRspInfo.aucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen), 
+                        (const unsigned char *)"\r\n+QENG:0,");
+        AtcAp_StrPrintf_AtcRspBuf("%u,",pQengCnf->stRadio.last_earfcn_value);
+        AtcAp_StrPrintf_AtcRspBuf("0,%u,",pQengCnf->stRadio.last_pci_value);
+        AtcAp_StrPrintf_AtcRspBuf("%c%08X%c,",D_ATC_N_QUOTATION, pQengCnf->stRadio.last_cell_ID, D_ATC_N_QUOTATION);
+        AtcAp_StrPrintf_AtcRspBuf("%d,",pQengCnf->stRadio.rsrp / 10);
+        AtcAp_StrPrintf_AtcRspBuf("%d,",pQengCnf->stRadio.rsrq / 10);
+        AtcAp_StrPrintf_AtcRspBuf("%d,",pQengCnf->stRadio.rssi / 10);
+        AtcAp_StrPrintf_AtcRspBuf("%d,",pQengCnf->stRadio.last_snr_value / 10);
+        AtcAp_StrPrintf_AtcRspBuf("%d,",pQengCnf->stRadio.band);
+        AtcAp_StrPrintf_AtcRspBuf("%c%04X%c,", D_ATC_N_QUOTATION, pQengCnf->stRadio.current_tac, D_ATC_N_QUOTATION);
+        AtcAp_StrPrintf_AtcRspBuf("%u,",pQengCnf->stRadio.last_ECL_value);
+        AtcAp_StrPrintf_AtcRspBuf("%d,",pQengCnf->stRadio.current_tx_power_level / 10);
+        AtcAp_StrPrintf_AtcRspBuf("%d",pQengCnf->stRadio.operation_mode);
+        
+        if(pQengCnf->stCell.stCellList.ucCellNum > 1)
         {
-            g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(g_AtcApInfo.stAtRspInfo.aucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen), 
-                (const unsigned char *)"\r\n+QENG:1,%d,%d,", pQengCnf->stCell.stCellList.aNCell[ucIdx].ulDlEarfcn, pQengCnf->stCell.stCellList.aNCell[ucIdx].usPhyCellId);
-    
-            if(0 == pQengCnf->stCell.stCellList.aNCell[ucIdx].sRsrp)
+            for (ucIdx = 1; ucIdx < pQengCnf->stCell.stCellList.ucCellNum; ucIdx++)
             {
                 g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(g_AtcApInfo.stAtRspInfo.aucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen), 
-                    (const unsigned char *)"%s", "0,");
-            }
-            else
-            {
-                u16Rsrp = (~(pQengCnf->stCell.stCellList.aNCell[ucIdx].sRsrp - 1)) & 0x7FFF;
-                g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(g_AtcApInfo.stAtRspInfo.aucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen), 
-                    (const unsigned char *)"%c%d%c", '-', u16Rsrp / 10, ',');
-            }
-    
-            if(pQengCnf->stCell.stCellList.aNCell[ucIdx].sRsrq < 0)
-            {
-                u16Rsrq = (~(pQengCnf->stCell.stCellList.aNCell[ucIdx].sRsrq - 1)) & 0x7FFF;
-                g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(g_AtcApInfo.stAtRspInfo.aucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen), 
-                    (const unsigned char *)"%c%d", '-', u16Rsrq / 10);
-            }
-            else
-            {
-                u16Rsrq = pQengCnf->stCell.stCellList.aNCell[ucIdx].sRsrq;
-                g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(g_AtcApInfo.stAtRspInfo.aucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen), 
-                    (const unsigned char *)"%d", u16Rsrq / 10);
+                    (const unsigned char *)"\r\n+QENG:1,%d,%d,", pQengCnf->stCell.stCellList.aNCell[ucIdx].ulDlEarfcn, pQengCnf->stCell.stCellList.aNCell[ucIdx].usPhyCellId);
+        
+                if(0 == pQengCnf->stCell.stCellList.aNCell[ucIdx].sRsrp)
+                {
+                    g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(g_AtcApInfo.stAtRspInfo.aucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen), 
+                        (const unsigned char *)"%s", "0,");
+                }
+                else
+                {
+                    u16Rsrp = (~(pQengCnf->stCell.stCellList.aNCell[ucIdx].sRsrp - 1)) & 0x7FFF;
+                    g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(g_AtcApInfo.stAtRspInfo.aucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen), 
+                        (const unsigned char *)"%c%d%c", '-', u16Rsrp / 10, ',');
+                }
+        
+                if(pQengCnf->stCell.stCellList.aNCell[ucIdx].sRsrq < 0)
+                {
+                    u16Rsrq = (~(pQengCnf->stCell.stCellList.aNCell[ucIdx].sRsrq - 1)) & 0x7FFF;
+                    g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(g_AtcApInfo.stAtRspInfo.aucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen), 
+                        (const unsigned char *)"%c%d", '-', u16Rsrq / 10);
+                }
+                else
+                {
+                    u16Rsrq = pQengCnf->stCell.stCellList.aNCell[ucIdx].sRsrq;
+                    g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(g_AtcApInfo.stAtRspInfo.aucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen), 
+                        (const unsigned char *)"%d", u16Rsrq / 10);
+                }
             }
         }
+    }
+
+    if(pQengCnf->ucQengValue == 3)
+    {
+        if(0 != pQengCnf->stPlmnStatus.ulSelectPlmn)
+        {
+            AtcAp_IntegerToMCCMNC(pQengCnf->stPlmnStatus.ulSelectPlmn, aucMCC, aucMNC);
+        }
+        else
+        {
+            aucMCC[0] = 0x30;
+            aucMNC[0] = 0x30;
+        }
+        g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(g_AtcApInfo.stAtRspInfo.aucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen), 
+                        (const unsigned char *)"\r\n+QENG:4,");
+        AtcAp_StrPrintf_AtcRspBuf("%c%s%c,", D_ATC_N_QUOTATION, abEMM_State[pQengCnf->stPlmnStatus.ucEmmState], D_ATC_N_QUOTATION);
+        AtcAp_StrPrintf_AtcRspBuf("%c%s%c,", D_ATC_N_QUOTATION, abEMM_Mode[pQengCnf->stPlmnStatus.ucEmmMode], D_ATC_N_QUOTATION);
+        AtcAp_StrPrintf_AtcRspBuf("%c%s%c,", D_ATC_N_QUOTATION, abPLMN_State[pQengCnf->stPlmnStatus.ucPlmnState], D_ATC_N_QUOTATION);
+        AtcAp_StrPrintf_AtcRspBuf("%c%s%c,", D_ATC_N_QUOTATION, abPLMN_Type[pQengCnf->stPlmnStatus.ucPlmnType], D_ATC_N_QUOTATION);
+        AtcAp_StrPrintf_AtcRspBuf("%c0x%s,0x%s%c", D_ATC_N_QUOTATION, aucMCC, aucMNC, D_ATC_N_QUOTATION);
     }
     AtcAp_StrPrintf_AtcRspBuf("\r\n");
     AtcAp_SendDataInd();

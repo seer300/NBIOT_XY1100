@@ -340,7 +340,7 @@ int at_QMTCFG_req(char *at_buf, char **prsp_cmd)
 				}
 				else {
 					*prsp_cmd = xy_malloc(64);
-                	snprintf(*prsp_cmd, 64, "\r\n+QMTCFG: %d\r\n\r\nOK\r\n", MQTT_SHOWFLAG_DEFAULT);
+                	snprintf(*prsp_cmd, 64, "\r\n+QMTCFG: %d\r\n\r\nOK\r\n", MQTT_ECHOMODE_DEFAULT);
 				}
 			}
 			else {
@@ -946,7 +946,7 @@ int at_QMTPUB_req(char *at_buf, char **prsp_cmd)
 			mqtt_passthr.proc = mqtt_client_publish_passthr_proc;
 			
 			into_Passthr_Mode(mqtt_passthr);
-			send_urc_to_ext("\r\n>");
+			send_urc_to_ext("\r\n>\r\n");
 
 			return AT_ASYN;
 		}

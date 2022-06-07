@@ -38,7 +38,8 @@ extern void hal_gpio_out_work_task_init();
 * @brief   用户外设总线等初始化入口，内部不能执行flash的擦写接口
 */
 void user_peripheral_init()
-{		
+{
+
 	if(*(uint32_t*)(BACKUP_MEM_RF_MODE) != 0)
 		return;
 	
@@ -117,10 +118,10 @@ int main(void)
 
 	system_init();
 
+	user_peripheral_init();
+
 	sys_app_init();
 
-	user_peripheral_init();
-	
 	user_task_init();
 	
 	xy_srand((uint32_t)(HWREG(UTC_BASE + UTC_CLK_CNT)+HWREG(SYS_UP_REASON+32-4)));

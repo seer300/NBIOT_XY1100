@@ -745,7 +745,7 @@ int mqttCycle(mqtt_context_t *pctx, Timer *timer)
             break;
         case PUBLISH:
         {
-            MQTTString topicName;
+            MQTTString topicName = {0};
             MQTTMessage msg = {0};
             int intQoS;
 			char *topic_rsp = NULL;
@@ -781,7 +781,7 @@ int mqttCycle(mqtt_context_t *pctx, Timer *timer)
 				}
 				
 			}else {
-				    if (mqttCurContext->data_format.recv_data_format == HEX_ASCII_STRING) {
+				   if (mqttCurContext->data_format.recv_data_format == HEX_ASCII_STRING) {
 						temp_buf = xy_malloc(msg.payloadlen * 2 + 1);
 						bytes2hexstr(payload_rsp, msg.payloadlen, temp_buf, msg.payloadlen * 2 + 1);
 						publish_rsp = (char*)xy_malloc(30 + topicName.lenstring.len + msg.payloadlen * 2);
@@ -1619,7 +1619,7 @@ int mqtt_client_publish_passthr_proc(char* buf, uint32_t len, void *param)
     
     if (((mqtt_context_t *)(publish_params->pContext))->data_format.send_data_format == HEX_ASCII_STRING) {
         if (len % 2 != 0) {
-			return XY_ERR;
+			goto exit;
 		}
 		else {
 			data_len = len / 2;
@@ -1630,7 +1630,9 @@ int mqtt_client_publish_passthr_proc(char* buf, uint32_t len, void *param)
 	memset(payload, 0, len + 1);
 	memcpy(payload, buf, len);
 	
-	mqtt_client_publish(publish_params->tcpconnectID, publish_params->msgID, publish_params->qos, publish_params->retain, publish_params->topic, data_len, payload);
+	if (mqtt_client_publish(publish_params->tcpconnectID, publish_params->msgID, publish_params->qos, publish_params->retain, publish_params->topic, data_len, payload) != XY_OK) {
+		goto exit;
+	}
 
 	if (publish_params != NULL) {
 		if (publish_params->topic != NULL) {
@@ -1640,7 +1642,19 @@ int mqtt_client_publish_passthr_proc(char* buf, uint32_t len, void *param)
 		xy_free(publish_params);
 		publish_params = NULL;
 	}
-
+	
 	return XY_OK;
+	
+exit:
+	if (publish_params != NULL) {
+		if (publish_params->topic != NULL) {
+			xy_free(publish_params->topic);
+		    publish_params->topic = NULL;
+		}
+		xy_free(publish_params);
+		publish_params = NULL;
+	}
+
+	return XY_ERR;
 }
 

@@ -84,7 +84,7 @@ typedef void          (*cis_event_callback_t)           (void* context,cis_evt_t
 
 #define LIFETIME_INVALID      ((uint32_t)0xFFFFFFFF)
 #define MESSAGEID_INVALID     ((uint32_t)0x00)
-#define LIFETIME_LIMIT_MIN    ((uint32_t)0x0000000f)       //修改为原文档要求15s  //((uint32_t)0x00000078)       //120s
+#define LIFETIME_LIMIT_MIN    ((uint32_t)0x0000000f)       //DT???a?-??μμòa?ó15s  //((uint32_t)0x00000078)       //120s
 #define LIFETIME_LIMIT_MAX    ((uint32_t)0x0FFFFFFF)
 
 #define OBJECT_MAX_ID         ((uint16_t)0xFFFF - 1)

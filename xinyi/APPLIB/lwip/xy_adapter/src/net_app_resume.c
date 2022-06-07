@@ -22,8 +22,8 @@ void save_net_app_infos(void)
 
     net_info = xy_zalloc(sizeof(app_deepsleep_infos_t));
     xy_ftl_read(NV_FLASH_NET_BASE, (unsigned char*)net_info, sizeof(app_deepsleep_infos_t));
-   
-#if AT_SOCKET            
+
+#if AT_SOCKET&&!VER_QUCTL260
     ret = save_udp_context_deepsleep(&(net_info->udp_context));
     SET_NET_RECOVERY_FLAG(SOCKET_TASK);
 #endif
@@ -190,7 +190,7 @@ int resume_net_app(net_app_type_t type)
         return RESUME_FLAG_ERROR;
     }
 
-#if AT_SOCKET 
+#if AT_SOCKET
     if(type == SOCKET_TASK)
     {   
         resume_socket_app(OFFSET_NETINFO_PARAM(udp_context));
@@ -273,7 +273,7 @@ int  resume_net_app_by_dl_pkt(void *data, unsigned short len)
 
     softap_printf(USER_LOG, WARN_LOG,"eDRX recv downlink ip packet, resume start!\n");
 
-#if AT_SOCKET
+#if AT_SOCKET&&!VER_QUCTL260
     if(NET_NEED_RECOVERY(SOCKET_TASK))
     {
         if(match_net_app_by_touple(SOCKET_TASK, data))

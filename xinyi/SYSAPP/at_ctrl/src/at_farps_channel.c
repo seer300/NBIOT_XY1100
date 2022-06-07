@@ -495,7 +495,7 @@ such as "+DBGINFO:",normal log can not send by it*/
 void send_debug_str_to_at_uart(char *buf)
 {
 	if(g_softap_fac_nv->off_debug == 1)
- 		return;								
+ 		return;
 	
 	int coreState = osCoreGetState();
 

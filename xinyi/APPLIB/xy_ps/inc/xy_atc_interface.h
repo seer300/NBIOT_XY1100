@@ -2852,9 +2852,45 @@ typedef struct
 
 typedef struct 
 {
+#define D_EMM_STATE_NULL                0
+#define D_EMM_STATE_DEREG               1
+#define D_EMM_STATE_REG_INIT            2
+#define D_EMM_STATE_REG                 3
+#define D_EMM_STATE_DEREG_INIT          4
+#define D_EMM_STATE_TAU_INIT            5
+#define D_EMM_STATE_SR_INIT             6
+#define D_EMM_STATE_UNKNOWN             7
+    unsigned char                       ucEmmState;
+
+#define D_EMM_MODE_IDLE                 0
+#define D_EMM_MODE_PSM                  1
+#define D_EMM_MODE_CONN                 2
+#define D_EMM_MODE_UNKNOWN              3
+    unsigned char                       ucEmmMode;
+
+#define D_PLMN_STATE_NO_PLMN            0
+#define D_PLMN_STATE_SERCHING           1
+#define D_PLMN_STATE_SELECTED           2
+#define D_PLMN_STATE_UNKNOWN            3
+    unsigned char                       ucPlmnState;
+
+#define D_PLMN_TYPE_HPLMN               0
+#define D_PLMN_TYPE_EHPLMN              1
+#define D_PLMN_TYPE_VPLMN               2
+#define D_PLMN_TYPE_UPLMN               3
+#define D_PLMN_TYPE_OPLMN               4
+#define D_PLMN_TYPE_UNKNOWN             5
+    unsigned char                       ucPlmnType;
+    unsigned long                       ulSelectPlmn;
+} ATC_QENG_PLMN_STATUS_STRU;
+
+typedef struct 
+{
     unsigned short                usEvent;
+    unsigned char                 ucQengValue;
     ATC_NUESTATS_RSLT_RADIO_STRU  stRadio;
     ATC_NUESTATS_RSLT_CELL_STRU   stCell;
+    ATC_QENG_PLMN_STATUS_STRU     stPlmnStatus;
 } ATC_MSG_QENG_CNF_STRU;
 
 typedef struct {

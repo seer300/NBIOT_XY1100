@@ -291,7 +291,7 @@ int get_ascii_data(char *fmt_parm, char *at_str, int ascii_len, char *param_data
 			str_len = end_temp - at_str;
 		}
 		else {
-			end_temp = strchr(at_str, '\0');
+			end_temp = strchr(at_str, '\r');
 			if(end_temp == NULL)
 				return ATERR_PARAM_INVALID;
 
@@ -319,7 +319,6 @@ int get_ascii_data(char *fmt_parm, char *at_str, int ascii_len, char *param_data
 	return AT_OK;
 
 }
-
 
 int at_parse_param(char *fmt, char *buf, ...)
 {

@@ -617,6 +617,9 @@ unsigned char ATC_CGPADDR_LNB_Command(unsigned char *pCommandBuffer, unsigned ch
             return D_ATC_COMMAND_TOO_MANY_PARAMETERS;
         }
         break;
+    case D_ATC_CMD_FUNC_READ:
+        ((ST_ATC_CGPADDR_PARAMETER *)pEventBuffer)->ucAllCidFlg = D_ATC_FLAG_TRUE;
+        break;
     default:
         break;
     }

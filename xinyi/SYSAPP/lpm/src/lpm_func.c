@@ -1548,13 +1548,14 @@ void LPM_Deepsleep_Process()
 			while(1);
 
 		LPM_ARM_Entry_Deep_Sleep();
-
+#if 0	// not use
 		sprintf(deepsleep_debug_info_str, "g_nvic_pend_l:%lx\r\n",g_nvic_pend_l );
 		sprintf(deepsleep_debug_info_str + strlen(deepsleep_debug_info_str), "g_nvic_pend_h:%lx\r\n",g_nvic_pend_h );
 		sprintf(deepsleep_debug_info_str + strlen(deepsleep_debug_info_str), "g_nvic_enable_l:%lx\r\n",g_nvic_enable_l );
 		sprintf(deepsleep_debug_info_str + strlen(deepsleep_debug_info_str), "g_nvic_enable_h:%lx\r\n",g_nvic_enable_h );
 		sprintf(deepsleep_debug_info_str + strlen(deepsleep_debug_info_str), "g_wakeupint_source:%lx\r\n",g_wakeupint_source );
 		lpm_string_output(deepsleep_debug_info_str,strlen(deepsleep_debug_info_str));			
+#endif		
 		while(csp_write_allout_state() == 0);
 		//while(while1);
 	}

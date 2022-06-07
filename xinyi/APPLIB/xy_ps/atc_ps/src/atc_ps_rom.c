@@ -382,7 +382,7 @@ const ST_ATC_EVENT_TABLE ATC_Event_Table[] =
     {   0xFF,                          0xFF,                    D_ATC_EVENT_CLAC_T,       D_ATC_EVENT_CLAC},   /*EVENT_CLAC     7 */
     {   D_ATC_EVENT_CESQ,              0xFF,                    D_ATC_EVENT_CESQ_T,       D_ATC_EVENT_CESQ},   /*EVENT_CESQ     8 */
 
-    {   D_ATC_EVENT_CGPADDR,           0xFF,                    D_ATC_EVENT_CGPADDR_T,    D_ATC_EVENT_CGPADDR},/*EVENT_CGPADDR  9 */
+    {   D_ATC_EVENT_CGPADDR,           D_ATC_EVENT_CGPADDR,     D_ATC_EVENT_CGPADDR_T,    D_ATC_EVENT_CGPADDR},/*EVENT_CGPADDR  9 */
     {   D_ATC_EVENT_CGACT,             D_ATC_EVENT_CGACT_R,     D_ATC_EVENT_CGACT_T,      0xFF},               /*EVENT_CGACT    10 */
     {   D_ATC_EVENT_CSODCP,            0xFF,                    D_ATC_EVENT_CSODCP_T,     0xFF},               /*EVENT_CSODCP   11 */
 

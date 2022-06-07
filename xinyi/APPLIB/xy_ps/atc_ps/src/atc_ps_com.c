@@ -1583,6 +1583,28 @@ void AtcAp_IntegerToPlmn(unsigned long ulInputData, unsigned char *pOutputData)
     return;
 }
 
+void AtcAp_IntegerToMCCMNC(unsigned long ulInputData, unsigned char *pucMcc ,unsigned char *pucMnc)
+{
+    pucMcc[0] = (unsigned char)(((ulInputData) >> 16) & 0x0F) + 0x30;
+    pucMcc[1] = (unsigned char)(((ulInputData) >> 20) & 0x0F) + 0x30;
+    pucMcc[2] = (unsigned char)(((ulInputData) >> 8) & 0x0F) + 0x30;
+    if (0x0F != (((ulInputData) >> 12) & 0x0F))
+    {
+        pucMnc[0] = 0x30;
+        pucMnc[1] = (unsigned char)((ulInputData) & 0x0F) + 0x30;
+        pucMnc[2] = (unsigned char)(((ulInputData) >> 4) & 0x0F) + 0x30;
+        pucMnc[3] = (((ulInputData) >> 12) & 0x0F) + 0x30;
+    }
+    else
+    {
+        pucMnc[0] = 0x66;
+        pucMnc[1] = 0x30;
+        pucMnc[2] = (unsigned char)((ulInputData) & 0x0F) + 0x30;
+        pucMnc[3] = (unsigned char)(((ulInputData) >> 4) & 0x0F) + 0x30;
+    }
+
+    return;
+}
 void AtcAp_OutputPortRange(unsigned char ucDataLen, unsigned short *pData, unsigned char* pRespBuff)
 {
     if (0 != ucDataLen)

@@ -77,7 +77,70 @@
  ../../../../SYSAPP/at_cmd/inc/at_passthrough.h \
  ../../../../SYSAPP/shm_msg/inc/inter_core_msg.h \
  ../../../../DRIVERS/IpcMsg/inc/ipcmsg.h \
- ../../../../DRIVERS/IpcMsg/inc/ipcmsg_hal.h
+ ../../../../DRIVERS/IpcMsg/inc/ipcmsg_hal.h \
+ ../../../../APPLIB/at_socket/inc/at_socket_context.h \
+ ../../../../APPLIB/cloud/utils/inc/cloud_utils.h \
+ ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/sockets.h \
+ ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/opt.h \
+ ../../../../APPLIB/lwip/lwip_config/lwipopts.h \
+ ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/debug.h \
+ ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/arch.h \
+ ../../../../APPLIB/lwip/lwip_port/arch/cc.h \
+ ../../../../APPLIB/lwip/lwip_port/arch/cpu.h \
+ ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/ip_addr.h \
+ ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/def.h \
+ ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/ip4_addr.h \
+ ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/ip6_addr.h \
+ ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/def.h \
+ ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/ip6_zone.h \
+ ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/netif.h \
+ ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/err.h \
+ ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/pbuf.h \
+ ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/stats.h \
+ ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/mem.h \
+ ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/memp.h \
+ ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/priv/memp_std.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/lwippools.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/coap_internal.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/coap_config.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/coap.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/libcoap.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/coap_forward_decls.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/address.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/async.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/net.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/coap_io.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/coap_dtls.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/coap_time.h \
+ ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/sys.h \
+ ../../../../APPLIB/lwip/lwip_port/arch/sys_arch.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/coap_event.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/option.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/bits.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/pdu.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/uri.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/str.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/prng.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/coap_session.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/uthash.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/block.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/encode.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/coap_debug.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/mem.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/resource.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/subscribe.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/utlist.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/coap_hashkey.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/coap_mutex.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/coap_session_internal.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/coap_subscribe_internal.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/net.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/resource.h \
+ ../../../../APPLIB/libcoap/CoapPacket/include/coap2/subscribe.h \
+ ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/priv/memp_priv.h \
+ ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/priv/mem_priv.h \
+ ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/inet.h \
+ ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/errno.h
 
 ../../../../SYSAPP/system/inc/xy_utils.h:
 
@@ -234,3 +297,129 @@
 ../../../../DRIVERS/IpcMsg/inc/ipcmsg.h:
 
 ../../../../DRIVERS/IpcMsg/inc/ipcmsg_hal.h:
+
+../../../../APPLIB/at_socket/inc/at_socket_context.h:
+
+../../../../APPLIB/cloud/utils/inc/cloud_utils.h:
+
+../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/sockets.h:
+
+../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/opt.h:
+
+../../../../APPLIB/lwip/lwip_config/lwipopts.h:
+
+../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/debug.h:
+
+../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/arch.h:
+
+../../../../APPLIB/lwip/lwip_port/arch/cc.h:
+
+../../../../APPLIB/lwip/lwip_port/arch/cpu.h:
+
+../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/ip_addr.h:
+
+../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/def.h:
+
+../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/ip4_addr.h:
+
+../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/ip6_addr.h:
+
+../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/def.h:
+
+../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/ip6_zone.h:
+
+../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/netif.h:
+
+../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/err.h:
+
+../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/pbuf.h:
+
+../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/stats.h:
+
+../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/mem.h:
+
+../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/memp.h:
+
+../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/priv/memp_std.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/lwippools.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/coap_internal.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/coap_config.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/coap.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/libcoap.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/coap_forward_decls.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/address.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/async.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/net.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/coap_io.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/coap_dtls.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/coap_time.h:
+
+../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/sys.h:
+
+../../../../APPLIB/lwip/lwip_port/arch/sys_arch.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/coap_event.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/option.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/bits.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/pdu.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/uri.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/str.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/prng.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/coap_session.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/uthash.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/block.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/encode.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/coap_debug.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/mem.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/resource.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/subscribe.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/utlist.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/coap_hashkey.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/coap_mutex.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/coap_session_internal.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/coap_subscribe_internal.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/net.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/resource.h:
+
+../../../../APPLIB/libcoap/CoapPacket/include/coap2/subscribe.h:
+
+../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/priv/memp_priv.h:
+
+../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/priv/mem_priv.h:
+
+../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/inet.h:
+
+../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/errno.h:

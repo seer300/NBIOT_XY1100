@@ -49,7 +49,6 @@ struct at_fifo_msg
 /*******************************************************************************
  *                       Global function declarations                          *
  ******************************************************************************/
-
 //用于解析AT命令参数中含ASCII字符串的参数，由于ASCII字符串可能包含双引号和逗号特殊字符，影响通过at_parse_param解析后续的参数，进而在将ASCII字符串拷贝出来之后，对原ASCII字符串中的特殊字符进行转义
 int get_ascii_data(char *fmt_parm, char *at_str, int ascii_len, char *param_data);
 

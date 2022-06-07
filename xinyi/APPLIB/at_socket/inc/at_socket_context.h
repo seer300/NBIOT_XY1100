@@ -74,7 +74,7 @@ typedef struct sock_context
     uint32_t acked;
     uint32_t unacked;
     uint16_t local_port_ori;
-    uint16_t reserved;
+    uint16_t zero_flag;
     uint8_t accessmode;
     uint8_t cid;
     uint8_t sock_state;

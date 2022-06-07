@@ -106,12 +106,14 @@ void at_sock_recv_thread(void)
 
 			ioctl(sock_ctx[i]->fd, FIONREAD, &len);  //get the size of received data
             softap_printf(USER_LOG, WARN_LOG, "socket[%d] fionread len:%d", i, len);
+#if !VER_QUCTL260
             if (len == 0)
             {
                 softap_printf(USER_LOG, WARN_LOG, "socket[%d] recv 0 BYTES,force to close socket", i);
                 del_socket_ctx_by_index(i, true);
 				continue;
             }
+#endif /* VER_QUCTL260 */
 
             buf = xy_zalloc(len+1);
 			remote_info = xy_zalloc(sizeof(struct sockaddr_in));
@@ -136,8 +138,13 @@ void at_sock_recv_thread(void)
             }
             else if (read_len == 0)
             {
+#if VER_QUCTL260
+                /* 美格版本收到0长度下行数据不删除socket */
+                softap_printf(USER_LOG, WARN_LOG, "socket[%d]read 0 BYTES", i);
+#else
                 softap_printf(USER_LOG, WARN_LOG, "socket[%d]read 0 BYTES,force to close socket", i);
                 del_socket_ctx_by_index(i, true);
+#endif //VER_QUCTL260
 				xy_free(buf);
 				xy_free(remote_info);
 				continue;
@@ -172,8 +179,17 @@ void at_sock_recv_thread(void)
             {
                 if (g_data_recv_mode == ASCII_STRING)
                 {
+                    int size = 0;
                     rsp_cmd = xy_zalloc(80 + read_len);
-                    snprintf(rsp_cmd, 80 + read_len, "\r\n+QIURC: \"recv\",%d,%d,\"%s\"\r\n", sock_ctx[i]->sock_id, read_len, buf);
+                    snprintf(rsp_cmd, 80 + read_len, "\r\n+QIURC: \"recv\",%d,%d,\"", sock_ctx[i]->sock_id, read_len);
+                    size += strlen(rsp_cmd);
+                    memcpy(rsp_cmd + size, buf, read_len);
+                    size += read_len;
+                    memcpy(rsp_cmd + size, "\"\r\n", 3);
+                    size += 3;
+                    at_write_all_to_uart(rsp_cmd, size);
+                    xy_free(rsp_cmd);
+                    continue;
                 }
                 else if (g_data_recv_mode == HEX_ASCII_STRING)
                 {

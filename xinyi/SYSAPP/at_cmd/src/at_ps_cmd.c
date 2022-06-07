@@ -38,7 +38,7 @@ int8_t g_netifIp_type = NON_IP;
 int g_check_valid_sim = 1;
 int g_uicc_type = UICC_UNKNOWN;
 osSemaphoreId_t g_out_OOS_sem = NULL;
-int g_Echo_mode = 0;
+int g_Echo_mode = 1;
 extern int convert_wall_time2(char *data, char *time, struct xy_wall_clock *wall_time);
 
 /*******************************************************************************
@@ -594,9 +594,11 @@ void urc_UDPSN_Callback(unsigned long eventId, void *param, int paramLen)
 	int soc_ctx_id = -1;
 	unsigned short seq_num = 0;
 
-	seq_soc_num = ipsn_urc->usIpSn;
+    softap_printf(USER_LOG, WARN_LOG, "udpsn cb Ipsn:%d,stat:%d", ipsn_urc->usIpSn, ipsn_urc->ucStatus);
+    seq_soc_num = ipsn_urc->usIpSn;
 	send_status = ipsn_urc->ucStatus;
 	xy_free(ipsn_urc);
+
 
 	socket_fd = (unsigned short)((seq_soc_num & 0XFF00) >> 8);
 	seq_num = (unsigned short)(seq_soc_num & 0X00FF);

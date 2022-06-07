@@ -25,7 +25,7 @@
 
 #define MQTT_TX_BUF_DEFAULT           (4+16+256+1460)    /*header+variable header+topic+payload*/
 #define MQTT_RX_BUF_DEFAULT           (4+16+256+1460)    /*header+variable header+topic+payload*/
-#define MQTT_YIELD_TIMEOUT_MS_DEFAULT (2000)
+#define MQTT_YIELD_TIMEOUT_MS_DEFAULT (1000)
 #define MQTT_TCP_CONNECT_ID_DEFAULT   (0xff)
 #define MQTT_CLOUD_TYPE_DEFAULT       (0xff)
 

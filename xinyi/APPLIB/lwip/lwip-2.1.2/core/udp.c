@@ -773,6 +773,12 @@ udp_sendto_if_src_chksum(struct udp_pcb *pcb, struct pbuf *p, const ip_addr_t *d
       /* chain header q in front of given pbuf p (only if p contains data) */
       pbuf_chain(q, p);
     }
+    else
+    {
+        /* XINYI:发送0字节数据时只有一个pbuf,需要将socket id传递给新的pbuf */
+        q->soc_id = p->soc_id;
+    }
+    
     /* first pbuf q points to header pbuf */
     LWIP_DEBUGF(UDP_DEBUG,
                 ("udp_send: added header pbuf %p before given pbuf %p\n", (void *)q, (void *)p));

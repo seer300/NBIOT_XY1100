@@ -18,6 +18,7 @@
 
 osThreadId_t passthr_sock_send_thd = NULL;
 osMessageQueueId_t passthr_sock_msg_q = NULL;
+extern app_passthr_info_t g_app_passthr;
 
 /*******************************************************************************
  *                             Type definitions                                *
@@ -47,8 +48,16 @@ static int bc26_get_free_sequence(int sock_ctx_id)
 
 int passthr_socket_data_proc(char *data, int len, void *param)
 {
-    if (data == NULL || len == 0 || passthr_sock_msg_q == NULL)
+    if (data == NULL || passthr_sock_msg_q == NULL)
         xy_assert(0);
+
+    xy_assert(param != NULL);
+    socket_context_t *ctx = (socket_context_t *)param;
+    if (ctx->net_type == 0 && len == 0)
+    {
+        ctx->zero_flag = 1;
+        return XY_OK;
+    }
 
     /* 开始处理透传数据前，需根据发送类型判断已接收数据长度是否合法，比如十六进制格式下数据长度必须可以整除2 */
     int data_len = len;
@@ -63,7 +72,7 @@ int passthr_socket_data_proc(char *data, int len, void *param)
     /* 数据交由用户线程处理，不得在透传线程中处理 */
     passthr_socket_msg_t *msg = xy_zalloc(sizeof(passthr_socket_msg_t) + len + 1);
     msg->data_len = data_len;
-    msg->ctx = (socket_context_t*)param;
+    msg->ctx = (socket_context_t *)param;
     memcpy(msg->data, data, len);
     osMessageQueuePut(passthr_sock_msg_q, &msg, 0, osWaitForever);
 
@@ -78,6 +87,7 @@ int bc26_socket_send_data(char *data, uint32_t len, int rai_flag, socket_context
     uint32_t pre_sn = 0;
     int32_t sock_ctx_id = -1;
     char *hex_data = NULL;
+    ctx->zero_flag = 0;
 
     if ((sock_ctx_id = find_sock_ctx_id_by_sock_id(ctx->sock_id)) == -1)
     {
@@ -91,6 +101,17 @@ int bc26_socket_send_data(char *data, uint32_t len, int rai_flag, socket_context
         softap_printf(USER_LOG, WARN_LOG, "bc26_socket_send_data find no avail seq");
         return XY_ERR;
     }
+    else
+    {
+        softap_printf(USER_LOG, WARN_LOG, "bc26_socket_send_data seq:%d", sequence_no);
+    }
+
+    /* TCP 发送0长度数据直接上报SEND OK */
+    if (ctx->net_type == 0 && len == 0)
+    {
+        ctx->zero_flag = 1;
+        return XY_OK;
+    }
 
     if (g_data_send_mode == HEX_ASCII_STRING)
     {
@@ -99,13 +120,16 @@ int bc26_socket_send_data(char *data, uint32_t len, int rai_flag, socket_context
             softap_printf(USER_LOG, WARN_LOG, "bc26_socket_send_data len error for hex string");
             return XY_ERR;
         }
-        hex_data = xy_zalloc(len);
-        if (hexstr2bytes(data, len * 2, hex_data, len) == -1)
+        if (len > 0)
         {
-            if (hex_data != NULL)
-                xy_free(hex_data);
-            softap_printf(USER_LOG, WARN_LOG, "bc26_socket_send_data hex2byte error for hex string");
-            return XY_ERR;
+            hex_data = xy_zalloc(len);
+            if (hexstr2bytes(data, len * 2, hex_data, len) == -1)
+            {
+                if (hex_data != NULL)
+                    xy_free(hex_data);
+                softap_printf(USER_LOG, WARN_LOG, "bc26_socket_send_data hex2byte error for hex string");
+                return XY_ERR;
+            }
         }
     }
     else
@@ -117,8 +141,11 @@ int bc26_socket_send_data(char *data, uint32_t len, int rai_flag, socket_context
         }
         else
         {
-            hex_data = xy_zalloc(len);
-            memcpy(hex_data, data, len);
+            if (len > 0)
+            {
+                hex_data = xy_zalloc(len);
+                memcpy(hex_data, data, len);
+            }
         }
         
     }
@@ -129,7 +156,7 @@ int bc26_socket_send_data(char *data, uint32_t len, int rai_flag, socket_context
 	}
 
     int ret = send2(ctx->fd, hex_data, len, 0, sequence_no, rai_flag);
-    if (ret <= 0)
+    if (ret < 0)
     {
         softap_printf(USER_LOG, WARN_LOG, "socket id[%d] bc26_socket_send_data errno:%d", ctx->sock_id, errno);
         if (sequence_no != 0)
@@ -161,8 +188,9 @@ void passthr_socket_send_proc(void* param)
     while (1)
     {
         osMessageQueueGet(passthr_sock_msg_q, (void *)(&msg), NULL, osWaitForever);
-        bc26_socket_send_data(msg->data, msg->data_len, 0, (socket_context_t *)msg->ctx);
+        g_app_passthr.callback_ret = bc26_socket_send_data(msg->data, msg->data_len, 0, (socket_context_t *)msg->ctx);
         xy_free(msg);
+        xy_exitPassthroughMode();
     }
 }
 
@@ -630,10 +658,28 @@ int at_QISEND_req(char *at_buf, char **prsp_cmd)
         char *data = xy_zalloc(strlen(at_buf));
         socket_context_t *socket_ctx = NULL;
 
-        if (g_data_send_mode == ASCII_STRING && at_parse_param("%d(0-4),%d[0-1024],%s,%d[0-2]", at_buf, &socket_id, &data_len, data, &rai_flag) != AT_OK)
+        if (g_data_send_mode == ASCII_STRING)
         {
-            *prsp_cmd = BC26_AT_ERR_BUILD();
-            goto END_PROC;
+            if (at_parse_param("%d(0-4),%d[0-1024]", at_buf, &socket_id, &data_len) != AT_OK)
+            {
+                *prsp_cmd = BC26_AT_ERR_BUILD();
+                goto END_PROC;
+            }
+
+            if (data_len > 0 && at_strnchr(at_buf, ',', 2) != NULL)
+            {
+                if (get_ascii_data(",,%s,", at_buf, data_len, data) != AT_OK)
+                {
+                    *prsp_cmd = BC26_AT_ERR_BUILD();
+                    goto END_PROC;
+                }
+
+                if (at_parse_param(",,,%d[0-2]", at_buf, &rai_flag) != AT_OK)
+                {
+                    *prsp_cmd = BC26_AT_ERR_BUILD();
+                    goto END_PROC;
+                }
+            }
         }
 
         if (g_data_send_mode == HEX_ASCII_STRING && at_parse_param("%d(0-4),%d[0-512],%s,%d[0-2]", at_buf, &socket_id, &data_len, data, &rai_flag) != AT_OK)
@@ -665,7 +711,7 @@ int at_QISEND_req(char *at_buf, char **prsp_cmd)
             xy_free(data);
             return AT_ASYN;      
         }
-        else if (data_len == 0)
+        else if (data_len == 0 && at_strnchr(at_buf, ',', 2) == NULL)
         {
             /* 查询已发送、已应答，以及已发送但未应答数据的总长度 +QISEND: <sent>,<acked>,<nAcked> */
             if (socket_ctx->net_type == 0)
@@ -674,12 +720,17 @@ int at_QISEND_req(char *at_buf, char **prsp_cmd)
                 *prsp_cmd = xy_zalloc(32);
                 snprintf(*prsp_cmd, 32, "\r\n+QISEND: %d,%d,%d\r\n\r\nOK\r\n", socket_ctx->sended_size, socket_ctx->acked, unacked);
             }
+            else if (socket_ctx->net_type == 1)
+            {
+                *prsp_cmd = xy_zalloc(32);
+                snprintf(*prsp_cmd, 32, "\r\n+QISEND: %d,%d,%d\r\n\r\nOK\r\n", socket_ctx->sended_size, 0, socket_ctx->sended_size);
+            }
             goto END_PROC;
         }
         else
         {
             /* 透传发送定长数据 */
-            if (strlen(data) == 0)
+            if (data_len > 0 && at_strnchr(at_buf, ',', 2) == NULL)
             {
                 passthrough_socket_init();
                 app_passthr_info_t socket_passthr = {0};
@@ -702,6 +753,12 @@ int at_QISEND_req(char *at_buf, char **prsp_cmd)
                 {
                     *prsp_cmd = BC26_AT_ERR_BUILD();
                     goto END_PROC;
+                }
+                else if (socket_ctx->zero_flag == 1)
+                {
+                    socket_ctx->zero_flag = 0;
+                    *prsp_cmd = xy_zalloc(32);
+                    snprintf(*prsp_cmd, 32, "\r\nOK\r\n\r\nSEND OK\r\n");
                 }
             }
         }

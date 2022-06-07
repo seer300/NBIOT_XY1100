@@ -511,6 +511,7 @@ extern unsigned char ATC_CheckUSStrParameter(unsigned char *pCommandBuffer, sign
     unsigned short *pStrLength, unsigned char *pParaStr, unsigned char *pStopStrInf);
 extern void AtcAp_HexToAsc(unsigned short usLength,unsigned char *pOutData,unsigned char *pInputData);
 extern void AtcAp_IntegerToPlmn(unsigned long ulInputData, unsigned char *pOutputData);
+extern void AtcAp_IntegerToMCCMNC(unsigned long ulInputData, unsigned char *pucMcc ,unsigned char *pucMnc);
 extern unsigned char ATC_CheckHexNumParameter(unsigned char *pCommandBuffer, unsigned int uiFigure, unsigned char *pLength, 
     unsigned short *pBinaryData, unsigned char *pStopStrInf);
 extern void AtcAp_ConvertTimeZone(unsigned char *pTimeZoneTime,unsigned char ucDayLightTime);

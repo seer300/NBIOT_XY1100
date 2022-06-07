@@ -1577,6 +1577,8 @@ void agent_tiny_entry(void)
 #elif VER_QUCTL260
 	if(g_softap_fac_nv->cdp_lifetime)
         atiny_params->server_params.life_time = g_softap_fac_nv->cdp_lifetime;
+	else
+		atiny_params->server_params.life_time = LWM2M_DEFAULT_LIFETIME;
 #else
     if(cdp_lifetime)
         atiny_params->server_params.life_time = cdp_lifetime;

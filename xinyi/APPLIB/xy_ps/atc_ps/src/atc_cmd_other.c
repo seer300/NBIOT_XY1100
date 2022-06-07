@@ -3622,7 +3622,7 @@ unsigned char ATC_QENG_LNB_Command(unsigned char *pCommandBuffer, unsigned char 
     unsigned char ucResult;
     unsigned char ucCmdFunc;
     unsigned char ucEvent;
-    ST_ATC_CMD_PARAMETER* pParam = (ST_ATC_CMD_PARAMETER*)pEventBuffer;
+    ST_ATC_QENG_PARAMETER* pParam = (ST_ATC_QENG_PARAMETER*)pEventBuffer;
 
     ucResult = ATC_CmdFuncInf(pCommandBuffer + usCmdStrLen,EVENT_QENG, pEventBuffer, &ucCmdFunc);
     if(ucCmdFunc != D_ATC_CMD_FUNC_SET)
@@ -3631,11 +3631,15 @@ unsigned char ATC_QENG_LNB_Command(unsigned char *pCommandBuffer, unsigned char 
     }
     usCmdStrLen += 1;
 
-    if(D_ATC_COMMAND_OK != ATC_GetDecimalParameterByte(pCommandBuffer, &usCmdStrLen, 3, &pParam->ucValue, NULL, 0, 0, 0, 1))
+    if(D_ATC_COMMAND_OK != ATC_GetDecimalParameterByte(pCommandBuffer, &usCmdStrLen, 3, &pParam->ucVal, NULL, 0, 3, 0, 1))
     {
         return D_ATC_COMMAND_PARAMETER_ERROR;
     }
 
+    if(pParam->ucVal != 0 && pParam->ucVal != 3)
+    {
+        return D_ATC_COMMAND_PARAMETER_ERROR;
+    }
     return D_ATC_COMMAND_OK;
 }
 

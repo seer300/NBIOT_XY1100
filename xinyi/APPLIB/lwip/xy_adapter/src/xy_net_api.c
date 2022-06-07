@@ -348,13 +348,8 @@ int xy_wait_tcpip_ok(int timeout)
     {
         timeout = 0;
     }
-
-    if (g_netifIp_type == NON_IP)
-    {
-        return XY_ERR;
-    }
-    
-    while ((g_netifIp_type == IPV4_TYPE) ? ps_netif_is_ok() == 0 : netif_ip6_addr_state(netif_default, 1) != IP6_ADDR_PREFERRED)
+   
+    while ((g_netifIp_type == IPV4_TYPE || g_netifIp_type == NON_IP) ? ps_netif_is_ok() == 0 : netif_ip6_addr_state(netif_default, 1) != IP6_ADDR_PREFERRED)
     {
         if (timeout > 0 && strstr(osThreadGetName(osThreadGetId()), XY_PROXY_THREAD_NAME))
         {

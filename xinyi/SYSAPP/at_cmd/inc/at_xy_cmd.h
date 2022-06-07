@@ -6,17 +6,17 @@
 #if  MODULE_130
 
 #define MODULE 		"SLM130X"
-#define TVERSION 	"T02"
+#define TVERSION 	"T03"
 #define SDATE		"S0221"
-#define SDKVERSION	"0.2.0.C21"
+#define SDKVERSION	"0.2.1.C21"
 #define MVERSION	"M003"
 #define SI_NUM		HAL_GPIO_PIN_NUM_13
 #else
 
 #define MODULE 		"SLM160X"
-#define TVERSION 	"T01"
+#define TVERSION 	"T02"
 #define SDATE		"S0221"
-#define SDKVERSION	"0.2.0.C21"
+#define SDKVERSION	"0.2.1.C21"
 #define MVERSION	"M003"
 #define SI_NUM		HAL_GPIO_PIN_NUM_11
 #define LED_NUM		HAL_GPIO_PIN_NUM_10
