@@ -43,7 +43,7 @@
 enum AT_XY_ERR
 {
 	AT_OK = 0,
-
+	AT_JSON,
 	ATERR_XY_ERR = 8000,
 	ATERR_PARAM_INVALID,         //8001
 	ATERR_NOT_ALLOWED,           //8002

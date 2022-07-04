@@ -647,6 +647,7 @@ int at_QISTATE_req(char *at_buf, char **prsp_cmd)
 //透传发送定长数据   AT+QISEND=<connectID>,<send_length>
 //透传发送不定长数据 AT+QISEND=<connectID>
 //查询已发送、已应答，以及已发送但未应 答数据的总长度 AT+QISEND=<connectID>,0
+bool transmission_flag = 0;
 int at_QISEND_req(char *at_buf, char **prsp_cmd)
 {
     if (g_req_type == AT_CMD_REQ)
@@ -655,6 +656,7 @@ int at_QISEND_req(char *at_buf, char **prsp_cmd)
         int data_len = -1;
         int socket_ctx_index = -1;
         int rai_flag = 0;
+		int mode = 0;
         char *data = xy_zalloc(strlen(at_buf));
         socket_context_t *socket_ctx = NULL;
 
@@ -664,23 +666,30 @@ int at_QISEND_req(char *at_buf, char **prsp_cmd)
             {
                 *prsp_cmd = BC26_AT_ERR_BUILD();
                 goto END_PROC;
-            }
-
+            }			
             if (data_len > 0 && at_strnchr(at_buf, ',', 2) != NULL)
-            {
-                if (get_ascii_data(",,%s,", at_buf, data_len, data) != AT_OK)
+            {   
+            	transmission_flag = 1;
+                if ((mode = get_ascii_data(",,%s,", at_buf, data_len, data)) > AT_JSON)
                 {
-                    *prsp_cmd = BC26_AT_ERR_BUILD();
+                    *prsp_cmd = BC26_AT_ERR_BUILD();	
+					transmission_flag = 0;
                     goto END_PROC;
                 }
-
-                if (at_parse_param(",,,%d[0-2]", at_buf, &rai_flag) != AT_OK)
+				#if 0	
+                if ((at_parse_param(",,,%d[0-2]", at_buf, &rai_flag) != AT_OK)&&(mode == 0))
                 {
-                    *prsp_cmd = BC26_AT_ERR_BUILD();
+                    *prsp_cmd = BC26_AT_ERR_BUILD();						
                     goto END_PROC;
                 }
+				#else
+				xy_printf("wait send data=%s,datalen=%d\n",data,data_len);
+				//TCP/UDT数据采用透传模式
+				mode = AT_JSON;
+				transmission_flag = 0;
+				#endif
             }
-        }
+        }		
 
         if (g_data_send_mode == HEX_ASCII_STRING && at_parse_param("%d(0-4),%d[0-512],%s,%d[0-2]", at_buf, &socket_id, &data_len, data, &rai_flag) != AT_OK)
         {
@@ -746,6 +755,22 @@ int at_QISEND_req(char *at_buf, char **prsp_cmd)
                 xy_free(data);
                 return AT_ASYN;
             }
+			//TCP/UDP采用透传发送
+			else if((data_len > 0 ) && (mode == AT_JSON))
+			{
+				
+				if (bc26_socket_send_data(data, data_len, rai_flag, socket_ctx) == XY_ERR)
+                {
+                    *prsp_cmd = BC26_AT_ERR_BUILD();
+                    goto END_PROC;
+                }
+                else if (socket_ctx->zero_flag == 1)
+                {
+                    socket_ctx->zero_flag = 0;
+                    *prsp_cmd = xy_zalloc(32);
+                    snprintf(*prsp_cmd, 32, "\r\nOK\r\n\r\nSEND OK\r\n");
+                }
+			}
             /* 正常发送数据 */
             else
             {

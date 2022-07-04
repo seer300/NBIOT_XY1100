@@ -273,33 +273,109 @@ int get_ascii_data(char *fmt_parm, char *at_str, int ascii_len, char *param_data
 			return ATERR_PARAM_INVALID;
 		at_str++;
 		douhao_num--;
+	}	
+#if 0	
+	//用于判定是否是JSON，TCP和UDP模式改为透传，因此不需要	
+	int kuo1_num = 0;
+	int kuo2_num = 0;	
+	char *str_temp;
+	xy_printf("func=%s, STRING=%s\n",__func__,at_str);
+	//memcpy(str_temp,at_str,ascii_len);
+	//str_temp[ascii_len] = '\0';
+	str_temp = at_str;
+	if ((*at_str == '"')&&(*(at_str + ascii_len+1) == '"'))
+	{
+		for(i = 0;i<(ascii_len+1);i++)
+		{		
+			//处理JSON字符串
+			if(str_temp[i] == '{')
+				kuo1_num++;
+			if(str_temp[i] == '}')
+				kuo2_num++;		
+		}
 	}
-
+	else
+	{		
+		for(i = 0;i<(ascii_len);i++)
+		{		
+			//处理JSON字符串
+			if(str_temp[i] == '{')
+				kuo1_num++;
+			if(str_temp[i] == '}')
+				kuo2_num++;		
+		}
+	}
+		
+#endif
 	//字符串用双引号括起来情况
 	if (*at_str == '"')
 	{
-		at_str++;
+		at_str++;		
 		if (*(at_str + ascii_len) != '"')
+		{			
 			return ATERR_PARAM_INVALID;
+		}	
+#if 0		
+			//用于判定是否是JSON，TCP和UDP模式改为透传，因此不需要
+		if((kuo1_num == kuo2_num)&&(kuo1_num != 0) && (kuo2_num != 0))
+		{
+			//是左｛和右｝成对出现，是JSON就直接透传输出
+			xy_printf("func=%s,JSON STRING+yinhao=%s\n",__func__,at_str);
+			mode = AT_JSON;
+		}
+#endif		
 	}
+#if 0	
+	//具备JSON格式
+	//用于判定是否是JSON，TCP和UDP模式改为透传，因此不需要
+	else if((kuo1_num == kuo2_num)&&(kuo1_num != 0) && (kuo2_num != 0))
+	{
+		//是左｛和右｝成对出现，是JSON就直接透传输出
+		xy_printf("func=%s,JSON STRING=%s\n",__func__,at_str);
+		mode = AT_JSON;
+	}
+#endif	
 	//无引号，下一个逗号或结束符为字符串结尾
 	else
 	{
-		end_temp = strchr(at_str, ',');
-		if(end_temp != NULL)
 		{
-			str_len = end_temp - at_str;
-		}
-		else {
-			end_temp = strchr(at_str, '\r');
-			if(end_temp == NULL)
-				return ATERR_PARAM_INVALID;
-
-			str_len = end_temp - at_str;
-		}
-
-		if(str_len != ascii_len)
-			 return ATERR_PARAM_INVALID;
+			extern bool transmission_flag;	//TCP/UDP的字符串模式，采用透传发送
+			if(transmission_flag == 0)
+			{
+				end_temp = strchr(at_str, ',');
+				if(end_temp != NULL)
+				{			
+					str_len = end_temp - at_str;
+				}
+				else {			
+					end_temp = strchr(at_str, '\r');
+					if(end_temp == NULL)
+						{					
+							return ATERR_PARAM_INVALID;
+						}
+					str_len = end_temp - at_str;			
+				}
+						
+				if(str_len != ascii_len)
+					{				
+						return ATERR_PARAM_INVALID;
+					}
+			}
+			else
+				{
+					end_temp = strchr(at_str, '\r');
+					if(end_temp == NULL)
+					{					
+						return ATERR_PARAM_INVALID;
+					}
+					str_len = end_temp - at_str;	
+					if(str_len != ascii_len)
+					{				
+						return ATERR_PARAM_INVALID;
+					}
+				}
+			}
+			
 	}
 
 	//将引号里面的内容拷出来作为有效参数内容
