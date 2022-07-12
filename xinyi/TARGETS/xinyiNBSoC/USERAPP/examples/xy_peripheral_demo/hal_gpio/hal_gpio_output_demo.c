@@ -14,7 +14,7 @@
 
 //任务参数配置
 #define GPIO_OUT_TASK_PRIORITY    10
-#define GPIO_OUT_STACK_SIZE       500
+#define GPIO_OUT_STACK_SIZE       512//500
 
 //任务全局变量
 osThreadId_t g_hal_gpio_out_TskHandle =NULL;
