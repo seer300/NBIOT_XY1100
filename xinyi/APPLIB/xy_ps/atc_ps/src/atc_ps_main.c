@@ -80,7 +80,7 @@ int xy_atc_interface_call(char* pCmd, func_AppInterfaceCallback callback_func, v
         }
         else
         {
-            ucRtnVal = XY_ERR;
+     //       ucRtnVal = XY_ERR;
         }
     }
     AtcAp_DelAppInterfaceResult(pNode);

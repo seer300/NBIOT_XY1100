@@ -27,6 +27,10 @@
 #include "at_global_def.h"
 #include "at_uart.h"
 #include "cloud_utils.h"
+
+
+#include "xy_atc_interface.h" //kt
+
 /*******************************************************************************
  *                             Macro definitions                               *
  ******************************************************************************/
@@ -2007,6 +2011,135 @@ int at_SGSW_req(char *at_buf, char **prsp_cmd)
 	return AT_END;
 }
 
+//kt
+int at_QCGDEFCONT_req(char *at_buf, char **prsp_cmd)
+{	
+	unsigned char				   aPdpType[][7] = {"IP","IPV6","IPV4V6","PPP","Non-IP"};//已有类型
+	unsigned char                  aucPdpType[][7] = {"RESERV","IP","IPV6","IPV4V6","RESERV","Non-IP"};//CGDCONT显示类型数组
+
+	if (g_req_type == AT_CMD_REQ)
+	{
+		int i;
+		int val;
+		unsigned char  	PdpType[1][7] = {0};
+		unsigned char   aucApnValue[D_APN_LEN] = {0};
+		unsigned char   aucUserName[D_PCO_AUTH_MAX_LEN] = {0};
+		unsigned char   aucPassword[D_PCO_AUTH_MAX_LEN] = {0};
+		
+		char at_QCGDEFCONT[150]={0};
+	
+		if (at_parse_param("%s,%s,%s,%s", at_buf, PdpType,aucApnValue,aucUserName,aucPassword) != AT_OK)
+		{
+			*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
+			return AT_END;
+		}
+		
+		for(i=0;i<5;i++)
+		{
+			if(strcmp(PdpType,aPdpType[i]) == 0)
+			{
+				val = 1;
+				break;
+			}
+			
+		}
+		if(val == 0)
+		{
+			*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
+			return AT_END;
+
+		}
+		
+		if((strlen(aucApnValue)>100) || (strlen(aucUserName)>16) || (strlen(aucPassword)>16))
+		{
+			*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
+			return AT_END;
+		}
+
+		sprintf(at_QCGDEFCONT, "AT+CGDCONT=0,\"%s\",\"%s\"\r\n", PdpType,aucApnValue);
+		if(XY_OK != xy_atc_interface_call(at_QCGDEFCONT, NULL, (void*)NULL))
+		{
+			*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
+			return AT_END;
+		}
+
+		if(strlen(aucUserName) != 0 || strlen(aucPassword) != 0)
+		{
+			if (strlen(aucUserName) == 0 && strlen(aucPassword) != 0)
+			{
+				sprintf(at_QCGDEFCONT, "AT+CGAUTH=0,2,\"%s\"\r\n",aucPassword);
+			}
+			else if (strlen(aucUserName) != 0 && strlen(aucPassword) == 0)
+			{
+				sprintf(at_QCGDEFCONT, "AT+CGAUTH=0,2,\"%s\"\r\n",aucUserName);
+			}
+			else if (strlen(aucUserName) != 0 && strlen(aucPassword) != 0)
+			{
+				sprintf(at_QCGDEFCONT, "AT+CGAUTH=0,2,\"%s\",\"%s\"\r\n", aucUserName,aucPassword);
+			}
+			
+			if(XY_OK != xy_atc_interface_call(at_QCGDEFCONT, NULL, (void*)NULL))
+			{
+				*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
+				return AT_END;
+			}
+		}
+		
+		return AT_END;
+		
+	}
+	else if (g_req_type == AT_CMD_QUERY)
+	{
+		*prsp_cmd = (char*)xy_zalloc(200);
+		ATC_MSG_CGDCONT_R_CNF_STRU* CGDCONT_R_info = (ATC_MSG_CGDCONT_R_CNF_STRU*)xy_zalloc(sizeof(ATC_MSG_CGDCONT_R_CNF_STRU));
+		
+		ATC_MSG_CGAUTH_R_CNF_STRU* CGAUTH_R_info = (ATC_MSG_CGAUTH_R_CNF_STRU*)xy_zalloc(sizeof(ATC_MSG_CGAUTH_R_CNF_STRU)); 
+	
+	    if(XY_OK != xy_atc_interface_call("AT+CGDCONT?\r\n", (func_AppInterfaceCallback)NULL, (void*)CGDCONT_R_info))
+	    {
+	        xy_free(CGDCONT_R_info);
+			*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
+			return AT_END;
+	    }
+		if(XY_OK != xy_atc_interface_call("AT+CGAUTH?\r\n", (func_AppInterfaceCallback)NULL, (void*)CGAUTH_R_info))
+		{
+			xy_free(CGAUTH_R_info);
+			*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
+			return AT_END;
+		}
+		
+		if(strlen(CGAUTH_R_info->stCgauth[0].aucUserName) == 0 && strlen(CGAUTH_R_info->stCgauth[0].aucPassword) == 0)
+		{
+			snprintf(*prsp_cmd, 200, "\r\n+QCGDEFCONT:\"%s\",\"%s\"\r\n\r\nOK\r\n",aucPdpType[CGDCONT_R_info->stPdpContext[0].ucPdpType],CGDCONT_R_info->stPdpContext[0].aucApnValue);
+		}
+		else if(strlen(CGAUTH_R_info->stCgauth[0].aucUserName) == 0 && strlen(CGAUTH_R_info->stCgauth[0].aucPassword) != 0)
+		{
+			snprintf(*prsp_cmd, 200, "\r\n+QCGDEFCONT:\"%s\",\"%s\",\"%s\"\r\n\r\nOK\r\n",aucPdpType[CGDCONT_R_info->stPdpContext[0].ucPdpType],CGDCONT_R_info->stPdpContext[0].aucApnValue,
+																							CGAUTH_R_info->stCgauth[0].aucPassword);
+		}
+		else if(strlen(CGAUTH_R_info->stCgauth[0].aucUserName) != 0 && strlen(CGAUTH_R_info->stCgauth[0].aucPassword) == 0)
+		{
+			snprintf(*prsp_cmd, 200, "\r\n+QCGDEFCONT:\"%s\",\"%s\",\"%s\"\r\n\r\nOK\r\n",aucPdpType[CGDCONT_R_info->stPdpContext[0].ucPdpType],CGDCONT_R_info->stPdpContext[0].aucApnValue,
+																							CGAUTH_R_info->stCgauth[0].aucUserName);
+		}
+		else if(strlen(CGAUTH_R_info->stCgauth[0].aucUserName) != 0 && strlen(CGAUTH_R_info->stCgauth[0].aucPassword) != 0)
+		{
+			snprintf(*prsp_cmd, 200, "\r\n+QCGDEFCONT:\"%s\",\"%s\",\"%s\",\"%s\"\r\n\r\nOK\r\n",aucPdpType[CGDCONT_R_info->stPdpContext[0].ucPdpType],CGDCONT_R_info->stPdpContext[0].aucApnValue,
+																							CGAUTH_R_info->stCgauth[0].aucUserName,CGAUTH_R_info->stCgauth[0].aucPassword);
+		}
+
+	    xy_free(CGDCONT_R_info);
+		xy_free(CGAUTH_R_info);	
+	}
+	else if (g_req_type == AT_CMD_TEST)
+	{
+		*prsp_cmd = xy_zalloc(60);
+		snprintf(*prsp_cmd, 60, "\r\n+QCGDEFCONT:(\"IP\",\"IPV6\",\"IPV4V6\",\"PPP\",\"Non-IP\")\r\n\r\nOK\r\n");
+	}
+	else
+		*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
+	return AT_END;
+}
 
 uint8_t* getNewBuildInfo(void)
 {
@@ -2044,5 +2177,43 @@ uint8_t* getNewBuildInfo(void)
    // sprintf(outInfo,"%s %s",VERSION_INFO_NEW,date_origin_format_buf);
    //  sprintf(outInfo,"%s",date_origin_format_buf);
     return date_origin_format_buf;
+}
+
+extern void  write_user_nv_demo();
+extern void  read_user_nv_demo();
+user_nv_data_t *g_user_nv = NULL;
+
+int at_QATWAKEUP_req(char *at_buf, char **prsp_cmd)
+{
+	int8_t wakeup_mode;
+
+	if (g_req_type == AT_CMD_REQ)
+	{
+		if (at_parse_param("%1d", at_buf, &wakeup_mode) != AT_OK)
+		{
+			*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
+			return AT_END;
+		}
+
+		g_user_nv->atWakeup = wakeup_mode;
+		xy_printf("g_user_nv->atWakeup0000=%d",g_user_nv->atWakeup);
+		write_user_nv_demo();
+
+	}
+	else if(g_req_type == AT_CMD_QUERY)
+	{
+		*prsp_cmd = xy_zalloc(32);
+		read_user_nv_demo();
+		sprintf(*prsp_cmd, "\r\n+QATWAKEUP:%1d\r\n\r\nOK\r\n", g_user_nv->atWakeup);
+	}
+	else if(g_req_type == AT_CMD_TEST)
+	{
+		*prsp_cmd = xy_zalloc(32);
+		sprintf(*prsp_cmd, "\r\n+QATWAKEUP:(0,1)\r\n\r\nOK\r\n");
+	}
+	else
+		*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
+
+	return AT_END;
 }
 

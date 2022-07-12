@@ -22,6 +22,7 @@
 #include "xy_system.h"
 #include "xy_utils.h"
 #include "zero_copy_shm.h"
+#include "at_xy_cmd.h"
 
 /*******************************************************************************
  *                             Macro definitions                               *
@@ -662,6 +663,9 @@ int at_rsp_info_broadcast(void *buf, int size)
 	return XY_OK;
 }
 
+extern user_nv_data_t *g_user_nv;
+extern void read_user_nv_demo();
+extern void init_user_flash();
 void sys_up_urc()
 {
     static int have_send_poweron = 0;
@@ -673,12 +677,20 @@ void sys_up_urc()
     have_send_poweron = 1;
 	
 	at_str = xy_zalloc(64);
-
+	
+	init_user_flash();
+	read_user_nv_demo();
+	
 	if(get_sys_up_stat() == UTC_WAKEUP || get_sys_up_stat() == EXTPIN_WAKEUP)
 	{
 		if(g_softap_fac_nv->deepsleep_urc == 1 && g_softap_var_nv->sleep_mode == 1)
 		{
-			sprintf(at_str,"\r\n+QNBIOTEVENT:\"EXIT DEEPSLEEP\"\r\n");
+			sprintf(at_str,"\r\n+QNBIOTEVENT:\"EXIT DEEPSLEEP\"\r\n");			
+
+			if(g_user_nv->atWakeup==1)
+			{
+				strcat(at_str,"\r\n+QATWAKEUP\r\n");
+			}
 		}
 	}
 	else

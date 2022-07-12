@@ -1,12 +1,12 @@
 #pragma once
 
-#define MODULE_130  0
+#define MODULE_130  1
 
 
 #if  MODULE_130
 
 #define MODULE 		"SLM130X"
-#define TVERSION 	"T04"
+#define TVERSION 	"T05"
 #define SDATE		"S0221"
 #define SDKVERSION	"0.2.1.C21"
 #define MVERSION	"M003"
@@ -22,6 +22,12 @@
 #define LED_NUM		HAL_GPIO_PIN_NUM_10
 
 #endif
+
+typedef struct
+{	
+    unsigned char    atWakeup;   
+}user_nv_data_t;
+
 
 
 /*******************************************************************************
@@ -43,7 +49,8 @@ int at_ATI_req(char *at_buf,char **prsp_cmd);
 int at_QGMR_req(char *at_buf,char **prsp_cmd);
 int at_QVERTIME_req(char *at_buf,char **prsp_cmd);
 int at_SGSW_req(char *at_buf,char **prsp_cmd);
-
+int at_QATWAKEUP_req(char *at_buf, char **prsp_cmd);
+int at_QCGDEFCONT_req(char *at_buf,char **prsp_cmd);
 
 
 
