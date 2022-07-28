@@ -125,7 +125,7 @@ secondary_outputs: $(TARGET).elf
 ifeq ($(LC_OS_NAME),cygwin)
 	@cmd /c "m3ld.exe ./"
 else
-	@python m3ld.py ./
+	@python3 m3ld.py ./
 endif
 	@echo "Moving files..."
 	@$(MKDIR) $(BIN_DIR)
