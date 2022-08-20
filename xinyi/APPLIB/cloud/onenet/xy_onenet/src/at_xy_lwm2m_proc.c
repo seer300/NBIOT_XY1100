@@ -606,8 +606,13 @@ int xy_lwm2m_at_get_notify_value(char *at_buf, struct onenet_notify *param)
 
     if (param->value_type == cis_data_type_string)
     {
-        if (get_ascii_data(",,,,,%s,", (char *)at_buf, param->len, param->value) != AT_OK)
-            goto ERR_PROC;
+        //if (get_ascii_data(",,,,,%s,", (char *)at_buf, param->len, param->value) != AT_OK)
+            //goto ERR_PROC;
+        //just support json string
+        if (get_ascii_data_json(",,,,,%s", (char *)at_buf, param->len, param->value) > AT_JSON)
+        {
+			goto ERR_PROC;
+        }
 
         if (strlen(param->value) != param->len)
             goto ERR_PROC;
@@ -2092,7 +2097,9 @@ int at_proc_qlanotify_req(char *at_src_buf, char **rsp_cmd)
 		at_buf = xy_malloc(strlen(at_src_buf) + 1);
 		strcpy(at_buf, at_src_buf);
 
-        if (at_parse_param("%d,%d,%d,%d,%d,,%d,%d", at_buf, &param.objId, &param.insId,
+
+       //at_buf parse,only for AT+QLANOTIFY ,support json data in param.value
+        if (at_parse_param_adapt("%d,%d,%d,%d,%d, ,%d,%d", at_buf, &param.objId, &param.insId,
                            &param.resId, &param.value_type, &param.len, &param.index, &param.ackid) != AT_OK)
         {
         	err_num = ATERR_PARAM_INVALID;

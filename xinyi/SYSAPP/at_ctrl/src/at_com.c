@@ -1026,7 +1026,120 @@ int parse_param_vp(char *fmt_parm, char *buf, int is_strict, va_list *ap)
 				ret = ATERR_PARAM_INVALID;
 				break;
 			}
+			
+			param_comma = strchr(param_quotes_end + 1, ',');
+			buf = param_quotes_begin + 1;
+			*param_quotes_end = '\0';
+		}
 
+		if (param_comma && fmt_comma)
+		{
+			*param_comma = '\0';
+			*fmt_comma = '\0';
+
+			if ((ret = parase_type_val_vp(buf, fmt, ap)) != AT_OK)
+				break;
+			*param_comma = ',';
+			*fmt_comma = ',';
+			if (param_quotes_end)
+				*param_quotes_end = '"';
+			buf = param_comma + 1;
+			fmt = fmt_comma + 1;
+		}
+		else if (param_comma)
+		{
+			*param_comma = '\0';
+			ret = parase_type_val_vp(buf, fmt, ap);
+
+			//too many param
+			if (ret == AT_OK && is_strict)
+				ret = ATERR_MORE_PARAM;
+			break;
+		}
+		else if (fmt_comma)
+		{
+			*fmt_comma = '\0';
+			ret = parase_type_val_vp(buf, fmt, ap);
+			if(ret == AT_OK)
+			{
+				if (param_quotes_end)
+					*param_quotes_end = '"';
+				buf = buf + strlen(buf);
+				*fmt_comma = ',';
+				fmt = fmt_comma + 1;
+			}
+			else
+				break;
+		}
+		else
+		{
+			ret = parase_type_val_vp(buf, fmt, ap);
+			break;
+		}
+	}
+END:
+	if (param_end)
+		*param_end = '\r';
+	if (param_comma)
+		*param_comma = ',';
+	if (param_quotes_end)
+		*param_quotes_end = '"';
+	xy_free(fmt_original);
+	return ret;
+}
+
+
+//added by WangJiebin 20220818, based on parse_param_vp
+//brief only for AT+QLANOTIFY that can notify json data
+//json need to care many "" and ,
+int parse_param_vp_adapt(char *fmt_parm, char *buf, int is_strict, va_list *ap)
+{
+	xy_assert(fmt_parm != NULL && buf != NULL);
+	int ret = AT_OK;
+	char *param_comma = NULL;
+	char *param_quotes_begin = NULL;
+	char *param_quotes_end = NULL;
+	char *fmt_comma = NULL;
+	char *param_end = NULL;
+	//fmt指针指向随时会变化，释放内存时必须从起始释放，zallco首地址也必须有记录(fmt_original变量)
+	int fmt_len = strlen(fmt_parm);
+	char *fmt_original = xy_malloc(fmt_len + 1);
+	*(fmt_original + fmt_len) = '\0';
+	char *fmt = fmt_original; 
+	strncpy(fmt, fmt_parm, fmt_len);
+
+	while (*buf == ' ')
+		buf++;
+
+	param_end = strchr(buf, '\r');
+	if (param_end != NULL)
+		*param_end = '\0';
+
+	if (strcmp(fmt, "%a") == 0 || strcmp(fmt, "%A") == 0)
+	{
+		strcpy((char *)va_arg(*ap, int), buf);
+		goto END;
+	}
+
+	while (*buf != '\0' || *fmt != '\0')
+	{
+		param_comma = strchr(buf, ',');
+		fmt_comma = strchr(fmt, ',');
+		param_quotes_begin = strchr(buf, '"');
+		//param_quotes_end = NULL;
+		param_quotes_end = strrchr(buf, '"');//从后面往前找
+
+		//如果参数带引号，则去掉引号
+		if (param_quotes_begin && (param_quotes_begin < param_comma || param_comma == NULL))
+		{
+			//param_quotes_end = strchr(param_quotes_begin + 1, '"');
+			//只有左引号，没有右引号
+			if (param_quotes_end == NULL)
+			{
+				ret = ATERR_PARAM_INVALID;
+				break;
+			}
+			
 			param_comma = strchr(param_quotes_end + 1, ',');
 			buf = param_quotes_begin + 1;
 			*param_quotes_end = '\0';

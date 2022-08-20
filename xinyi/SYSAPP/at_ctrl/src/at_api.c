@@ -396,6 +396,73 @@ int get_ascii_data(char *fmt_parm, char *at_str, int ascii_len, char *param_data
 
 }
 
+//added by WangJiebin 20220818, based on get_ascii_data
+//brief adaptation for support json string
+int get_ascii_data_json(char *fmt_parm, char *at_str, int ascii_len, char *param_data)
+{
+	int i = 0;
+	char *end_temp;
+	char *fmt_temp;
+	int douhao_num = 0;
+	int str_len = 0;
+
+    end_temp = strstr(fmt_parm, "%s");
+	xy_assert(end_temp != NULL);
+	xy_assert(strstr(end_temp + 2, "%s") == NULL);
+
+	//跳过前面的参数个数
+	fmt_temp = fmt_parm;
+	while (fmt_temp < end_temp)
+	{
+		if (*fmt_temp == ',')
+			douhao_num++;
+		fmt_temp++;
+	}
+
+	//找到字符串参数首地址
+	while (douhao_num != 0)
+	{
+		at_str = strchr(at_str, ',');
+		if (at_str == NULL)
+			return ATERR_PARAM_INVALID;
+		at_str++;
+		douhao_num--;
+	}
+
+   //such as {"value":-1,"error":2,"pics":3,"time":"1970-01-01/00:00:00","tzone":8,"sim":"89861120220010975785","rssi":9,"batt":100}"
+	if (*at_str == '"' )
+	{
+		at_str++;
+
+		//find char '"' from right to left
+		end_temp = strrchr(at_str, '"');
+		
+		if(end_temp != NULL)
+			str_len = end_temp - at_str;
+		else return ATERR_PARAM_INVALID;
+		if(str_len != ascii_len)
+			 return ATERR_PARAM_INVALID;
+	}
+
+	//将引号里面的内容拷出来作为有效参数内容
+	memcpy(param_data, at_str, str_len);
+	*(param_data + str_len) = '\0';
+
+	
+	//由于后续还有参数需要使用at_parse_param接口进行解析，进而需要将源字符串参数中的双引号和逗号这两个特殊匹配字符转义，以避免后续参数解析异常
+	while (i < ascii_len)
+	{
+		if (*(at_str + i) == '"')
+			*(at_str + i) = '\'';
+		if (*(at_str + i) == ',')
+			*(at_str + i) = ';';
+		i++;
+	}
+	
+	return AT_OK;
+}
+
+
 int at_parse_param(char *fmt, char *buf, ...)
 {
     int ret = AT_OK;
@@ -405,6 +472,17 @@ int at_parse_param(char *fmt, char *buf, ...)
     va_end(vl);
     return ret;
 }
+
+int at_parse_param_adapt(char *fmt, char *buf, ...)
+{
+    int ret = AT_OK;
+    va_list vl;
+    va_start(vl,buf);
+    ret = parse_param_vp_adapt(fmt, buf, 0, &vl);
+    va_end(vl);
+    return ret;
+}
+
 
 int at_parse_param_in_quotation(char *fmt, char *buf, ...)
 {

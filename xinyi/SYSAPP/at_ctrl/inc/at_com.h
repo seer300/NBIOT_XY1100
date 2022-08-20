@@ -52,6 +52,9 @@ struct at_fifo_msg
 //用于解析AT命令参数中含ASCII字符串的参数，由于ASCII字符串可能包含双引号和逗号特殊字符，影响通过at_parse_param解析后续的参数，进而在将ASCII字符串拷贝出来之后，对原ASCII字符串中的特殊字符进行转义
 int get_ascii_data(char *fmt_parm, char *at_str, int ascii_len, char *param_data);
 
+////added by WangJiebin 20220818, based on get_ascii_data
+int get_ascii_data_json(char *fmt_parm, char *at_str, int ascii_len, char *param_data);
+
 /**
  * @brief 获取AT请求命令的前缀和参数首地址，其中is_all用来指示前缀是否携带“AT+”
  * @param at_cmd [IN] at cmd data
@@ -120,6 +123,9 @@ int at_check_sms_fun(char *at_cmd_prefix);
 
 /*该接口仅内部函数调用，参数解析以可变入参方式提供，类似scanf*/
 int parse_param_vp(char *fmt_param, char *buf, int is_strict, va_list *ap);
+
+//added by WangJiebin 20220818, based on parse_param_vp
+int parse_param_vp_adapt(char *fmt_param, char *buf, int is_strict, va_list *ap);
 
 /**
  * @brief close_urc置1时，识别待输出给外部MCU的buf是否可以为可丢弃的URC；对于一些异步AT命令的中间结果上报和特别重要的URC是不可以丢弃的

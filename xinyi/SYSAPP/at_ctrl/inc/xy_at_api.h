@@ -179,6 +179,10 @@ void register_app_at_req(char *at_prefix, ser_req_func func);
  */
 int at_parse_param(char *fmt, char *buf, ...);
 
+//added by WangJiebin 20220818
+//brief only for AT+QLANOTIFY that can notify json data
+int at_parse_param_adapt(char *fmt, char *buf, ...);
+
 /**
  * @brief  仅用于特殊AT命令格式的参数解析，即多个参数被放在一组冒号内的AT命令，例如AT+CCLK="19/12/10,11:12:24+32"
  * @param fmt  [IN] format,such as "%s,%s"
