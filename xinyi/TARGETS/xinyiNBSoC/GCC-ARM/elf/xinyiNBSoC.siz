@@ -52,7 +52,7 @@
    5098	      0	      8	   5106	   13f2	../object/KERNEL/OSAL/FreeRTOS/Source/osal.o.ram
     209	      0	      4	    213	     d5	../object/KERNEL/OSAL/FreeRTOS/Source/osal_freertos_hook.o.ram
     486	      0	    244	    730	    2da	../object/KERNEL/OSAL/FreeRTOS/Source/osal_statistics.o.ram
-   1935	   1448	      0	   3383	    d37	../object/SYSAPP/at_cmd/src/at_cmd.o.flash
+   1962	   1464	      0	   3426	    d62	../object/SYSAPP/at_cmd/src/at_cmd.o.flash
    5070	     18	      5	   5093	   13e5	../object/SYSAPP/at_cmd/src/at_hardware_cmd.o.flash
    2628	      0	     12	   2640	    a50	../object/SYSAPP/at_cmd/src/at_passthrough.o.flash
    4450	     10	     19	   4479	   117f	../object/SYSAPP/at_cmd/src/at_ps_cmd.o.flash
@@ -61,7 +61,7 @@
    9059	      0	     16	   9075	   2373	../object/SYSAPP/at_cmd/src/at_test_cmd.o.flash
     621	    208	      0	    829	    33d	../object/SYSAPP/at_cmd/src/at_urc.o.flash
    2567	      0	     28	   2595	    a23	../object/SYSAPP/at_cmd/src/at_worklock.o.flash
-  17510	      0	      9	  17519	   446f	../object/SYSAPP/at_cmd/src/at_xy_cmd.o.flash
+  18932	      0	     13	  18945	   4a01	../object/SYSAPP/at_cmd/src/at_xy_cmd.o.flash
    2168	     32	     26	   2226	    8b2	../object/SYSAPP/at_uart/src/at_uart.o.flash
    2157	      0	     40	   2197	    895	../object/SYSAPP/at_uart/src/dirty_data_processing.o.ram
       0	      0	      0	      0	      0	../object/SYSAPP/diag_ctrl/src/diag_IsPrintLog.o.flash
@@ -205,7 +205,7 @@
     664	      0	      0	    664	    298	../object/APPLIB/cloud/onenet/ciscore/std_object/std_object.o.flash
    1620	      0	      0	   1620	    654	../object/APPLIB/cloud/onenet/ciscore/std_object/std_object_security.o.flash
   17222	      1	     74	  17297	   4391	../object/APPLIB/cloud/onenet/xy_onenet/src/at_onenet_proc.o.flash
-  10695	      0	     12	  10707	   29d3	../object/APPLIB/cloud/onenet/xy_onenet/src/at_xy_lwm2m_proc.o.flash
+  10683	      0	     12	  10695	   29c7	../object/APPLIB/cloud/onenet/xy_onenet/src/at_xy_lwm2m_proc.o.flash
    3481	      0	     20	   3501	    dad	../object/APPLIB/cloud/onenet/xy_onenet/src/onenet_backup_proc.o.flash
    1104	      0	     20	   1124	    464	../object/APPLIB/cloud/onenet/xy_onenet/src/onenet_fota.o.flash
    1969	      0	      4	   1973	    7b5	../object/APPLIB/cloud/onenet/xy_onenet/src/onenet_net.o.flash
@@ -335,7 +335,7 @@
     912	      0	      0	    912	    390	../object/APPLIB/Dtls/mbedtls-2.6.0/library/asn1parse.o.flash
       0	      0	      0	      0	      0	../object/APPLIB/Dtls/mbedtls-2.6.0/library/asn1write.o.flash
     768	      0	      0	    768	    300	../object/APPLIB/Dtls/mbedtls-2.6.0/library/base64.o.flash
-   7879	      0	      0	   7879	   1ec7	../object/APPLIB/Dtls/mbedtls-2.6.0/library/bignum.o.flash
+   7877	      0	      0	   7877	   1ec5	../object/APPLIB/Dtls/mbedtls-2.6.0/library/bignum.o.flash
       0	      0	      0	      0	      0	../object/APPLIB/Dtls/mbedtls-2.6.0/library/blowfish.o.flash
       0	      0	      0	      0	      0	../object/APPLIB/Dtls/mbedtls-2.6.0/library/camellia.o.flash
    1036	      0	      0	   1036	    40c	../object/APPLIB/Dtls/mbedtls-2.6.0/library/ccm.o.flash
@@ -379,11 +379,11 @@
       0	      0	      0	      0	      0	../object/APPLIB/Dtls/mbedtls-2.6.0/library/ripemd160.o.flash
    5182	      0	      0	   5182	   143e	../object/APPLIB/Dtls/mbedtls-2.6.0/library/rsa.o.flash
    4086	      0	      0	   4086	    ff6	../object/APPLIB/Dtls/mbedtls-2.6.0/library/sha1.o.flash
-   2658	      0	      0	   2658	    a62	../object/APPLIB/Dtls/mbedtls-2.6.0/library/sha256.o.flash
+   2650	      0	      0	   2650	    a5a	../object/APPLIB/Dtls/mbedtls-2.6.0/library/sha256.o.flash
       0	      0	      0	      0	      0	../object/APPLIB/Dtls/mbedtls-2.6.0/library/sha512.o.flash
     552	      0	      0	    552	    228	../object/APPLIB/Dtls/mbedtls-2.6.0/library/ssl_cache.o.flash
    1141	      0	      0	   1141	    475	../object/APPLIB/Dtls/mbedtls-2.6.0/library/ssl_ciphersuites.o.flash
-   3068	      0	      0	   3068	    bfc	../object/APPLIB/Dtls/mbedtls-2.6.0/library/ssl_cli.o.flash
+   3080	      0	      0	   3080	    c08	../object/APPLIB/Dtls/mbedtls-2.6.0/library/ssl_cli.o.flash
       0	      0	      0	      0	      0	../object/APPLIB/Dtls/mbedtls-2.6.0/library/ssl_cookie.o.flash
       0	      0	      0	      0	      0	../object/APPLIB/Dtls/mbedtls-2.6.0/library/ssl_srv.o.flash
       0	      0	      0	      0	      0	../object/APPLIB/Dtls/mbedtls-2.6.0/library/ssl_ticket.o.flash
@@ -406,11 +406,11 @@
    1164	      0	      0	   1164	    48c	../object/APPLIB/Dtls/xy_dtls/src/tls_interface.o.flash
     444	      0	      0	    444	    1bc	../object/APPLIB/Dtls/xy_dtls/src/xy_aes.o.flash
     490	      0	      0	    490	    1ea	../object/APPLIB/Dtls/xy_dtls/src/xy_mbedtls_net_sockets.o.flash
-   4841	      0	      8	   4849	   12f1	../object/APPLIB/at_socket/src/at_socket_bc26.o.flash
+   4936	      0	      9	   4945	   1351	../object/APPLIB/at_socket/src/at_socket_bc26.o.flash
    6123	      0	      0	   6123	   17eb	../object/APPLIB/at_socket/src/at_socket_cmd.o.flash
    3595	     12	     34	   3641	    e39	../object/APPLIB/at_socket/src/at_socket_context.o.flash
     593	      0	      0	    593	    251	../object/APPLIB/at_socket/src/at_socket_ram.o.ram
-   1227	      0	      0	   1227	    4cb	../object/APPLIB/at_socket/src/at_socket_rcv.o.flash
+   1223	      0	      0	   1223	    4c7	../object/APPLIB/at_socket/src/at_socket_rcv.o.flash
    6501	     12	     23	   6536	   1988	../object/APPLIB/cJSON/cJSON.o.flash
    1661	      0	      4	   1665	    681	../object/APPLIB/http/atcmd/at_http.o.flash
    1124	      0	      0	   1124	    464	../object/APPLIB/http/atcmd/http_socket.o.flash
@@ -432,12 +432,12 @@
    1470	      0	      0	   1470	    5be	../object/APPLIB/mqtt/utils/sha256.o.flash
     689	      0	      0	    689	    2b1	../object/APPLIB/mqtt/xy_mqtt/src/MQTTClient.o.flash
     771	      0	      0	    771	    303	../object/APPLIB/mqtt/xy_mqtt/src/MQTTTimer.o.flash
-   7692	      0	     18	   7710	   1e1e	../object/APPLIB/mqtt/xy_mqtt/src/at_mqtt.o.flash
+   7700	      0	     18	   7718	   1e26	../object/APPLIB/mqtt/xy_mqtt/src/at_mqtt.o.flash
    5841	      0	      2	   5843	   16d3	../object/APPLIB/mqtt/xy_mqtt/src/at_xy_mqtt.o.flash
    8417	      0	    896	   9313	   2461	../object/APPLIB/mqtt/xy_mqtt/src/at_xy_mqtt_proc.o.flash
    1789	      0	      4	   1793	    701	../object/APPLIB/mqtt/xy_mqtt/src/xy_mqtt_api.o.flash
     445	      0	      0	    445	    1bd	../object/APPLIB/xy_ps/atc_ps/src/at_3GPP_cmd_demo.o.flash
-    454	      0	      0	    454	    1c6	../object/APPLIB/xy_ps/atc_ps/src/atc_analysis.o.flash
+    458	      0	      0	    458	    1ca	../object/APPLIB/xy_ps/atc_ps/src/atc_analysis.o.flash
    4778	      0	      0	   4778	   12aa	../object/APPLIB/xy_ps/atc_ps/src/atc_cmd_basic.o.flash
    8923	      0	      0	   8923	   22db	../object/APPLIB/xy_ps/atc_ps/src/atc_cmd_other.o.flash
   21507	      0	      4	  21511	   5407	../object/APPLIB/xy_ps/atc_ps/src/atc_cmd_proc.o.flash
@@ -477,7 +477,7 @@
       0	      0	      0	      0	      0	../object/USERAPP/examples/xy_opencpu_demo/user_task_demo2.o.flash
       0	      0	      0	      0	      0	../object/USERAPP/examples/xy_opencpu_demo/user_task_demo3.o.flash
       0	      0	      0	      0	      0	../object/USERAPP/examples/xy_opencpu_demo/user_task_volatile_demo.o.flash
-      0	      0	      0	      0	      0	../object/USERAPP/examples/xy_peripheral_demo/flash/user_flash_demo.o.flash
+    364	      0	      4	    368	    170	../object/USERAPP/examples/xy_peripheral_demo/flash/user_flash_demo.o.flash
       0	      0	      0	      0	      0	../object/USERAPP/examples/xy_peripheral_demo/hal_adc/hal_adc_demo.o.flash
       0	      0	      0	      0	      0	../object/USERAPP/examples/xy_peripheral_demo/hal_adc/hal_adc_switch_demo.o.flash
       0	      0	      0	      0	      0	../object/USERAPP/examples/xy_peripheral_demo/hal_csp/hal_csp_irda_demo.o.flash
@@ -488,8 +488,8 @@
       0	      0	      0	      0	      0	../object/USERAPP/examples/xy_peripheral_demo/hal_gpi/standby_wakeup_demo.o.flash
       0	      0	      0	      0	      0	../object/USERAPP/examples/xy_peripheral_demo/hal_gpio/hal_gpio_input_demo.o.flash
       0	      0	      0	      0	      0	../object/USERAPP/examples/xy_peripheral_demo/hal_gpio/hal_gpio_interrupt_demo.o.flash
-    177	      0	      4	    181	     b5	../object/USERAPP/examples/xy_peripheral_demo/hal_gpio/hal_gpio_output_demo.o.flash
-   1247	      0	     16	   1263	    4ef	../object/USERAPP/examples/xy_peripheral_demo/hal_gpio/net_led_pro.o.flash
+    181	      0	      4	    185	     b9	../object/USERAPP/examples/xy_peripheral_demo/hal_gpio/hal_gpio_output_demo.o.flash
+   1231	      0	     16	   1247	    4df	../object/USERAPP/examples/xy_peripheral_demo/hal_gpio/net_led_pro.o.flash
       0	      0	      0	      0	      0	../object/USERAPP/examples/xy_peripheral_demo/hal_i2c/hal_i2c_master_demo.o.flash
       0	      0	      0	      0	      0	../object/USERAPP/examples/xy_peripheral_demo/hal_i2c/hal_i2c_slave_IT_demo.o.flash
       0	      0	      0	      0	      0	../object/USERAPP/examples/xy_peripheral_demo/hal_i2c/hal_i2c_slave_demo.o.flash

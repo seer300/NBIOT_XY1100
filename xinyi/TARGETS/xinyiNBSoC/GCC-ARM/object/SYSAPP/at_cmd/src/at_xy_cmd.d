@@ -159,7 +159,8 @@
  ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/priv/memp_priv.h \
  ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/priv/mem_priv.h \
  ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/inet.h \
- ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/errno.h
+ ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/errno.h \
+ ../../../../APPLIB/xy_ps/inc/xy_atc_interface.h
 
 ../../../../SYSAPP/at_cmd/inc/at_xy_cmd.h:
 
@@ -480,3 +481,5 @@
 ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/inet.h:
 
 ../../../../APPLIB/lwip/lwip-2.1.2/include/lwip/errno.h:
+
+../../../../APPLIB/xy_ps/inc/xy_atc_interface.h:

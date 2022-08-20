@@ -106,7 +106,8 @@
  ../../../../DRIVERS/hal/inc/hal_cortex.h \
  ../../../../DRIVERS/driverlib/inc/replace.h \
  ../../../../DRIVERS/driverlib/inc/hw_memmap.h \
- ../../../../SYSAPP/shm_msg/inc/zero_copy_shm.h
+ ../../../../SYSAPP/shm_msg/inc/zero_copy_shm.h \
+ ../../../../SYSAPP/at_cmd/inc/at_xy_cmd.h
 
 ../../../../SYSAPP/at_ctrl/inc/at_ctl.h:
 
@@ -321,3 +322,5 @@
 ../../../../DRIVERS/driverlib/inc/hw_memmap.h:
 
 ../../../../SYSAPP/shm_msg/inc/zero_copy_shm.h:
+
+../../../../SYSAPP/at_cmd/inc/at_xy_cmd.h:
