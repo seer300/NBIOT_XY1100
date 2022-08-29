@@ -517,7 +517,7 @@ coap_status_t observe_handleRequest(st_context_t * contextP,st_uri_t * uriP,
                 if (result == COAP_206_CONFORM)
                 {
 #if LWM2M_COMMON_VER
-                    if (contextP->cloud_platform == CLOUD_PLATFORM_COMMON && xy_lwm2m_config->access_mode == 1)
+                    if (contextP->cloud_platform == CLOUD_PLATFORM_COMMON && (xy_lwm2m_config->is_auto_ack == 1 || std_object_isStdObject(uriP->objectId)))
                     {
                         st_request_t *request;
                         request = (st_request_t *)cis_malloc(sizeof(st_request_t));

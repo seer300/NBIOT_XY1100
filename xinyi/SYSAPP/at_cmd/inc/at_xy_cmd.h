@@ -6,7 +6,7 @@
 #if  MODULE_130
 
 #define MODULE 		"SLM130X"
-#define TVERSION 	"T05"
+#define TVERSION 	"Test06"
 #define SDATE		"S0221"
 #define SDKVERSION	"0.2.1.C21"
 #define MVERSION	"M003"
