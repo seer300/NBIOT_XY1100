@@ -31,7 +31,9 @@ typedef struct xy_lwm2m_config_s
     int platform;
 
     // TODO: cfg_res
-
+#if VER_QUCTL260
+	int cfg_res;   //add by cjh for QLACFG
+#endif
     int recovery_mode;
     int lifetime_enable;
     int dtls_mode;

@@ -272,8 +272,14 @@ void init_xy_lwm2m_config()
 
     xy_lwm2m_config->ack_timeout = 2;
     xy_lwm2m_config->retrans_max_times = 5;
-
+/*************add by cjh for QLACFG**************/
+#if VER_QUCTL260
+	xy_lwm2m_config->lifetime_enable = 0; 
+	xy_lwm2m_config->dtls_version = 2;    
+#else
     xy_lwm2m_config->lifetime_enable = 1;
+#endif
+/**********add end************/
 }
 
 void clear_xy_lwm2m_config()
@@ -813,9 +819,32 @@ int at_proc_qlaconfig_req(char *at_buf, char **rsp_cmd)
             report_recover_result(resume_net_app(ONENET_TASK));
 
         if (is_xy_lwm2m_running())
-        {
-            *rsp_cmd = AT_ERR_BUILD(ATERR_NOT_ALLOWED);
-            return AT_END;
+        {   
+#if VER_QUCTL260
+   	      if (onenet_context_config != NULL && onenet_context_config->config_hex != NULL)
+          {
+        		
+           		xy_free(onenet_context_config->config_hex);
+            	memset(onenet_context_config, 0, sizeof(onenet_context_config_t));
+		  }
+        	if (onenet_context_ref != NULL)
+       	    {
+        	
+            if (onenet_context_ref->onenet_context != NULL)
+                cis_deinit((void **)&onenet_context_ref->onenet_context);
+
+            if (onenet_context_ref->onet_at_thread_id != NULL)
+            {   
+            
+                osThreadTerminate(onenet_context_ref->onet_at_thread_id);
+                onenet_context_ref->onet_at_thread_id = NULL;
+            }
+            free_onenet_context_ref(onenet_context_ref);
+            }
+#else
+				rsp_cmd = AT_ERR_BUILD(ATERR_NOT_ALLOWED);
+				return AT_END;   
+#endif         
         }
         if (xy_lwm2m_config == NULL)
             init_xy_lwm2m_config();
@@ -896,13 +925,22 @@ int at_proc_qlaconfig_req(char *at_buf, char **rsp_cmd)
             thread_attr.priority = XY_OS_PRIO_NORMAL1;
             thread_attr.stack_size = 0x1000;
             onenet_context_ref->onet_at_thread_id = osThreadNew((osThreadFunc_t)(onet_at_pump), onenet_context_ref, &thread_attr);
-
+/*****************add by cjh for bc260y********************/
+#if VER_QUCTL260
             //store factory_nv
+			g_softap_fac_nv->AEP_config_len = onenet_context_config->total_len; 
+            memset(g_softap_fac_nv->onenet_config_hex, 0, sizeof(g_softap_fac_nv->onenet_config_hex));
+            memcpy(g_softap_fac_nv->onenet_config_hex, onenet_context_config->config_hex, onenet_context_config->total_len);
+            SAVE_FAC_PARAM(onenet_config_hex);
+            SAVE_FAC_PARAM(AEP_config_len); 
+#else
             g_softap_fac_nv->onenet_config_len = onenet_context_config->total_len;
             memset(g_softap_fac_nv->onenet_config_hex, 0, sizeof(g_softap_fac_nv->onenet_config_hex));
             memcpy(g_softap_fac_nv->onenet_config_hex, onenet_context_config->config_hex, onenet_context_config->total_len);
             SAVE_FAC_PARAM(onenet_config_hex);
             SAVE_FAC_PARAM(onenet_config_len);
+#endif
+/*********add end*************/
         }
 
         *rsp_cmd = gen_at_ok();
@@ -1161,6 +1199,58 @@ int at_proc_qlacfg_req(char *at_buf, char **rsp_cmd)
                 xy_lwm2m_config->lifetime_enable = lifetime_enable;
             }
         }
+/******************add by cjh for newly add "dtls_mode" "dtls_version"*************/
+#if VER_QUCTL260
+		else if (at_strcasecmp(operation, "dtls_mode") == 0)
+		{
+			int dtls_mode = -1;
+			 if (at_parse_param(",%d", at_buf, &dtls_mode) != AT_OK)//at_parse_param返回值为0，则成功，执行下一个if
+            {
+            	err_num = ATERR_PARAM_INVALID;
+                goto error;
+            }
+			 if (dtls_mode == -1)
+			 {
+			 	*rsp_cmd = xy_malloc(64);
+				snprintf(*rsp_cmd, 64, "\r\n+QLACFG: \"dtls_mode\",%d\r\n\r\nOK\r\n", xy_lwm2m_config->dtls_mode);
+				goto out;
+			 }
+			 else
+			 {
+			 	if(dtls_mode != 0 && dtls_mode !=1)
+			 	{
+			 		 err_num = ATERR_PARAM_INVALID;
+                     goto error;
+			 	}
+				xy_lwm2m_config->dtls_mode = dtls_mode;
+			 }
+		}
+		else if (at_strcasecmp(operation, "dtls_version") == 0)
+		{	
+			int dtls_version = -1;
+			if (at_parse_param(",%d", at_buf, &dtls_version) != AT_OK)
+            {
+            	err_num = ATERR_PARAM_INVALID;
+                goto error;
+            }
+			if (dtls_version == -1)
+			{	
+				*rsp_cmd = xy_malloc(64);
+                snprintf(*rsp_cmd, 64, "\r\n+QLACFG: \"dtls_version\",%d\r\n\r\nOK\r\n", xy_lwm2m_config->dtls_version);
+                goto out;
+			}
+			else
+			{
+				if (dtls_version != 0 && dtls_version != 1 && dtls_version != 2)
+				{
+					err_num = ATERR_PARAM_INVALID;
+                    goto error;
+				}
+				xy_lwm2m_config->dtls_version = 2;
+			}
+		}
+#endif
+/************add end**************/
         else
         {
         	err_num = ATERR_PARAM_INVALID;
@@ -1185,6 +1275,20 @@ int at_proc_qlacfg_req(char *at_buf, char **rsp_cmd)
         }
 
         *rsp_cmd = xy_malloc(256);
+/***************add by cjh for bc260y qlacfg*****************/
+#if VER_QUCTL260
+		snprintf(*rsp_cmd, 256, "\r\n+QLACFG: \"retransmit\",%d,%d\r\n"
+                                "+QLACFG: \"auto_ack\",%d\r\n"
+                                "+QLACFG: \"platform\",%d\r\n"
+                                "+QLACFG: \"cfg_res\",3,0,17,%d\r\n" 
+                                "+QLACFG: \"lifetime_enable\",%d\r\n"
+                                "+QLACFG: \"dtls_mode\",%d\r\n"		 
+                                "+QLACFG: \"dtls_version\",%d\r\n"	 
+                                "\r\nOK\r\n",
+                 xy_lwm2m_config->ack_timeout, xy_lwm2m_config->retrans_max_times, xy_lwm2m_config->is_auto_ack,
+                 xy_lwm2m_config->platform, xy_lwm2m_config->cfg_res,xy_lwm2m_config->lifetime_enable, 
+				 xy_lwm2m_config->dtls_mode, xy_lwm2m_config->dtls_version); 
+#else
         snprintf(*rsp_cmd, 256, "\r\n+QLACFG: \"retransmit\",%d,%d\r\n"
                                 "+QLACFG: \"auto_ack\",%d\r\n"
                                 "+QLACFG: \"access_mode\",%d\r\n"
@@ -1195,6 +1299,8 @@ int at_proc_qlacfg_req(char *at_buf, char **rsp_cmd)
                  xy_lwm2m_config->ack_timeout, xy_lwm2m_config->retrans_max_times, xy_lwm2m_config->is_auto_ack,
                  /* xy_lwm2m_config->access_mode */ xy_lwm2m_config->access_mode_alternative, xy_lwm2m_config->platform, g_softap_var_nv->lwm2m_recovery_mode,
                  xy_lwm2m_config->lifetime_enable);
+#endif
+/*********add end*************/
     }
     else
     {
@@ -1212,6 +1318,10 @@ int at_proc_qlacfg_req(char *at_buf, char **rsp_cmd)
    Return 	 	: AT_END
    Eg 		 	: AT+QLAREG
 *****************************************************************************/
+#if VER_QUCTL260
+int Flag_QLASTATUS = 0; //add by cjh for QLASTATUS
+#endif
+
 int at_proc_qlareg_req(char *at_buf, char **rsp_cmd)
 {
     if (g_req_type == AT_CMD_ACTIVE)
@@ -1393,7 +1503,9 @@ int at_proc_qladereg_req(char *at_buf, char **rsp_cmd)
         	err_num = ATERR_NOT_ALLOWED;
         	goto error;
         }
-
+#if VER_QUCTL260
+		Flag_QLASTATUS = 1; //add by cjh for QLASTATUS
+#endif
         *rsp_cmd = gen_at_ok();
         return AT_END;
     error:
@@ -2349,6 +2461,79 @@ int at_proc_qlard_req(char *at_buf, char **rsp_cmd)
  *****************************************************************************/
 int at_proc_qlstatus_req(char *at_buf, char **rsp_cmd)
 {
+#if VER_QUCTL260
+ if (g_req_type == AT_CMD_QUERY)
+    {
+    	unsigned int err_num = ATERR_XY_ERR;
+        int status;
+        if (!ps_netif_is_ok())
+        {
+        	err_num = ATERR_NOT_NET_CONNECT;
+            goto error;
+        }
+		if (Flag_QLASTATUS == 1)
+		{
+			status = 4;
+		}
+		else
+			{
+        if (!is_xy_lwm2m_running())
+        {
+            if(NET_NEED_RECOVERY(ONENET_TASK))
+                status = 7;
+            else
+                status = 5;
+        }
+        else
+        {
+            st_context_t *onenet_context = onenet_context_refs[0].onenet_context;
+            if (onenet_context->registerEnabled == true)
+            {
+                switch (registration_getStatus(onenet_context))
+                {
+                case STATE_REGISTERED:
+                {
+                    status = 2;
+                    break;
+                }
+
+                case STATE_REG_FAILED:
+                {
+                    status = 0;
+                    break;
+                }
+
+                case STATE_REG_PENDING:
+                default:
+                        status = 1;
+                    break;
+                }
+            }
+            else
+            {
+                status = 0;
+            }
+        }
+			}
+		*rsp_cmd = xy_malloc(32);
+        snprintf(*rsp_cmd, 32, "\r\n+QLASTATUS: %d\r\n\r\nOK\r\n", status);
+
+        // *rsp_cmd = gen_at_ok();
+        if(status == 4) //add by cjh
+			Flag_QLASTATUS = 0;
+        return AT_END;
+    error:
+        *rsp_cmd = AT_ERR_BUILD(err_num);
+        return AT_END;
+    }
+    else
+    {
+        *rsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
+    }
+
+    return AT_END;
+
+#else
     if (g_req_type == AT_CMD_QUERY)
     {
     	unsigned int err_num = ATERR_XY_ERR;
@@ -2411,6 +2596,7 @@ int at_proc_qlstatus_req(char *at_buf, char **rsp_cmd)
     }
 
     return AT_END;
+#endif
 }
 
 

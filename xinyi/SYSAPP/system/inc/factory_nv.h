@@ -555,6 +555,9 @@ typedef struct {
     uint32_t ref_secdns4;   //##134744072("8.8.8.8"字节形式)## ipv4默认辅dns服务器地址。以字节形式保存
     
     uint8_t   reserved[44];		//##0## 
+#if VER_QUCTL260
+    uint8_t	  AEP_config_len;	//add by cjh
+#endif
 
 }softap_fac_nv_t;
 
