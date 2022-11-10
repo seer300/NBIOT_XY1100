@@ -20,6 +20,11 @@ xy_lwm2m_config_t *xy_lwm2m_config = NULL;
 xy_lwm2m_cached_urc_head_t *xy_lwm2m_cached_urc_head = NULL;
 xy_lwm2m_object_info_head_t *xy_lwm2m_object_info_head = NULL;
 
+#if VER_QUCTL260
+int Flag_QLASTATUS = 0; //add by cjh for QLASTATUS
+int qlastatus = 0;		//MG 20221109 add by LGF for reREG
+#endif
+
 extern onenet_context_config_t onenet_context_configs[CIS_REF_MAX_NUM];
 extern onenet_context_reference_t onenet_context_refs[CIS_REF_MAX_NUM];
 extern osMutexId_t g_onenet_mutex;
@@ -354,8 +359,12 @@ int convert_cis_event_to_common_urc(char *at_str, int max_len, int cis_eid, void
     switch (cis_eid)
     {
     case CIS_EVENT_REG_SUCCESS:
+#if VER_QUCTL260
+    	qlastatus = 1;
+#endif
         snprintf(at_str, max_len, "\r\n+QLAREG: %d", XY_LWM2M_SUCCESS);
         break;
+
     case CIS_EVENT_REG_FAILED:
         snprintf(at_str, max_len, "\r\n+QLAREG: %d", XY_LWM2M_ERROR);
         break;
@@ -390,7 +399,12 @@ int convert_cis_event_to_common_urc(char *at_str, int max_len, int cis_eid, void
         if ((int)param != -1)
             snprintf(at_str, max_len, "\r\n+QLAUPDATE: %d,%d", XY_LWM2M_UPDATEFAILED, (int)param);
         else
+{
             snprintf(at_str, max_len, "\r\n+QLAURC: \"ping\",%d", XY_LWM2M_UPDATEFAILED);
+#if VER_QUCTL260	//MG 20221110 add by LGF 
+			qlastatus = 2;
+#endif
+}
         break;
     case CIS_EVENT_UPDATE_TIMEOUT:
         if ((int)param != -1)
@@ -401,7 +415,12 @@ int convert_cis_event_to_common_urc(char *at_str, int max_len, int cis_eid, void
     case CIS_EVENT_UNREG_DONE:
         snprintf(at_str, max_len, "\r\n+QLADEREG: %d", XY_LWM2M_SUCCESS);
         xy_lwm2m_deinit(&onenet_context_refs[0]);
+#if VER_QUCTL260	//MG 20221110 add by LGF
+		clear_xy_lwm2m_cached_urc_list();
+		qlastatus = 2;
+#else
         clear_xy_lwm2m_config();
+#endif
         break;
     case CIS_EVENT_NOTIFY_SUCCESS:
         snprintf(at_str, max_len, "\r\n+QLAURC: \"report_ack\",%d,%d", XY_LWM2M_SUCCESS, (int)param);
@@ -817,33 +836,38 @@ int at_proc_qlaconfig_req(char *at_buf, char **rsp_cmd)
 
         if(g_softap_var_nv->lwm2m_recovery_mode == 0)
             report_recover_result(resume_net_app(ONENET_TASK));
-
+#if VER_QUCTL260	//MG 20221110 add by LGF			
+		if (qlastatus==1)
+		{
+		    *rsp_cmd = AT_ERR_BUILD(ATERR_NOT_ALLOWED);
+            return AT_END;
+		}
+#endif		
         if (is_xy_lwm2m_running())
         {   
 #if VER_QUCTL260
-   	      if (onenet_context_config != NULL && onenet_context_config->config_hex != NULL)
-          {
-        		
-           		xy_free(onenet_context_config->config_hex);
-            	memset(onenet_context_config, 0, sizeof(onenet_context_config_t));
-		  }
-        	if (onenet_context_ref != NULL)
-       	    {
-        	
-            if (onenet_context_ref->onenet_context != NULL)
-                cis_deinit((void **)&onenet_context_ref->onenet_context);
-
-            if (onenet_context_ref->onet_at_thread_id != NULL)
-            {   
-            
-                osThreadTerminate(onenet_context_ref->onet_at_thread_id);
-                onenet_context_ref->onet_at_thread_id = NULL;
-            }
-            free_onenet_context_ref(onenet_context_ref);
-            }
+			if (onenet_context_config != NULL && onenet_context_config->config_hex != NULL)
+			{
+				xy_free(onenet_context_config->config_hex);
+				memset(onenet_context_config, 0, sizeof(onenet_context_config_t));
+			}
+			if (onenet_context_ref != NULL)
+			{
+				if (onenet_context_ref->onenet_context != NULL)
+					cis_deinit((void **)&onenet_context_ref->onenet_context);
+			
+				if (onenet_context_ref->onet_at_thread_id != NULL)
+				{
+					osThreadTerminate(onenet_context_ref->onet_at_thread_id);
+					onenet_context_ref->onet_at_thread_id = NULL;
+				}
+				free_onenet_context_ref(onenet_context_ref);
+				memset(onenet_context_ref, 0, sizeof(onenet_context_reference_t));
+			}
+			init_xy_lwm2m_object_info_list();
 #else
-				rsp_cmd = AT_ERR_BUILD(ATERR_NOT_ALLOWED);
-				return AT_END;   
+			rsp_cmd = AT_ERR_BUILD(ATERR_NOT_ALLOWED);
+			return AT_END;   
 #endif         
         }
         if (xy_lwm2m_config == NULL)
@@ -912,27 +936,20 @@ int at_proc_qlaconfig_req(char *at_buf, char **rsp_cmd)
         	goto error;
         }
 
-        osThreadAttr_t thread_attr = {0};
-
         if (xy_lwm2m_init(onenet_context_ref, onenet_context_config) < 0)
         {
         	err_num = ATERR_NOT_ALLOWED;
         	goto error;
         }
         else
-        {
+        {	
+        	osThreadAttr_t thread_attr = {0};
             thread_attr.name = "xy_lwm2m_tk";
             thread_attr.priority = XY_OS_PRIO_NORMAL1;
             thread_attr.stack_size = 0x1000;
             onenet_context_ref->onet_at_thread_id = osThreadNew((osThreadFunc_t)(onet_at_pump), onenet_context_ref, &thread_attr);
 /*****************add by cjh for bc260y********************/
 #if VER_QUCTL260
-            //store factory_nv
-			g_softap_fac_nv->AEP_config_len = onenet_context_config->total_len; 
-            memset(g_softap_fac_nv->onenet_config_hex, 0, sizeof(g_softap_fac_nv->onenet_config_hex));
-            memcpy(g_softap_fac_nv->onenet_config_hex, onenet_context_config->config_hex, onenet_context_config->total_len);
-            SAVE_FAC_PARAM(onenet_config_hex);
-            SAVE_FAC_PARAM(AEP_config_len); 
 #else
             g_softap_fac_nv->onenet_config_len = onenet_context_config->total_len;
             memset(g_softap_fac_nv->onenet_config_hex, 0, sizeof(g_softap_fac_nv->onenet_config_hex));
@@ -1021,6 +1038,13 @@ int at_proc_qlacfg_req(char *at_buf, char **rsp_cmd)
 
         if(g_softap_var_nv->lwm2m_recovery_mode == 0)
             report_recover_result(resume_net_app(ONENET_TASK));
+#if VER_QUCTL260	//MG 20221110 add by LGF			
+		if (qlastatus==1)
+		{
+		    *rsp_cmd = AT_ERR_BUILD(ATERR_NOT_ALLOWED);
+            return AT_END;
+		}
+#endif		
 
         if (xy_lwm2m_config == NULL)
         {
@@ -1283,7 +1307,7 @@ int at_proc_qlacfg_req(char *at_buf, char **rsp_cmd)
                                 "+QLACFG: \"cfg_res\",3,0,17,%d\r\n" 
                                 "+QLACFG: \"lifetime_enable\",%d\r\n"
                                 "+QLACFG: \"dtls_mode\",%d\r\n"		 
-                                "+QLACFG: \"dtls_version\",%d\r\n"	 
+                                "+QLACFG: \"dtls_version\",%d\r\n"
                                 "\r\nOK\r\n",
                  xy_lwm2m_config->ack_timeout, xy_lwm2m_config->retrans_max_times, xy_lwm2m_config->is_auto_ack,
                  xy_lwm2m_config->platform, xy_lwm2m_config->cfg_res,xy_lwm2m_config->lifetime_enable, 
@@ -1318,9 +1342,6 @@ int at_proc_qlacfg_req(char *at_buf, char **rsp_cmd)
    Return 	 	: AT_END
    Eg 		 	: AT+QLAREG
 *****************************************************************************/
-#if VER_QUCTL260
-int Flag_QLASTATUS = 0; //add by cjh for QLASTATUS
-#endif
 
 int at_proc_qlareg_req(char *at_buf, char **rsp_cmd)
 {
@@ -1334,16 +1355,109 @@ int at_proc_qlareg_req(char *at_buf, char **rsp_cmd)
         }
         if(g_softap_var_nv->lwm2m_recovery_mode == 0)
             report_recover_result(resume_net_app(ONENET_TASK));
+		
+		onenet_context_config_t *onenet_context_config = &onenet_context_configs[0];
+		onenet_context_reference_t *onenet_context_ref = &onenet_context_refs[0];
 
         if (!is_xy_lwm2m_running())
         {
-        	err_num = ATERR_NOT_ALLOWED;
-            goto error;
+#if VER_QUCTL260 //MG 20221110 add by LGF
+			if(qlastatus == 2)
+			{
+				qlastatus++;
+				if (onenet_context_config != NULL && onenet_context_config->config_hex != NULL)
+				{
+					xy_free(onenet_context_config->config_hex);
+					memset(onenet_context_config, 0, sizeof(onenet_context_config_t));
+				}
+				if (onenet_context_ref != NULL)
+				{
+					if (onenet_context_ref->onenet_context != NULL)
+						cis_deinit((void **)&onenet_context_ref->onenet_context);
+			
+					if (onenet_context_ref->onet_at_thread_id != NULL)
+					{
+						osThreadTerminate(onenet_context_ref->onet_at_thread_id);
+						onenet_context_ref->onet_at_thread_id = NULL;
+					}
+					free_onenet_context_ref(onenet_context_ref);
+					memset(onenet_context_ref, 0, sizeof(onenet_context_reference_t));
+				}
+				if (generate_config_hex() < 0)		
+				{
+					err_num = ATERR_PARAM_INVALID;
+					goto error;
+				}
+				if (xy_lwm2m_init(onenet_context_ref, onenet_context_config) < 0)
+				{
+					err_num = ATERR_NOT_ALLOWED;
+					goto error;
+				}
+				osThreadAttr_t thread_attr = {0};
+				thread_attr.name = "xy_lwm2m_tk";
+				thread_attr.priority = XY_OS_PRIO_NORMAL1;
+				thread_attr.stack_size = 0x1000;
+				onenet_context_ref->onet_at_thread_id = osThreadNew((osThreadFunc_t)(onet_at_pump), onenet_context_ref, &thread_attr);
+				if(xy_lwm2m_object_info_head->num >0)	
+				{
+					int ret = -1;
+					uint8_t instPtr[1] = {0};
+					cis_inst_bitmap_t bitmap = {0};
+					cis_res_count_t rescount;
+					xy_lwm2m_object_info_t *node = xy_lwm2m_object_info_head->first;
+					while (node)
+					{
+						bitmap.instanceBitmap	= instPtr;
+						bitmap.instanceCount	= 8;
+						bitmap.instanceBytes	= 1;
+						rescount.attrCount		= node->resource_count;
+						rescount.actCount		= node->resource_count;
+						instPtr[0]				= 0x80 >> node->instance_id;
+						st_object_t *objectP = prv_findObject(onenet_context_refs[0].onenet_context, node->obj_id);
+						if(objectP != NULL)
+						{
+							if(instPtr[0] & *objectP->instBitmapPtr)
+							{						
+							//obj_id和ins_id 已存在。
+							//printf("\r\nqlareg_qlaaddobj\r\n"); //MG 20221110 add by LGF
+							}
+							else
+							{					
+							//obj_id存在，ins_id不存在，需先删除obj，再重新添加
+								instPtr[0] |= *objectP->instBitmapPtr;
+								if(node->resource_count < objectP->attributeCount)
+								{
+									rescount.attrCount = objectP->attributeCount;
+									rescount.actCount = objectP->actionCount;
+								}
+								osMutexAcquire(g_onenet_mutex, osWaitForever);
+								cis_delobject(onenet_context_refs[0].onenet_context, node->obj_id);
+								osMutexRelease(g_onenet_mutex);
+							}
+						}
+						osMutexAcquire(g_onenet_mutex, osWaitForever);
+						ret = cis_addobject(onenet_context_refs[0].onenet_context, node->obj_id, &bitmap, &rescount);
+						osMutexRelease(g_onenet_mutex);
+						if (ret != CIS_RET_OK)
+						{
+							err_num = ATERR_NOT_ALLOWED;
+							break;
+						}	
+						node = node->next;
+					}
+				}
+			}
+			else
+			{
+				err_num = ATERR_PARAM_INVALID;
+				goto error;
+			}
+#else	
+			err_num = ATERR_NOT_ALLOWED;
+			goto error;
+#endif	
+
         }
-
-        onenet_context_reference_t *onenet_context_ref = &onenet_context_refs[0];
-        int ret = CIS_RET_ERROR;
-
         if (onenet_context_refs[0].onenet_context->registerEnabled == true)
         {
         	err_num = ATERR_NOT_ALLOWED;
@@ -1351,7 +1465,7 @@ int at_proc_qlareg_req(char *at_buf, char **rsp_cmd)
         }
 
         onenet_context_refs[0].onenet_context->platform_common_type = xy_lwm2m_config->platform;
-
+        int ret = CIS_RET_ERROR;
         osMutexAcquire(g_onenet_mutex, osWaitForever);
         ret = onet_register(onenet_context_ref->onenet_context, xy_lwm2m_config->lifetime);
         osMutexRelease(g_onenet_mutex);
@@ -1547,11 +1661,113 @@ int at_proc_qlaaddobj_req(char *at_buf, char **rsp_cmd)
         if(g_softap_var_nv->lwm2m_recovery_mode == 0)
             report_recover_result(resume_net_app(ONENET_TASK));
 
+		if (qlastatus==1)	
+		{
+		    *rsp_cmd = AT_ERR_BUILD(ATERR_NOT_ALLOWED);
+            return AT_END;
+		}
+		
+		onenet_context_config_t *onenet_context_config = &onenet_context_configs[0];
+		onenet_context_reference_t *onenet_context_ref = &onenet_context_refs[0];
+
         if (!is_xy_lwm2m_running())
         {
-        	err_num = ATERR_NOT_ALLOWED;
-        	goto error;
-        }
+#if VER_QUCTL260 //MG 20221110 add by LGF
+			if(qlastatus == 2)
+			{
+				qlastatus++;
+				if (onenet_context_config != NULL && onenet_context_config->config_hex != NULL)
+				{
+					xy_free(onenet_context_config->config_hex);
+					memset(onenet_context_config, 0, sizeof(onenet_context_config_t));
+				}
+				if (onenet_context_ref != NULL)
+				{
+					if (onenet_context_ref->onenet_context != NULL)
+						cis_deinit((void **)&onenet_context_ref->onenet_context);
+			
+					if (onenet_context_ref->onet_at_thread_id != NULL)
+					{
+						osThreadTerminate(onenet_context_ref->onet_at_thread_id);
+						onenet_context_ref->onet_at_thread_id = NULL;
+					}
+					free_onenet_context_ref(onenet_context_ref);
+					memset(onenet_context_ref, 0, sizeof(onenet_context_reference_t));
+				}
+				if (generate_config_hex() < 0)		
+				{
+					err_num = ATERR_PARAM_INVALID;
+					goto error;
+				}
+				if (xy_lwm2m_init(onenet_context_ref, onenet_context_config) < 0)
+				{
+					err_num = ATERR_NOT_ALLOWED;
+					goto error;
+				}
+				osThreadAttr_t thread_attr = {0};
+				thread_attr.name = "xy_lwm2m_tk";
+				thread_attr.priority = XY_OS_PRIO_NORMAL1;
+				thread_attr.stack_size = 0x1000;
+				onenet_context_ref->onet_at_thread_id = osThreadNew((osThreadFunc_t)(onet_at_pump), onenet_context_ref, &thread_attr);
+				if(xy_lwm2m_object_info_head->num >0)	
+				{
+					int ret = -1;
+					uint8_t instPtr[1] = {0};
+					cis_inst_bitmap_t bitmap = {0};
+					cis_res_count_t rescount;
+					xy_lwm2m_object_info_t *node = xy_lwm2m_object_info_head->first;
+					while (node)
+					{
+						bitmap.instanceBitmap	= instPtr;
+						bitmap.instanceCount	= 8;
+						bitmap.instanceBytes	= 1;
+						rescount.attrCount		= node->resource_count;
+						rescount.actCount		= node->resource_count;
+						instPtr[0]				= 0x80 >> node->instance_id;
+						st_object_t *objectP = prv_findObject(onenet_context_refs[0].onenet_context, node->obj_id);
+						if(objectP != NULL)
+						{
+							if(instPtr[0] & *objectP->instBitmapPtr)
+							{						
+							//obj_id和ins_id 已存在。
+							//printf("\r\nqlaaddobj_qlaaddobj\r\n"); //MG 20221110 add by LGF
+							}
+							else
+							{					
+							//obj_id存在，ins_id不存在，需先删除obj，再重新添加
+								instPtr[0] |= *objectP->instBitmapPtr;
+								if(node->resource_count < objectP->attributeCount)
+								{
+									rescount.attrCount = objectP->attributeCount;
+									rescount.actCount = objectP->actionCount;
+								}
+								osMutexAcquire(g_onenet_mutex, osWaitForever);
+								cis_delobject(onenet_context_refs[0].onenet_context, node->obj_id);
+								osMutexRelease(g_onenet_mutex);
+							}
+						}
+						osMutexAcquire(g_onenet_mutex, osWaitForever);
+						ret = cis_addobject(onenet_context_refs[0].onenet_context, node->obj_id, &bitmap, &rescount);
+						osMutexRelease(g_onenet_mutex);
+						if (ret != CIS_RET_OK)
+						{
+							err_num = ATERR_NOT_ALLOWED;
+							break;
+						}	
+						node = node->next;
+					}
+				}
+			}
+			else
+			{
+				err_num = ATERR_PARAM_INVALID;
+				goto error;
+			}
+#else	
+			err_num = ATERR_NOT_ALLOWED;
+			goto error;
+#endif	
+		}
 
         int ret;
         int obj_id;
@@ -1670,8 +1886,19 @@ int at_proc_qlaaddobj_req(char *at_buf, char **rsp_cmd)
     {
         if (!is_xy_lwm2m_running())
         {
+#if VER_QUCTL260 //MG 20221110 add by LGF
+			if(qlastatus == 2)
+			{
+			}
+			else
+			{
+				*rsp_cmd = AT_ERR_BUILD(ATERR_NOT_ALLOWED);
+				return AT_END;
+			}
+#else
             *rsp_cmd = AT_ERR_BUILD(ATERR_NOT_ALLOWED);
             return AT_END;
+#endif
         }
         if (xy_lwm2m_object_info_head == NULL || xy_lwm2m_object_info_head->num == 0)
         {
@@ -1680,13 +1907,24 @@ int at_proc_qlaaddobj_req(char *at_buf, char **rsp_cmd)
         }
         else
         {
-            st_context_t *context = onenet_context_refs[0].onenet_context;
+            //st_context_t *context = onenet_context_refs[0].onenet_context;
             int i, len, temp_len;
             len = 0;
+#if VER_QUCTL260 //MG 20221110 add by LGF
+			int whiletimes = 0;
+#endif
             *rsp_cmd = xy_malloc(90 * xy_lwm2m_object_info_head->num);
             xy_lwm2m_object_info_t *node = xy_lwm2m_object_info_head->first;
             while (node)
             {
+#if VER_QUCTL260 //MG 20221110 add by LGF
+            	whiletimes++;
+				if(whiletimes > xy_lwm2m_object_info_head->num)
+				{
+					//printf("\r\nqlaaddobj_QUERY\r\n");
+					break;
+				}
+#endif
                 temp_len = sprintf(*rsp_cmd + len, "\r\n+QLAADDOBJ: %d,%d,%d", node->obj_id, node->instance_id, node->resource_count);
                 len += temp_len;
                 for (i = 0; i < node->resource_count; i++)
@@ -1728,11 +1966,41 @@ int at_proc_qladelobj_req(char *at_buf, char **rsp_cmd)
 
         if(g_softap_var_nv->lwm2m_recovery_mode == 0)
             report_recover_result(resume_net_app(ONENET_TASK));
-
+		
+#if VER_QUCTL260 //MG 20221110 add by LGF
+		if (qlastatus==1)
+		{
+		    *rsp_cmd = AT_ERR_BUILD(ATERR_NOT_ALLOWED);
+            return AT_END;
+		}
+#endif
         if (!is_xy_lwm2m_running())
         {
+#if VER_QUCTL260 //MG 20221110 add by LGF
+        	if(qlastatus>=2)
+        	{
+				if(xy_lwm2m_object_info_head->num == 0)
+				{
+					err_num = ATERR_NOT_ALLOWED;
+            		goto error;
+				}
+				else
+				{
+					init_xy_lwm2m_object_info_list();
+					*rsp_cmd = gen_at_ok();
+					return AT_END;
+				}
+        	}
+			else
+			{
+	        	err_num = ATERR_NOT_ALLOWED;
+	            goto error;
+			}	
+#else
         	err_num = ATERR_NOT_ALLOWED;
             goto error;
+#endif
+
         }
 
         int ret;
