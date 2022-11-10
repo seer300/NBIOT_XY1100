@@ -198,12 +198,15 @@ int del_socket_ctx_by_index(int idx, bool report)
 		}
 		if (sock_ctx[idx]->remote_ip != NULL)
 			xy_free(sock_ctx[idx]->remote_ip);
-
+		
+        int actual_connectid = sock_ctx[idx]->sock_id;
 		del_allsnnode_by_socketid(sock_ctx[idx]->sock_id);
 		xy_free(sock_ctx[idx]);
         sock_ctx[idx] = NULL;
         if (report)
-            at_report_socket_state(idx, net_type);
+            //at_report_socket_state(idx, net_type);
+            /*20221110 wjb add: tcp close URC id is <connectID>, aka sock_ctx[idx]->sock_id*/
+		    at_report_socket_state(actual_connectid, net_type);
         osMutexRelease(g_socket_mux);
         return XY_OK;
     }

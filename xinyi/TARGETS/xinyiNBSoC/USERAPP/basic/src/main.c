@@ -58,8 +58,6 @@ void user_peripheral_init()
 */
 void user_task_init()
 {
-    int i ;
-
 	if(*(uint32_t*)(BACKUP_MEM_RF_MODE) != 0)
 		return;
 
@@ -68,6 +66,8 @@ void user_task_init()
 #if DEMO_TEST
  	if(g_softap_fac_nv->demotest > 0)
  	{
+        int i ;
+
  	    for (i = 0;i <g_demo_proc_list_len; i++)
  	    {
  	        if((g_demo_proc_list + i)->demo_num == g_softap_fac_nv->demotest)

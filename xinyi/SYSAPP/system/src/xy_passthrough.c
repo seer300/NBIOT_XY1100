@@ -603,7 +603,7 @@ void xy_exitPassthroughMode()
 	{
         if (g_app_passthr.app_type == APP_SOCKET && g_app_passthr.callback_ret == XY_OK)
         {   
-#if AT_SOCKET
+#if AT_SOCKET && VER_QUCTL260
             socket_context_t *ctx = (socket_context_t *)g_app_passthr.param;
             if (ctx->zero_flag == 1)
             {
