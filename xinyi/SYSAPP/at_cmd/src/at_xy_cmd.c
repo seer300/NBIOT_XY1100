@@ -1939,7 +1939,7 @@ int at_ATI_req(char *at_buf, char **prsp_cmd)
 		*prsp_cmd = xy_zalloc(128);
 #if VER_QUECTEL || VER_QUCTL260
 	//	snprintf(*prsp_cmd, 128, "\r\nXY1100\r\n%s\r\nRevision:%s\r\n\r\nOK\r\n", MODULE_VER, PRODUCT_VER);
-		snprintf(*prsp_cmd, 128, "\r\nMeiG \r\n"MODULE"\r\nRevision:"MODULE"_%sS%c%c%c%c_02\r\nOK\r\n", TVERSION, compTime[4],compTime[5],compTime[6],compTime[7]);		
+		snprintf(*prsp_cmd, 128, "\r\nMeiG \r\n"MODULE"\r\nRevision:"MODULE"_%sS%c%c%c%c\r\nOK\r\n", TVERSION, compTime[4],compTime[5],compTime[6],compTime[7]);		
 #else
 		snprintf(*prsp_cmd, 128, "XY1100\r\n%s\r\nRevision:%s\r\n\r\nOK\r\n", MODULE_VER, PRODUCT_VER);
 #endif //VER_QUECTEL

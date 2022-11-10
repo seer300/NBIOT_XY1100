@@ -1,6 +1,6 @@
 #pragma once
 
-#define MODULE_130  1
+#define MODULE_130  0
 
 
 #if  MODULE_130
@@ -14,7 +14,7 @@
 #else
 
 #define MODULE 		"SLM160X"
-#define TVERSION 	"T03"
+#define TVERSION 	"T04"
 #define SDATE		"S0221"
 #define SDKVERSION	"0.2.1.C21"
 #define MVERSION	"M003"
