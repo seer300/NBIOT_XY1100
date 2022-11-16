@@ -15,7 +15,13 @@
 #include "onenet_backup_proc.h"
 #endif
 
+#if VER_QUCTL260 //MG 20221114 add by LGF
+extern onenet_context_reference_t onenet_context_refs[CIS_REF_MAX_NUM];
+#define CLOUD_LIFETIME_DELTA(param)				((strcmp(osThreadGetName(onenet_context_refs[0].onet_at_thread_id),"xy_lwm2m_tk"))?((uint32_t)param)*9/10:(param<=30)?((uint32_t)param)/2:(param<=50)?  (15+(param-30)*3/4):(param<=100)?  (30+(param-50)*4/5):(param<=300)?(70+(param-100)*9/10):(250+(param-300)*19/20))
+#else
 #define CLOUD_LIFETIME_DELTA(param)             (((uint32_t)param)*9/10)  //距离lifetime 超时的时间间隔(s)
+#endif
+
 
 #define SET_NET_RECOVERY_FLAG(param)  \
         {  \

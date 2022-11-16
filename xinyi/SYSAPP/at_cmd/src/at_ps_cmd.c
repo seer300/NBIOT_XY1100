@@ -38,7 +38,10 @@ int8_t g_netifIp_type = NON_IP;
 int g_check_valid_sim = 1;
 int g_uicc_type = UICC_UNKNOWN;
 osSemaphoreId_t g_out_OOS_sem = NULL;
+#if VER_QUCTL260 //MG 20221116 add by LGF
+#else
 int g_Echo_mode = 1;
+#endif
 extern int convert_wall_time2(char *data, char *time, struct xy_wall_clock *wall_time);
 
 /*******************************************************************************
@@ -168,7 +171,11 @@ int at_ECHOMODE_req(char *at_buf, char **prsp_cmd)
             *prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
             return AT_END;
         }
+#if VER_QUCTL260 //MG 20221116 add by LGF
+		g_softap_var_nv->g_Echo_mode = echo_mode_temp;
+#else
         g_Echo_mode = echo_mode_temp;
+#endif
 	}
 	else
 	{

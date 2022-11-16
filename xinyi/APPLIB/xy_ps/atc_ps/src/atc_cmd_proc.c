@@ -1050,6 +1050,8 @@ unsigned char AtcAp_NCONFIG_LNB_Process(unsigned char *pEventBuffer)
 
 unsigned char AtcAp_MNBIOTEVENT_T_LNB_Process(unsigned char *pEventBuffer)
 {
+    AtcAp_StrPrintf_AtcRspBuf((const char *)"\r\n+MNBIOTEVENT:(0,1),(1)\r\n");
+    AtcAp_SendDataInd();
     AtcAp_SendOkRsp();
 
     return ATC_AP_TRUE;
@@ -1270,8 +1272,6 @@ void AtcAp_MsgProc_CEREG_R_Cnf(unsigned char* pRecvMsg)
     g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(g_AtcApInfo.stAtRspInfo.aucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen), (const unsigned char *)"\r\n");
     AtcAp_SendDataInd();
 }
-
-ATC_MSG_CGATT_R_CNF_STRU tCgattRCnf = { 0 };
 
 void AtcAp_MsgProc_CGATT_R_Cnf(unsigned char* pRecvMsg)
 {

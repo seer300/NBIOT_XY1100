@@ -512,8 +512,13 @@ coap_status_t observe_handleRequest(st_context_t * contextP,st_uri_t * uriP,
             }
             else
 #endif
-            {
-                result = contextP->callback.onObserve(contextP, uriP, true, observeMid);
+            {   
+#if VER_QUCTL260	//MG 20221115 add by LGF
+				if (std_object_isStdObject(uriP->objectId))
+					result = COAP_206_CONFORM;
+				else
+#endif
+				result = contextP->callback.onObserve(contextP, uriP, true, observeMid);
                 if (result == COAP_206_CONFORM)
                 {
 #if LWM2M_COMMON_VER

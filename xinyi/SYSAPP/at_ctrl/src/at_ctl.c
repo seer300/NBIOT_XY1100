@@ -696,7 +696,10 @@ void sys_up_urc()
 	else
 	{
 		sprintf(at_str,"\r\nRDY\r\n");
-	}
+#if VER_QUCTL260 //MG 20221116 add by LGF
+		g_softap_var_nv->g_Echo_mode = 1;
+#endif
+}
 
 	if(strlen(at_str) != 0)
 		at_rsp_info_broadcast(at_str, strlen(at_str));

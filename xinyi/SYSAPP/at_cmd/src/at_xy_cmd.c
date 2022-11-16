@@ -2110,7 +2110,14 @@ int at_QCGDEFCONT_req(char *at_buf, char **prsp_cmd)
 		
 		if(strlen(CGAUTH_R_info->stCgauth[0].aucUserName) == 0 && strlen(CGAUTH_R_info->stCgauth[0].aucPassword) == 0)
 		{
+#if VER_QUCTL260 //MG 20221116 add by LGF			
+			ATC_MSG_CGCONTRDP_CNF_STRU Disguiser = { 0 };
+			xy_atc_interface_call("AT+CGCONTRDP=0\r\n", NULL, (void*)&Disguiser);
+			snprintf(*prsp_cmd, 200, "\r\n+QCGDEFCONT:\"%s\",\"%s\"\r\n\r\nOK\r\n",aucPdpType[CGDCONT_R_info->stPdpContext[0].ucPdpType],Disguiser.stPara.aucPdpDynamicInfo[0].aucApn);
+#else
 			snprintf(*prsp_cmd, 200, "\r\n+QCGDEFCONT:\"%s\",\"%s\"\r\n\r\nOK\r\n",aucPdpType[CGDCONT_R_info->stPdpContext[0].ucPdpType],CGDCONT_R_info->stPdpContext[0].aucApnValue);
+#endif
+
 		}
 		else if(strlen(CGAUTH_R_info->stCgauth[0].aucUserName) == 0 && strlen(CGAUTH_R_info->stCgauth[0].aucPassword) != 0)
 		{

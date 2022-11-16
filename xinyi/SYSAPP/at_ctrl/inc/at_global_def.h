@@ -130,7 +130,10 @@ enum AT_SRC_FD
  *						  Global variable declarations						   *
  ******************************************************************************/
 extern int g_FOTAing_flag;
+#if VER_QUCTL260 //MG 20221116 add by LGF
+#else
 extern int g_Echo_mode;
+#endif
 extern int g_NITZ_mode;
 extern int g_CTZU_mode;
 

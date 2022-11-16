@@ -1272,10 +1272,17 @@ void AtcAp_OutputAddr(unsigned char ucDataLen, unsigned char *pData, unsigned ch
 {   
     if(4 == ucDataLen)
     {
+#if VER_QUCTL260 //MG 20221115 add by LGF 
+        g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen),
+            (const unsigned char *)",%d.%d.%d.%d",
+            pData[0], pData[1], 
+            pData[2], pData[3]);
+#else
         g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen),
             (const unsigned char *)",%c%d.%d.%d.%d%c",
             D_ATC_N_QUOTATION,  pData[0], pData[1], 
             pData[2], pData[3], D_ATC_N_QUOTATION);
+#endif
     }
     else if (8 == ucDataLen)
     {
@@ -1287,11 +1294,18 @@ void AtcAp_OutputAddr(unsigned char ucDataLen, unsigned char *pData, unsigned ch
     }
     else if(16 == ucDataLen && g_factory_nv->tNvData.tNasNv.ucIpv6AddressFormat == 0)
     {
+#if VER_QUCTL260 //MG 20221115 add by LGF
+		g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen),
+			(const unsigned char *)",%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d",
+			pData[0], pData[1], pData[2], pData[3], pData[4], pData[5], pData[6], pData[7], 
+			pData[8], pData[9], pData[10], pData[11], pData[12], pData[13], pData[14], pData[15]);
+#else
         g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen),
             (const unsigned char *)",%c%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d%c",
             D_ATC_N_QUOTATION,  pData[0], pData[1], pData[2], pData[3], pData[4], pData[5], pData[6], pData[7], 
             pData[8], pData[9], pData[10], pData[11], pData[12], pData[13], pData[14], pData[15], D_ATC_N_QUOTATION);
-    }
+#endif
+	}
     else if (32 == ucDataLen && g_factory_nv->tNvData.tNasNv.ucIpv6AddressFormat == 0)
     {
         g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen),

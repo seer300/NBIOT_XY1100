@@ -842,6 +842,10 @@ int at_proc_qlaconfig_req(char *at_buf, char **rsp_cmd)
 		    *rsp_cmd = AT_ERR_BUILD(ATERR_NOT_ALLOWED);
             return AT_END;
 		}
+		if (qlastatus==2)
+		{
+			init_xy_lwm2m_object_info_list();
+		}
 #endif		
         if (is_xy_lwm2m_running())
         {   
@@ -1660,13 +1664,14 @@ int at_proc_qlaaddobj_req(char *at_buf, char **rsp_cmd)
 
         if(g_softap_var_nv->lwm2m_recovery_mode == 0)
             report_recover_result(resume_net_app(ONENET_TASK));
-
+		
+#if VER_QUCTL260	//MG 20221110 add by LGF 
 		if (qlastatus==1)	
 		{
 		    *rsp_cmd = AT_ERR_BUILD(ATERR_NOT_ALLOWED);
             return AT_END;
 		}
-		
+#endif		
 		onenet_context_config_t *onenet_context_config = &onenet_context_configs[0];
 		onenet_context_reference_t *onenet_context_ref = &onenet_context_refs[0];
 

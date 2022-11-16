@@ -292,7 +292,11 @@ PROC_AGAIN:
 			set_lock_by_MCU_at();
 			
             //回显模式
-            if (g_Echo_mode == 1)
+#if VER_QUCTL260 //MG 20221116 add by LGF
+			if (g_softap_var_nv->g_Echo_mode == 1)
+#else
+			if (g_Echo_mode == 1)
+#endif
             {
                 osMutexAcquire(g_farps_write_m, osWaitForever);
 #if VER_QUECTEL

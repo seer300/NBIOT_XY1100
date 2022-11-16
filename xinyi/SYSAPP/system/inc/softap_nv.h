@@ -56,6 +56,9 @@ typedef struct
 	uint8_t         cdp_event_report_disable;    //cdp lwm2m event report 0:enable 打开, 1:disable,关闭
 	uint8_t         cdp_lwm2m_event_status;   //cdp lwm2m 事件状态查询(0-10)
 	uint8_t 		ipv6_addr[20];
+#if VER_QUCTL260 //MG 20221116 add by LGF
+	char            g_Echo_mode;
+#endif	
 }softap_var_nv_t;
 
 //size 236 BYTES,start from 3840 end at 4076
