@@ -666,6 +666,9 @@ int at_rsp_info_broadcast(void *buf, int size)
 extern user_nv_data_t *g_user_nv;
 extern void read_user_nv_demo();
 extern void init_user_flash();
+#if VER_QUCTL260 //MG 20221121 add by LGF
+extern char* cis_cfg_tool(char* ip,unsigned int port,char is_bs,char* authcode,char is_dtls,char* psk,int *cfg_out_len);
+#endif
 void sys_up_urc()
 {
     static int have_send_poweron = 0;
@@ -697,7 +700,14 @@ void sys_up_urc()
 	{
 		sprintf(at_str,"\r\nRDY\r\n");
 #if VER_QUCTL260 //MG 20221116 add by LGF
-		g_softap_var_nv->g_Echo_mode = 1;
+		g_softap_var_nv->g_Echo_mode = 1;		
+		//MG 20221121 added by LGF:for AT+MIPLCONFIG,sleepPreservation,resetNotPreservation
+		g_softap_fac_nv->onenet_config_len = 69;
+		g_softap_fac_nv->keep_cloud_alive = 1;
+		g_softap_fac_nv->write_format = 0;	
+		memset(g_softap_fac_nv->onenet_config_hex, 0, sizeof(g_softap_fac_nv->onenet_config_hex));
+		memcpy(g_softap_fac_nv->onenet_config_hex, (char*)cis_cfg_tool("183.230.40.39", 5683, 1, NULL, 0, NULL, NULL), 69);
+
 #endif
 }
 

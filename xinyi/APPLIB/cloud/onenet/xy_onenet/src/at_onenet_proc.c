@@ -1788,17 +1788,19 @@ int at_proc_miplconfig_req(char *at_buf, char **rsp_cmd)
 		}
 
 		g_softap_fac_nv->keep_cloud_alive = auto_update;
-//		SAVE_FAC_PARAM(keep_cloud_alive);		//按文档要求不保存
+		
+		//MG 20221121 exposed by LGF:for AT+MIPLCONFIG,sleepPreservation,resetNotPreservation
+		SAVE_FAC_PARAM(keep_cloud_alive);		//按文档要求不保存
 		g_softap_fac_nv->write_format = recv_data_format;
-//		SAVE_FAC_PARAM(write_format);			//按文档要求不保存
+		SAVE_FAC_PARAM(write_format);			//按文档要求不保存
 
 		cis_user_config = cis_cfg_tool(ip_addr, port, bs_mode, NULL, NULL, NULL, &cfg_len);
 
 		g_softap_fac_nv->onenet_config_len = cfg_len;
 		memset(g_softap_fac_nv->onenet_config_hex, 0, sizeof(g_softap_fac_nv->onenet_config_hex));
 		memcpy(g_softap_fac_nv->onenet_config_hex, cis_user_config, cfg_len);
-//		SAVE_FAC_PARAM(onenet_config_hex);		//按文档要求不保存
-//		SAVE_FAC_PARAM(onenet_config_len);		//按文档要求不保存
+		SAVE_FAC_PARAM(onenet_config_hex);		//按文档要求不保存
+		SAVE_FAC_PARAM(onenet_config_len);		//按文档要求不保存
 		if(cis_user_config)
 			xy_free(cis_user_config);
 	}

@@ -1217,7 +1217,7 @@ void registration_step(st_context_t * contextP,
                     if(contextP->lifetimeWarnningTime >= 0)
                     {
 #if VER_QUCTL260
-                    	if( g_softap_fac_nv->keep_cloud_alive == 0)
+                    	//if( g_softap_fac_nv->keep_cloud_alive == 0)  //MG 20221121 hid by LGF
                     	{
                     		if((interval - 1) <= 0)
                     		{
@@ -1234,7 +1234,7 @@ void registration_step(st_context_t * contextP,
                     		}
 
                     	}
-                    	else
+                    	//else	//MG 20221121 hid by LGF
                     	{
 #endif
 							LOGE("ERROR:lifetime timeout occurred.");
