@@ -453,6 +453,10 @@ void process_socket_ppp_data(char *buf, uint32_t data_len)
 void passthr_timeout_callback(uint16_t *timer)
 {
 	PASSTHR_UNUSED(timer);
+#if VER_QUCTL260  //add by cjh for bc260y 20221125
+	send_urc_to_ext("\r\nTimeout\r\n");
+	xy_exitPassthroughMode();
+#endif
 }
 
 void passthr_send_msg(uint8_t type, uint32_t len, void* data)

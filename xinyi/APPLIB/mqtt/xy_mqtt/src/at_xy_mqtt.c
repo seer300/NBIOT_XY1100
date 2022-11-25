@@ -16,11 +16,8 @@
 
 /********** add by cjh for bc260y 20221119 **********/
 #if VER_QUCTL260
-extern char *passthr_rcv_buff;
-extern app_passthr_info_t g_app_passthr;
-extern uint32_t passthr_rcvd_len;
-extern uint32_t passthr_fixed_buff_len;
-int TimeCount;
+extern osTimerId_t passthr_timer;
+extern passthr_timeout_callback(uint16_t *timer);
 #endif
 /******add end******/
 int at_QMTCFG_req(char *at_buf, char **prsp_cmd)
@@ -959,32 +956,12 @@ int at_QMTPUB_req(char *at_buf, char **prsp_cmd)
 			send_urc_to_ext("\r\n>\r\n");
 #if VER_QUCTL260
 /********** add by cjh for bc260y 20221119 **********/
-			int TimeCount = 60;
-			while(TimeCount > 0)			
-			{
-
-				osDelay(1000);
-				TimeCount--;
-
-				if(g_app_passthr.recv_len == 0)//不定长数据
-				{
-					if(passthr_rcv_buff!=NULL)
-					 	break;
+			if (passthr_timer == NULL){
+				osTimerAttr_t timer_attr = {0};
+				timer_attr.name = "timeout_timer";
+            	passthr_timer = osTimerNew((osTimerFunc_t)(passthr_timeout_callback), osTimerOnce, NULL, &timer_attr);
+				osTimerStart(passthr_timer, 60*1000);
 				}
-				else  //定长数据
-				{
-					if( passthr_rcvd_len >= passthr_fixed_buff_len)
-						break;
-								
-				}
-			}
-			if(TimeCount == 0)
-			{
-				*prsp_cmd = xy_malloc(30);
-				snprintf(*prsp_cmd,30,"\r\nTimeout\r\n");							
-				xy_exitPassthroughMode();
-				return AT_END;
-			}
 #endif
 /*****add end*******/
 			return AT_ASYN;
