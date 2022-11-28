@@ -859,6 +859,43 @@ int at_QMTUNS_req(char *at_buf, char **prsp_cmd)
 	}
 }
 
+#if VER_QUCTL260
+#include "at_xy_mqtt_proc.h"
+extern mqtt_context_t  mqttContext[MQTT_CONTEXT_NUM_MAX];
+int MessageExtract(char *fmt_parm, char *at_str, int ascii_len, char *param_data)
+{
+	int i = 0;
+	char *end_temp;
+	char *fmt_temp;
+	int douhao_num = 0;
+	int str_len = 0;
+	end_temp = strstr(fmt_parm, "%s");
+	xy_assert(end_temp != NULL);
+	xy_assert(strstr(end_temp + 2, "%s") == NULL);
+	fmt_temp = fmt_parm;	
+	while (fmt_temp < end_temp)
+	{
+		if (*fmt_temp == ',')
+			douhao_num++;
+		fmt_temp++;
+	}
+	while (douhao_num != 0)
+	{
+		at_str = strchr(at_str, ',');
+		if (at_str == NULL)
+			return 8001;	//ATERR_PARAM_INVALID
+		at_str++;
+		douhao_num--;
+	}
+	end_temp = strchr(at_str, '\r');
+	str_len = end_temp - at_str;	
+	if(!str_len)
+		return 0;	
+	memcpy(param_data, at_str, ascii_len);
+	*(param_data + ascii_len) = '\0';	
+	return AT_OK;
+}
+#endif
 /*******************************************************************************************
  Function    : at_QMTPUB_req
  Description : Publish Messages
@@ -889,7 +926,22 @@ int at_QMTPUB_req(char *at_buf, char **prsp_cmd)
         	*prsp_cmd = BC26_AT_ERR_BUILD();
        		 goto exit;
         }
-				
+#if VER_QUCTL260
+		if(mqttContext[tcpconnectID].data_format.send_data_format == 0 && at_strnchr(at_buf, ',', 6) != NULL)
+		{
+				if (at_parse_param("%d,%d,%d,%d,%s,%d", at_buf, &tcpconnectID, &msgID, &qos, &retain, topic, &message_len) != AT_OK) 
+				{
+					*prsp_cmd = BC26_AT_ERR_BUILD();
+					goto exit;
+				}
+				if(MessageExtract(",,,,,,%s", at_buf, message_len, message) > 0)
+				{
+					*prsp_cmd = BC26_AT_ERR_BUILD();
+					goto exit;
+				}
+		}
+		else
+#endif
 		if (at_parse_param("%d,%d,%d,%d,%s,%d,%s", at_buf, &tcpconnectID, &msgID, &qos, &retain, topic, &message_len, message) != AT_OK) {
 			*prsp_cmd = BC26_AT_ERR_BUILD();
 			goto exit;
