@@ -1002,8 +1002,16 @@ void mqttTaskSendProcess(void* argument)
 
 				mqttCurContext->state &= ~MQTT_STATE_CLOSE;
 				if (res == SUCCESS) {
+#if VER_QUCTL260	//add by cjh for bc260y 20221129
+					mqttCurContext->is_used = MQTT_CONTEXT_CONFIGED; 
+				  if (mqttCurContext->addrinfo_data.host != NULL) {
+					xy_free(mqttCurContext->addrinfo_data.host);
+					mqttCurContext->addrinfo_data.host = NULL;
+					}
+#else
 					mqttCurContext->is_used = MQTT_CONTEXT_NOT_USED;
 					mqttDeleteContext(mqttCurContext);
+#endif
 					char *rsp = xy_malloc(48);
 					snprintf(rsp, 48, "\r\n+QMTCLOSE: %d,%d\r\n", msg.tcpconnectID, 0);
 					send_urc_to_ext(rsp);
@@ -1061,8 +1069,17 @@ void mqttTaskSendProcess(void* argument)
 
 				mqttCurContext->state &= ~MQTT_STATE_DISCONNECT;
 				if (res == SUCCESS) {
+#if VER_QUCTL260  //add by cjh for bc260y 20221129
+					mqttCurContext->is_used = MQTT_CONTEXT_CONFIGED; 
+	              if (mqttCurContext->addrinfo_data.host != NULL) {	
+					xy_free(mqttCurContext->addrinfo_data.host);
+					mqttCurContext->addrinfo_data.host = NULL;
+				  }
+#else
 					mqttCurContext->is_used = MQTT_CONTEXT_NOT_USED;
 					mqttDeleteContext(mqttCurContext);
+#endif
+
 					char* rsp = xy_malloc(48);
 					snprintf(rsp, 48, "\r\n+QMTDISC: %d,%d\r\n", msg.tcpconnectID, 0);
 					send_urc_to_ext(rsp);
