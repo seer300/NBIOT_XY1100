@@ -862,7 +862,7 @@ int at_QMTUNS_req(char *at_buf, char **prsp_cmd)
 #if VER_QUCTL260
 #include "at_xy_mqtt_proc.h"
 extern mqtt_context_t  mqttContext[MQTT_CONTEXT_NUM_MAX];
-int MessageExtract(char *fmt_parm, char *at_str, int ascii_len, char *param_data)
+int MessageExtract(char *fmt_parm, char *at_str, int ascii_len, char *param_data, int tcpconnectID)
 {
 	int i = 0;
 	char *end_temp;
@@ -891,6 +891,8 @@ int MessageExtract(char *fmt_parm, char *at_str, int ascii_len, char *param_data
 	str_len = end_temp - at_str;	
 	if(!str_len)
 		return 0;	
+	if(mqttContext[tcpconnectID].data_format.send_data_format)
+		ascii_len+=ascii_len;
 	memcpy(param_data, at_str, ascii_len);
 	*(param_data + ascii_len) = '\0';	
 	return AT_OK;
@@ -927,14 +929,14 @@ int at_QMTPUB_req(char *at_buf, char **prsp_cmd)
        		 goto exit;
         }
 #if VER_QUCTL260
-		if(mqttContext[tcpconnectID].data_format.send_data_format == 0 && at_strnchr(at_buf, ',', 6) != NULL)
+		if(at_strnchr(at_buf, ',', 6) != NULL)
 		{
-				if (at_parse_param("%d,%d,%d,%d,%s,%d", at_buf, &tcpconnectID, &msgID, &qos, &retain, topic, &message_len) != AT_OK) 
+				if (at_parse_param("%d(0-4),%d,%d,%d,%s,%d", at_buf, &tcpconnectID, &msgID, &qos, &retain, topic, &message_len) != AT_OK) 
 				{
 					*prsp_cmd = BC26_AT_ERR_BUILD();
 					goto exit;
 				}
-				if(MessageExtract(",,,,,,%s", at_buf, message_len, message) > 0)
+				if(MessageExtract(",,,,,,%s", at_buf, message_len, message, tcpconnectID) > 0)
 				{
 					*prsp_cmd = BC26_AT_ERR_BUILD();
 					goto exit;
