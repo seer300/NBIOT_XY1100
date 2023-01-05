@@ -14,8 +14,8 @@
 #else
 
 #define MODULE 		"SLM160X"
-#define TVERSION 	"T04"
-#define SDATE		"S0221"
+#define TVERSION 	"T05"
+#define SDATE		"S0105"
 #define SDKVERSION	"0.2.1.C21"
 #define MVERSION	"M003"
 #define SI_NUM		HAL_GPIO_PIN_NUM_11
