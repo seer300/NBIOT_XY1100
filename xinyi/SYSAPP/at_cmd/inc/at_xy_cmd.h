@@ -1,22 +1,46 @@
 #pragma once
 
-#define MODULE_130  0
+/* 软件版本规则说明
+** 芯翼SDK版本说明，以<V1100B10012R05C2102P02>为例说明
+** V1100--芯翼的芯片型号XY1100
+** B10012--芯翼内部的git分支
+** R05--未知
+** C21--客户编号，上一个SDK中是C21应该MG于XY的编号，C00是普发版本，不是某个客户专用版本
+** 02--基线版本
+** P02--基线版本补丁
 
+** 基于此MG版本命名如下
+** MODULE--模组型号
+** TVERSION--版本号
+** SDATE--日期
+** SDKVERSION--芯翼SDK版本，字段分别为基线版本.基线版本补丁.客户编号
+** MVERSION--客户定制版本
+*/
+
+/* 版本：V1100B10012R05C2102P02
+** 时间：20230116
+** 修改信息：
+** [1]MODEM模块，优化调整，针对EDRX偶现大电流问题，测量抑制优化
+** [2]MODEM模块，优化调整，R16后向兼容处理优化
+*/
+
+#define MODULE_130  1
 
 #if  MODULE_130
 
 #define MODULE 		"SLM130X"
 #define TVERSION 	"T07"
 #define SDATE		"S0919"
-#define SDKVERSION	"0.2.1.C21"
+#define SDKVERSION	"0.2.2.C21"
 #define MVERSION	"M010"
 #define SI_NUM		HAL_GPIO_PIN_NUM_13
+
 #else
 
 #define MODULE 		"SLM160X"
 #define TVERSION 	"T05"
 #define SDATE		"S0105"
-#define SDKVERSION	"0.2.1.C21"
+#define SDKVERSION	"0.2.2.C21"
 #define MVERSION	"M003"
 #define SI_NUM		HAL_GPIO_PIN_NUM_11
 #define LED_NUM		HAL_GPIO_PIN_NUM_10
