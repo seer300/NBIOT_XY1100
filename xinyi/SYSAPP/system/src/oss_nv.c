@@ -74,7 +74,9 @@ void reboot_nv()
 	//if DSP have sleep,or need AT+OFFTIME,or BUSY,not shark with DSP
 	if (*(uint32_t*)(BACKUP_MEM_RF_MODE) == 0 && !DSP_IS_NOT_LOADED() && !DSP_IS_DEEPSLEEP() && !(nearps_ctx.state & SEND_REQ_NOW))
 	{
-		xy_atc_interface_call("AT+CFUN=5\r\n", NULL, (void*)NULL);
+		//xy_atc_interface_call("AT+CFUN=5\r\n", NULL, (void*)NULL);
+		//20230113 wjb add: cause +CFUN:(0,1,5),(0) --> +CFUN: (0,1,4),(0)
+		xy_atc_interface_call("AT+CFUN=4\r\n", NULL, (void*)NULL);
 	}
 	osCoreEnterCritical();
 

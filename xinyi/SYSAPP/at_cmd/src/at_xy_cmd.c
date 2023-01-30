@@ -1712,12 +1712,12 @@ int at_CGMI_req(char *at_buf, char **prsp_cmd)
 		if(end == NULL)
 		{
 			//snprintf(*prsp_cmd, 30, "\r\n%s\r\n\r\nOK\r\n", g_softap_fac_nv->modul_ver);			
-			sprintf(*prsp_cmd, "MeiG \r\nMeiG_"MODULE"\r\nRevision:XY1100\r\n\r\nOK\r\n");
+			sprintf(*prsp_cmd, "MeiG \r\nMeiG_"MODULE"\r\nRevision: XY1100\r\n\r\nOK\r\n");
 			return AT_END;		
 		}
 		memcpy(manufa_code,head,end-head);
 		//snprintf(*prsp_cmd, 30, "\r\n%s\r\n\r\nOK\r\n", manufa_code);
-		sprintf(*prsp_cmd, "\r\nMeiG \r\nMeiG_"MODULE"\r\nRevision:XY1100\r\n\r\nOK\r\n");
+		sprintf(*prsp_cmd, "\r\nMeiG \r\nMeiG_"MODULE"\r\nRevision: XY1100\r\n\r\nOK\r\n");
 	}
 	else if (g_req_type == AT_CMD_TEST)
 	{
@@ -1835,7 +1835,7 @@ int at_CMVER_req(char *at_buf, char **prsp_cmd)
 		*prsp_cmd = xy_zalloc(60);
 #if VER_QUCTL260
 		//snprintf(*prsp_cmd, 60, "\r\nVersion:%s\r\n\r\nOK\r\n", g_softap_fac_nv->versionExt);
-		snprintf(*prsp_cmd, 60, "\r\nRevision:"MODULE"_%sS%c%c%c%c\r\n\r\nOK\r\n", TVERSION,compTime[4],compTime[5],compTime[6],compTime[7]);
+		snprintf(*prsp_cmd, 60, "\r\nRevision: "MODULE"_%sS%c%c%c%c\r\n\r\nOK\r\n", TVERSION,compTime[4],compTime[5],compTime[6],compTime[7]);
 #else
 		snprintf(*prsp_cmd, 60, "\r\nSoftware Version:%s\r\n\r\nOK\r\n", g_softap_fac_nv->versionExt);
 #endif
@@ -1940,7 +1940,7 @@ int at_ATI_req(char *at_buf, char **prsp_cmd)
 #if VER_QUECTEL || VER_QUCTL260
 	    //snprintf(*prsp_cmd, 128, "\r\nXY1100\r\n%s\r\nRevision:%s\r\n\r\nOK\r\n", MODULE_VER, PRODUCT_VER);
 		//snprintf(*prsp_cmd, 128, "\r\nMeiG \r\n"MODULE"\r\nRevision:"MODULE"_%sS%c%c%c%c\r\nOK\r\n", TVERSION, compTime[4],compTime[5],compTime[6],compTime[7]);
-		snprintf(*prsp_cmd, 128, "\r\nMeiG \r\n"MODULE"\r\nRevision:"MODULE"_%s%s\r\nOK\r\n", TVERSION, SDATE);		
+		snprintf(*prsp_cmd, 128, "\r\nMeiG \r\n"MODULE"\r\nRevision: "MODULE"_%s%s\r\nOK\r\n", TVERSION, SDATE);		
 #else
 		snprintf(*prsp_cmd, 128, "XY1100\r\n%s\r\nRevision:%s\r\n\r\nOK\r\n", MODULE_VER, PRODUCT_VER);
 #endif //VER_QUECTEL
@@ -2115,7 +2115,7 @@ int at_QCGDEFCONT_req(char *at_buf, char **prsp_cmd)
 #if VER_QUCTL260 //MG 20221116 add by LGF			
 			ATC_MSG_CGCONTRDP_CNF_STRU Disguiser = { 0 };
 			xy_atc_interface_call("AT+CGCONTRDP=0\r\n", NULL, (void*)&Disguiser);
-			snprintf(*prsp_cmd, 200, "\r\n+QCGDEFCONT:\"%s\",\"%s\"\r\n\r\nOK\r\n",aucPdpType[CGDCONT_R_info->stPdpContext[0].ucPdpType],Disguiser.stPara.aucPdpDynamicInfo[0].aucApn);
+			snprintf(*prsp_cmd, 200, "\r\n+QCGDEFCONT: \"%s\",\"%s\"\r\n\r\nOK\r\n",aucPdpType[CGDCONT_R_info->stPdpContext[0].ucPdpType],Disguiser.stPara.aucPdpDynamicInfo[0].aucApn);
 #else
 			snprintf(*prsp_cmd, 200, "\r\n+QCGDEFCONT:\"%s\",\"%s\"\r\n\r\nOK\r\n",aucPdpType[CGDCONT_R_info->stPdpContext[0].ucPdpType],CGDCONT_R_info->stPdpContext[0].aucApnValue);
 #endif
@@ -2143,7 +2143,7 @@ int at_QCGDEFCONT_req(char *at_buf, char **prsp_cmd)
 	else if (g_req_type == AT_CMD_TEST)
 	{
 		*prsp_cmd = xy_zalloc(60);
-		snprintf(*prsp_cmd, 60, "\r\n+QCGDEFCONT:(\"IP\",\"IPV6\",\"IPV4V6\",\"PPP\",\"Non-IP\")\r\n\r\nOK\r\n");
+		snprintf(*prsp_cmd, 60, "\r\n+QCGDEFCONT: (\"IP\",\"IPV6\",\"IPV4V6\",\"PPP\",\"Non-IP\")\r\n\r\nOK\r\n");
 	}
 	else
 		*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);

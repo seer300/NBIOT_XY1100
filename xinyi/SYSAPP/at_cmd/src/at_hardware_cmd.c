@@ -874,12 +874,12 @@ int at_IPR_req(char *at_buf, char **prsp_cmd)
 	else if(g_req_type == AT_CMD_QUERY)
 	{
 		*prsp_cmd = xy_zalloc(36);
-		sprintf(*prsp_cmd,"\r\n+IPR:%d\r\n\r\nOK\r\n",(g_softap_fac_nv->uart_rate & 0x1ff) *2400);
+		sprintf(*prsp_cmd,"\r\n+IPR: %d\r\n\r\nOK\r\n",(g_softap_fac_nv->uart_rate & 0x1ff) *2400);
 	}
 	else if(g_req_type == AT_CMD_TEST)
 	{
 		*prsp_cmd = xy_zalloc(146);
-		sprintf(*prsp_cmd,"\r\n+IPR:(2400,4800,9600,19200,38400,57600,115200,230400),(0,2400,4800,9600,19200,38400,57600,115200,230400,460800)\r\n\r\nOK\r\n");
+		sprintf(*prsp_cmd,"\r\n+IPR: (2400,4800,9600,19200,38400,57600,115200,230400),(0,2400,4800,9600,19200,38400,57600,115200,230400,460800)\r\n\r\nOK\r\n");
 	}
 	else if( g_req_type==AT_CMD_ACTIVE)
 	{		

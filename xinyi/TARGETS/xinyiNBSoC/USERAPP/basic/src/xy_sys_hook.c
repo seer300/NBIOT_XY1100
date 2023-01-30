@@ -47,7 +47,9 @@ int drop_unused_urc_hook(char *buf)
 	(void) buf;
 
 	//user private URC
-#if USER_CARE
+//#if USER_CARE
+//wjb 20230130: bc260y no attach URC
+#if VER_QUCTL260
 	if(at_strstr(buf,"+CGEV:"))
 		return XY_OK;
 #endif
