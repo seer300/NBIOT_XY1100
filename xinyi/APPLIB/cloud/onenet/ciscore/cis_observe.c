@@ -56,6 +56,7 @@
 #include "std_object/std_object.h"
 
 extern onenet_context_reference_t onenet_context_refs[CIS_REF_MAX_NUM];
+extern uint8_t g_notify_raiflag;
 
 typedef struct 
 {
@@ -167,8 +168,12 @@ static void prv_handleNotifyReply(st_transaction_t * transacP, void * message)
     else
     {
         if (packet->type == COAP_TYPE_ACK && (packet->code == 0 ||packet->code == CIS_COAP_204_CHANGED))
-            core_callbackEvent((void *)notify_userdata->context,CIS_EVENT_NOTIFY_SUCCESS,(void *)notify_userdata->ackID);
-        else
+        	{
+			core_callbackEvent((void *)notify_userdata->context,CIS_EVENT_NOTIFY_SUCCESS,(void *)notify_userdata->ackID);
+			if(g_notify_raiflag != 0) //add 20230201
+				xy_atc_interface_call("AT+RAI=1\r\n",NULL,NULL);
+        	}
+		else
             core_callbackEvent((void *)notify_userdata->context,CIS_EVENT_NOTIFY_FAILED,(void *)notify_userdata->ackID);
     }
     cis_free(notify_userdata);

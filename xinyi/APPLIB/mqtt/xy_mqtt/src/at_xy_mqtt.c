@@ -942,7 +942,7 @@ int at_QMTPUB_req(char *at_buf, char **prsp_cmd)
 					goto exit;
 				}
 		}
-		else
+
 #endif
 		if (at_parse_param("%d,%d,%d,%d,%s,%d,%s", at_buf, &tcpconnectID, &msgID, &qos, &retain, topic, &message_len, message) != AT_OK) {
 			*prsp_cmd = BC26_AT_ERR_BUILD();

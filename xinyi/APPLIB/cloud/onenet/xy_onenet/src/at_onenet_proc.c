@@ -34,6 +34,8 @@ onenet_context_config_t onenet_context_configs[CIS_REF_MAX_NUM] = {0};
 onenet_context_reference_t onenet_context_refs[CIS_REF_MAX_NUM] = {0};
 
 uint8_t g_ONENET_ACK_TIMEOUT = 4;
+uint8_t g_notify_raiflag = 0;  
+
 //static int onenet_out_fd;
 osMutexId_t g_onenet_mutex= NULL;
 osSemaphoreId_t g_cis_del_sem = NULL;
@@ -2925,6 +2927,7 @@ int at_proc_miplnotify_req(char *at_src_buf, char **rsp_cmd)
 		if(at_parse_param(",,,,,,,,%d,%d,%d,%1d", at_buf, &param.index, &param.flag, &param.ackid, &param.raiflag) != AT_OK
 				|| param.index < 0 || param.flag < 0 || param.flag > 2 || param.raiflag < 0 || param.raiflag > 2)
 			goto param_error;
+		g_notify_raiflag = param.raiflag; 
 #else
 		if (at_parse_param_2(",,,,,,,,%d,%d,%d,%8s", at_buf, params1) != AT_OK) {
 			goto param_error;

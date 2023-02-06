@@ -784,7 +784,7 @@ int new_message_indication(char *data, int data_len)
             //OutputTraceMessage(1, "malloc failed!");
             goto failed;
         }
-        snprintf(rsp_cmd, 128, "\r\n+NNMI:%d,",data_len);
+        snprintf(rsp_cmd, 128, "\r\n+NNMI: %d,",data_len);
         bytes2hexstr(data, data_len, rsp_cmd + strlen(rsp_cmd), data_len*2+1);
         strcat(rsp_cmd + strlen(rsp_cmd), "\r\n");
         send_rsp_str_to_ext(rsp_cmd);

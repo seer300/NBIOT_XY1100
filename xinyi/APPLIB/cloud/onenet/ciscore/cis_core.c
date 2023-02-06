@@ -1235,7 +1235,7 @@ uint32_t    cis_pump(void* context)
 		}
 
 #if VER_QUCTL260
-		if(ctx->reg_times >= 4)		//0,3报三次停止ֹ
+		if(ctx->reg_times >= 3)		//0,3报三次停止ֹ
 		{
 			ctx->registerEnabled = false;
 			core_updatePumpState(ctx, PUMP_STATE_INITIAL);
