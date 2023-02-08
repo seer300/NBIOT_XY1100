@@ -154,7 +154,6 @@ int bc26_socket_send_data(char *data, uint32_t len, int rai_flag, socket_context
     {
 		ioctl(ctx->fd, FIOREADSN, &pre_sn);
 	}
-
     int ret = send2(ctx->fd, hex_data, len, 0, sequence_no, rai_flag);
     if (ret < 0)
     {
@@ -676,18 +675,18 @@ int at_QISEND_req(char *at_buf, char **prsp_cmd)
 					transmission_flag = 0;
                     goto END_PROC;
                 }
-				#if 0	
+//				#if 0	//Enable send_string with RAI[0-2] 20230208 add by LGF
                 if ((at_parse_param(",,,%d[0-2]", at_buf, &rai_flag) != AT_OK)&&(mode == 0))
                 {
                     *prsp_cmd = BC26_AT_ERR_BUILD();						
                     goto END_PROC;
                 }
-				#else
+//				#else
 				xy_printf("wait send data=%s,datalen=%d\n",data,data_len);
-				//TCP/UDT数据采用透传模式
+				//TCP/UDP数据采用透传模式
 				mode = AT_JSON;
 				transmission_flag = 0;
-				#endif
+//				#endif
             }
         }		
 

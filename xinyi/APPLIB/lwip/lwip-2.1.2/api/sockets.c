@@ -1487,19 +1487,18 @@ lwip_send2(int s, const void *data, size_t size, int flags,int seq,int rai_val)
 	}
 
   acquire_udp_send_mutex(); 
-  if (NETCONNTYPE_GROUP(netconn_type(sock->conn)) == NETCONN_UDP)
-  {
     g_udp_send_rai[s] = 0;
     if (rai_val != 0)
     {
       g_udp_send_rai[s] = (unsigned char)rai_val;
     }
+  if (NETCONNTYPE_GROUP(netconn_type(sock->conn)) == NETCONN_UDP)
+  {
     if (seq != 0)
     {
       g_udp_send_seq[s] = (s << 8) + (seq & 0XFF);
     }
   }
-	
 	done_socket(sock);
   ssize_t ret = lwip_send(s, data, size, flags);
   release_udp_send_mutex();
