@@ -1,0 +1,4 @@
+date：20230213
+1）ucSupportBandNum由4改成3
+2）aSupportBandInfo[3]的信息清零，原本是band20信息
+3）修改该项为了AT+QBAND=?回复+QBAND:(0-3),(5,8,3)，原来是+QBAND:(0-3),(5,8,3,20)
