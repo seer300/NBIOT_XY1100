@@ -136,9 +136,7 @@ void xy_fast_power_off(int abnormal_off)
     	int lock_msg = MSG_FASTOFF;
 		g_softap_var_nv->user_lock_state = 0;
 
-		//xy_atc_interface_call("AT+CFUN=5\r\n", NULL, (void*)NULL);
-		//20230113 wjb add: cause +CFUN:(0,1,5),(0) --> +CFUN: (0,1,4),(0)
-		xy_atc_interface_call("AT+CFUN=4\r\n", NULL, (void*)NULL);
+		xy_atc_interface_call("AT+CFUN=5\r\n", NULL, (void*)NULL);
 		//such as AT+WORKLOCK=0,but not send RAI to NB base,and not care lock num++
         softap_printf(USER_LOG, WARN_LOG, "do AT+FASTOFF");
 		send_shm_msg(SHM_MSG_PLAT_WORKLOCK,&lock_msg,sizeof(int));

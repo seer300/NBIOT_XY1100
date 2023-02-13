@@ -599,7 +599,7 @@ void atiny_event_notify(atiny_event_e event, const char* arg, int len)
             }
             else if (rpt_type == FIRMWARE_UPDATE_STATE)
             {
-                snprintf(rsp_cmd, buf_len, "\r\n+QLWEVTIND:5\r\n");
+                snprintf(rsp_cmd, buf_len, "\r\n+QLWEVTIND: 5\r\n");
                 if(cdp_wait_sem == NULL)
                     cdp_wait_sem = osSemaphoreNew(0xFFFF, 0, NULL);
                 osSemaphoreRelease(cdp_wait_sem); 

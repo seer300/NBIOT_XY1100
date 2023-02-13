@@ -138,140 +138,114 @@
 /* ATC command event table  */
 /* Basic */
 enum {
-    //D_ATC_EVENT_CGMI = 0,                                                               /* 0  */
-    ///D_ATC_EVENT_CGMI_T,                                                                 /* 1  */
-    //D_ATC_EVENT_CGMR,                                                                   /* 2  */
-    //D_ATC_EVENT_CGMR_T,                                                                 /* 3  */
-    D_ATC_EVENT_CGSN = 1,                                                               /* 0  */
-    D_ATC_EVENT_CGSN_T,                                                                 /* 1  */
-    D_ATC_EVENT_CEREG,                                                                  /* 2  */
-    D_ATC_EVENT_CEREG_R,                                                                /* 3  */
-    D_ATC_EVENT_CEREG_T,                                                                /* 4  */
-    D_ATC_EVENT_CGATT,                                                                  /* 5  */
-    D_ATC_EVENT_CGATT_R,                                                                /* 6  */
-    D_ATC_EVENT_CGATT_T,                                                                /* 7  */
-    D_ATC_EVENT_CIMI,                                                                   /* 8  */
-    D_ATC_EVENT_CIMI_T,                                                                 /* 9  */
-    D_ATC_EVENT_CGDCONT,                                                                /* 10 */
-    D_ATC_EVENT_CGDCONT_R,                                                              /* 11 */
-    D_ATC_EVENT_CGDCONT_T,                                                              /* 12 */
-    D_ATC_EVENT_CFUN,                                                                   /* 13 */
-    D_ATC_EVENT_CFUN_R,                                                                 /* 14 */
-    D_ATC_EVENT_CFUN_T,                                                                 /* 15 */
-    D_ATC_EVENT_CMEE,                                                                   /* 16 */
-    D_ATC_EVENT_CMEE_R,                                                                 /* 17 */
-    D_ATC_EVENT_CMEE_T,                                                                 /* 18 */
-    D_ATC_EVENT_CLAC,                                                                   /* 19 */
-    D_ATC_EVENT_CLAC_T,                                                                 /* 20 */
-    D_ATC_EVENT_CESQ,                                                                   /* 21 */
-    D_ATC_EVENT_CESQ_T,                                                                 /* 22 */
-    D_ATC_EVENT_CGPADDR,                                                                /* 23 */
-    D_ATC_EVENT_CGPADDR_T,                                                              /* 24 */
-    //D_ATC_EVENT_CGMM,                                                                   /* 25 */
-    //D_ATC_EVENT_CGMM_T,                                                                 /* 26 */
-    //D_ATC_EVENT_CGDATA,                                                                 /* 25 */
-    //D_ATC_EVENT_CGDATA_T,                                                               /* 26 */
-    D_ATC_EVENT_CGACT,                                                                  /* 27 */
-    D_ATC_EVENT_CGACT_R,                                                                /* 28 */
-    D_ATC_EVENT_CGACT_T,                                                                /* 29 */
-    D_ATC_EVENT_CSODCP,                                                                 /* 30 */
-    D_ATC_EVENT_CSODCP_T,                                                               /* 31 */
-    D_ATC_EVENT_CRTDCP,                                                                 /* 32 */
-    D_ATC_EVENT_CRTDCP_R,                                                               /* 33 */
-    D_ATC_EVENT_CRTDCP_T,                                                               /* 34 */
-    //D_ATC_EVENT_CRC,                                                                    /* 35 */
-    //D_ATC_EVENT_CRC_R,                                                                  /* 36 */
-    //D_ATC_EVENT_CRC_T,                                                                  /* 37 */
-    //D_ATC_EVENT_CMUX,                                                                   /* 38 */
-    //D_ATC_EVENT_CMUX_R,                                                                 /* 39 */
-    //D_ATC_EVENT_CMUX_T,                                                                 /* 40 */
-    //D_ATC_EVENT_S3,                                                                     /* 41 */
-    //D_ATC_EVENT_S3_R,                                                                   /* 42 */
-    //D_ATC_EVENT_S4,                                                                     /* 43 */
-    //D_ATC_EVENT_S4_R,                                                                   /* 44 */
-    //D_ATC_EVENT_S5,                                                                     /* 45 */
-    //D_ATC_EVENT_S5_R,                                                                   /* 46 */
-    D_ATC_EVENT_E,                                                                      /* 47 */
-    //D_ATC_EVENT_V,                                                                      /* 48 */
-    //D_ATC_EVENT_F,                                                                      /* 49 */
-    D_ATC_EVENT_SIMST_R,                                                                /* 50 */
-    D_ATC_EVENT_CEDRXS,                                                                 /* 51 */
-    D_ATC_EVENT_CEDRXS_R,                                                               /* 52 */
-    D_ATC_EVENT_CEDRXS_T,                                                               /* 53 */
-    D_ATC_EVENT_CPSMS,                                                                  /* 54 */
-    D_ATC_EVENT_CPSMS_R,                                                                /* 55 */
-    D_ATC_EVENT_CPSMS_T,                                                                /* 56 */
-    D_ATC_EVENT_CGAPNRC,                                                                /* 57 */
-    D_ATC_EVENT_CGAPNRC_T,                                                              /* 58 */
-/* Other */
-    D_ATC_EVENT_CGDSCONT,                                                               /* 59 */
-    D_ATC_EVENT_CGDSCONT_R,                                                             /* 60 */
-    D_ATC_EVENT_CGDSCONT_T,                                                             /* 61 */
-    D_ATC_EVENT_CGTFT,                                                                  /* 62 */
-    D_ATC_EVENT_CGTFT_R,                                                                /* 63 */
-    D_ATC_EVENT_CGTFT_T,                                                                /* 64 */
-    D_ATC_EVENT_CGEQOS,                                                                 /* 65 */
-    D_ATC_EVENT_CGEQOS_R,                                                               /* 66 */
-    D_ATC_EVENT_CGEQOS_T,                                                               /* 67 */
-    D_ATC_EVENT_CGCMOD,                                                                 /* 68 */
-    D_ATC_EVENT_CGCMOD_T,                                                               /* 69 */
-/* SMS */
-    D_ATC_EVENT_CSMS,                                                                   /* 70 */
-    D_ATC_EVENT_CSMS_R,                                                                 /* 71 */
-    D_ATC_EVENT_CSMS_T,                                                                 /* 72 */
-    D_ATC_EVENT_CMGF,                                                                   /* 73 */
-    D_ATC_EVENT_CMGF_R,                                                                 /* 74 */
-    D_ATC_EVENT_CMGF_T,                                                                 /* 75 */
-    D_ATC_EVENT_CSCA,                                                                   /* 76 */
-    D_ATC_EVENT_CSCA_R,                                                                 /* 77 */
-    D_ATC_EVENT_CSCA_T,                                                                 /* 78 */
-    //D_ATC_EVENT_CNMI,                                                                   /* 79 */
-    //D_ATC_EVENT_CNMI_R,                                                                 /* 80 */
-    //D_ATC_EVENT_CNMI_T,                                                                 /* 81 */
-    D_ATC_EVENT_CMGS,                                                                   /* 82 */
-    D_ATC_EVENT_CMGS_T,                                                                 /* 83 */
-    D_ATC_EVENT_CNMA,                                                                   /* 84 */
-    D_ATC_EVENT_CNMA_T,                                                                 /* 85 */
-    D_ATC_EVENT_COPS,                                                                   /* 86 */
-    D_ATC_EVENT_COPS_R,                                                                 /* 87 */
-    D_ATC_EVENT_COPS_T,                                                                 /* 88 */
-//shao add for USAT
-    D_ATC_EVENT_CSIM,                                                                   /* 89 */
-    D_ATC_EVENT_CSIM_T,                                                                 /* 90 */
-    D_ATC_EVENT_CCHC,                                                                   /* 91 */
-	D_ATC_EVENT_CCHC_T,                                                                 /* 92 */
-    D_ATC_EVENT_CCHO,                                                                   /* 93 */
-	D_ATC_EVENT_CCHO_T,																	/* 94 */
-    D_ATC_EVENT_CGLA,                                                                   /* 95 */
-	D_ATC_EVENT_CGLA_T,																	/* 96 */
-	D_ATC_EVENT_CRSM,                                                                   /* 97 */
-	D_ATC_EVENT_CRSM_T,																 	/* 98 */
-    D_ATC_EVENT_CSCON,                                                                  /* 99 */
-    D_ATC_EVENT_CSCON_R,                                                                /* 100 */
-    D_ATC_EVENT_CSCON_T,                                                                 /* 101 */
-    D_ATC_EVENT_CGEREP,                                                                  /* 102 */
-    D_ATC_EVENT_CGEREP_R,                                                                /* 103 */
-    D_ATC_EVENT_CGEREP_T,                                                                /* 104 */
-    D_ATC_EVENT_CCIOTOPT,                                                                /* 105 */
-    D_ATC_EVENT_CCIOTOPT_R,                                                              /* 106 */
-    D_ATC_EVENT_CCIOTOPT_T,                                                              /* 107 */
-    D_ATC_EVENT_CEDRXRDP,                                                                /* 108 */
-    D_ATC_EVENT_CEDRXRDP_T,                                                              /* 109 */
-    D_ATC_EVENT_CGEQOSRDP,                                                               /* 110 */
-    D_ATC_EVENT_CGEQOSRDP_T,                                                             /* 111 */
-	D_ATC_EVENT_CTZR,                                                                    /* 112 */
-	D_ATC_EVENT_CTZR_R,                                                                  /* 113 */
-	D_ATC_EVENT_CTZR_T,                                                                  /* 114 */
-	D_ATC_EVENT_CGCONTRDP,                                                               /* 115 */
-	D_ATC_EVENT_CGCONTRDP_T,                                                             /* 116 */
-    D_ATC_EVENT_CPIN,                                                                    /* 117 */
-    D_ATC_EVENT_CPIN_R,                                                                  /* 118 */
-    D_ATC_EVENT_CPIN_T,                                                                  /* 119 */
-    D_ATC_EVENT_CLCK,                                                                    /* 120 */
-    D_ATC_EVENT_CLCK_T,                                                                  /* 121 */
-    D_ATC_EVENT_CPWD,                                                                    /* 122 */
-    D_ATC_EVENT_CPWD_T,                                                                  /* 123 */
-   // D_ATC_EVENT_NRB,
+    D_ATC_EVENT_CGSN = 1,        /* 1  */
+    D_ATC_EVENT_CGSN_T,          /* 2  */
+    D_ATC_EVENT_CEREG,           /* 3  */
+    D_ATC_EVENT_CEREG_R,         /* 4  */
+    D_ATC_EVENT_CEREG_T,         /* 5  */
+    D_ATC_EVENT_CGATT,           /* 6  */
+    D_ATC_EVENT_CGATT_R,         /* 7  */
+    D_ATC_EVENT_CGATT_T,         /* 8  */
+    D_ATC_EVENT_CIMI,            /* 9  */
+    D_ATC_EVENT_CIMI_T,          /* 10  */
+    D_ATC_EVENT_CGDCONT,         /* 11 */
+    D_ATC_EVENT_CGDCONT_R,       /* 12 */
+    D_ATC_EVENT_CGDCONT_T,       /* 13 */
+    D_ATC_EVENT_CFUN,            /* 14 */
+    D_ATC_EVENT_CFUN_R,          /* 15 */
+    D_ATC_EVENT_CFUN_T,          /* 16 */
+    D_ATC_EVENT_CMEE,            /* 17 */
+    D_ATC_EVENT_CMEE_R,          /* 18 */
+    D_ATC_EVENT_CMEE_T,          /* 19 */
+    D_ATC_EVENT_CLAC,            /* 20 */
+    D_ATC_EVENT_CLAC_T,          /* 21 */
+    D_ATC_EVENT_CESQ,            /* 22 */
+    D_ATC_EVENT_CESQ_T,          /* 23 */
+    D_ATC_EVENT_CGPADDR,         /* 24 */
+    D_ATC_EVENT_CGPADDR_T,       /* 25 */
+    D_ATC_EVENT_CGACT,           /* 26 */
+    D_ATC_EVENT_CGACT_R,         /* 27 */
+    D_ATC_EVENT_CGACT_T,         /* 28 */
+    D_ATC_EVENT_CSODCP,          /* 29 */
+    D_ATC_EVENT_CSODCP_T,        /* 30 */
+    D_ATC_EVENT_CRTDCP,                                                                 
+    D_ATC_EVENT_CRTDCP_R,                                                               
+    D_ATC_EVENT_CRTDCP_T,                                                               
+    D_ATC_EVENT_E,                                                                      
+    D_ATC_EVENT_SIMST_R,                                                                
+    D_ATC_EVENT_CEDRXS,                                                                 
+    D_ATC_EVENT_CEDRXS_R,                                                               
+    D_ATC_EVENT_CEDRXS_T,                                                               
+    D_ATC_EVENT_CPSMS,                                                                  
+    D_ATC_EVENT_CPSMS_R,                                                                
+    D_ATC_EVENT_CPSMS_T,                                                                
+    D_ATC_EVENT_CGAPNRC,                                                                
+    D_ATC_EVENT_CGAPNRC_T,        /* 43 */                                                                                                                            
+    /* Other */
+    D_ATC_EVENT_CGDSCONT,                                                              
+    D_ATC_EVENT_CGDSCONT_R,                                                            
+    D_ATC_EVENT_CGDSCONT_T,                                                            
+    D_ATC_EVENT_CGTFT,                                                                 
+    D_ATC_EVENT_CGTFT_R,                                                               
+    D_ATC_EVENT_CGTFT_T,                                                               
+    D_ATC_EVENT_CGEQOS,                                                                
+    D_ATC_EVENT_CGEQOS_R,                                                              
+    D_ATC_EVENT_CGEQOS_T,                                                              
+    D_ATC_EVENT_CGCMOD,                                                                
+    D_ATC_EVENT_CGCMOD_T,         /* 54 */                                                            
+    /* SMS */
+    D_ATC_EVENT_CSMS,                                                                  
+    D_ATC_EVENT_CSMS_R,                                                                
+    D_ATC_EVENT_CSMS_T,                                                                
+    D_ATC_EVENT_CMGF,                                                                  
+    D_ATC_EVENT_CMGF_R,                                                                
+    D_ATC_EVENT_CMGF_T,                                                                
+    D_ATC_EVENT_CSCA,                                                                  
+    D_ATC_EVENT_CSCA_R,                                                                
+    D_ATC_EVENT_CSCA_T,                                                                
+    D_ATC_EVENT_CMGS,                                                                  
+    D_ATC_EVENT_CMGS_T,                                                                
+    D_ATC_EVENT_CNMA,                                                                  
+    D_ATC_EVENT_CNMA_T,                                                                
+    D_ATC_EVENT_COPS,                                                                  
+    D_ATC_EVENT_COPS_R,                                                                
+    D_ATC_EVENT_COPS_T,           /* 70 */                                                               
+    //shao add for USAT
+    D_ATC_EVENT_CSIM,                                                                  
+    D_ATC_EVENT_CSIM_T,                                                                
+    D_ATC_EVENT_CCHC,                                                                  
+	D_ATC_EVENT_CCHC_T,                                                                
+    D_ATC_EVENT_CCHO,                                                                  
+	D_ATC_EVENT_CCHO_T,																	
+    D_ATC_EVENT_CGLA,                                                                  
+	D_ATC_EVENT_CGLA_T,																	
+	D_ATC_EVENT_CRSM,                                                                  
+	D_ATC_EVENT_CRSM_T,																 	
+    D_ATC_EVENT_CSCON,                                                                 
+    D_ATC_EVENT_CSCON_R,                                                               
+    D_ATC_EVENT_CSCON_T,                                                               
+    D_ATC_EVENT_CGEREP,                                                                
+    D_ATC_EVENT_CGEREP_R,                                                              
+    D_ATC_EVENT_CGEREP_T,                                                              
+    D_ATC_EVENT_CCIOTOPT,                                                              
+    D_ATC_EVENT_CCIOTOPT_R,                                                            
+    D_ATC_EVENT_CCIOTOPT_T,                                                            
+    D_ATC_EVENT_CEDRXRDP,                                                              
+    D_ATC_EVENT_CEDRXRDP_T,                                                            
+    D_ATC_EVENT_CGEQOSRDP,                                                             
+    D_ATC_EVENT_CGEQOSRDP_T,                                                           
+	D_ATC_EVENT_CTZR,                                                                  
+	D_ATC_EVENT_CTZR_R,                                                                
+	D_ATC_EVENT_CTZR_T,                                                                
+	D_ATC_EVENT_CGCONTRDP,                                                             
+	D_ATC_EVENT_CGCONTRDP_T,                                                           
+    D_ATC_EVENT_CPIN,                                                                  
+    D_ATC_EVENT_CPIN_R,                                                                
+    D_ATC_EVENT_CPIN_T,                                                                
+    D_ATC_EVENT_CLCK,                                                                  
+    D_ATC_EVENT_CLCK_T,                                                                
+    D_ATC_EVENT_CPWD,                                                                  
+    D_ATC_EVENT_CPWD_T,                                                                     
     D_ATC_EVENT_NUESTATS,
     D_ATC_EVENT_NUESTATS_T,
     D_ATC_EVENT_NEARFCN,
@@ -284,35 +258,20 @@ enum {
     D_ATC_EVENT_NCONFIG_R,
     D_ATC_EVENT_NCONFIG_T,
     D_ATC_EVENT_NCCID,
-    D_ATC_EVENT_NCCID_T,
-    //D_ATC_EVENT_NPSMR,
-    //D_ATC_EVENT_NMGS,
-    //D_ATC_EVENT_NMGR,
-    //D_ATC_EVENT_NMGS,
-    //D_ATC_EVENT_NMGR,
-    //D_ATC_EVENT_NQMGS,
-    //D_ATC_EVENT_NQMGR,
-    //D_ATC_EVENT_QLWUDATAEX,
-    //D_ATC_EVENT_NCDP,
+    D_ATC_EVENT_NCCID_T,                                                              
     D_ATC_EVENT_NCSEARFCN,
     D_ATC_EVENT_RAI,
     D_ATC_EVENT_NFPLMN,
-        
     D_ATC_EVENT_NL2THP,             
     D_ATC_EVENT_NL2THP_R,      
-    D_ATC_EVENT_NL2THP_T,  
-    //D_ATC_EVENT_NATSPEED,
-    //D_ATC_EVENT_NSOCR,
-    //D_ATC_EVENT_NSOST,
-    //D_ATC_EVENT_NPING,
+    D_ATC_EVENT_NL2THP_T,                                                              
     D_ATC_EVENT_CSQ,
     D_ATC_EVENT_CSQ_T,
     D_ATC_EVENT_NSET,
     D_ATC_EVENT_NSET_R,
     D_ATC_EVENT_CMOLR,
     D_ATC_EVENT_CMOLR_R,                                                             
-    D_ATC_EVENT_CMOLR_T,
-
+    D_ATC_EVENT_CMOLR_T,                                                              
     D_ATC_EVENT_CEER,
     D_ATC_EVENT_CEER_T,
     D_ATC_EVENT_CIPCA,
@@ -388,18 +347,18 @@ enum {
     D_ATC_EVENT_QEDRXCFG,
     D_ATC_EVENT_QEDRXCFG_R,
     D_ATC_EVENT_QEDRXCFG_T,
-    D_ATC_EVENT_NULL
+    D_ATC_EVENT_NULL            /* 207 */
 };
 
 typedef enum {
     D_ATC_AP_AT_CMD_RST = D_ATC_EVENT_NULL,
     D_ATC_AP_SMS_PDU_IND,
-    D_ATC_AP_SIMST_IND,
+    D_ATC_AP_SIMST_IND,         /* 209 */
     D_ATC_AP_CRTDCP_IND,
     D_ATC_AP_CGAPNRC_IND,
     D_ATC_AP_CGEV_IND,
     D_ATC_AP_CEREG_IND,
-    D_ATC_AP_CSCON_IND,
+    D_ATC_AP_CSCON_IND,         /* 214 */
     D_ATC_AP_NPTWEDRXP_IND,
     D_ATC_AP_CEDRXP_IND,
     D_ATC_AP_CCIOTOPTI_IND,
@@ -411,7 +370,7 @@ typedef enum {
     D_ATC_AP_IPSN_IND,
     D_ATC_AP_CMOLRE_IND,
     D_ATC_AP_CMOLRG_IND,
-    D_ATC_AP_IPADDR_IND,
+    D_ATC_AP_IPADDR_IND,        /* 226 */
     D_ATC_AP_NGACTR_IND,
     D_ATC_AP_LOCALTIMEINFO_IND,
     D_ATC_OPELIST_SRCH_CNF,
@@ -426,7 +385,7 @@ typedef enum {
     D_ATC_AP_NQPODCP_IND,
     D_ATC_AP_CNEC_IND,
 	D_ATC_AP_NRNPDM_IND,
-	D_ATC_AP_MNBIOTEVENT_IND,
+	D_ATC_AP_MNBIOTEVENT_IND,                                                               /* 259 */
 } ATC_AP_EXTEND_EVENT_ID;
 
 enum 

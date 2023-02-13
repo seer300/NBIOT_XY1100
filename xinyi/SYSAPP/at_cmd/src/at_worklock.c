@@ -270,9 +270,7 @@ int decrease_worklock(int type)
 		softap_printf(USER_LOG, WARN_LOG, "all lock have released!\r\n");
 		//产线测试时不插卡,设置NOSIMST为127时协议栈无法进入深睡,此时发AT+WORKLOCK=0释放锁时触发CFUN5可以强制PS软关机，从而进深睡。
 		if(g_check_valid_sim == 0)
-			//xy_atc_interface_call("AT+CFUN=5\r\n", NULL, (void*)NULL);
-			//20230113 wjb add: cause +CFUN:(0,1,5),(0) --> +CFUN: (0,1,4),(0)
-			xy_atc_interface_call("AT+CFUN=4\r\n", NULL, (void*)NULL);
+			xy_atc_interface_call("AT+CFUN=5\r\n", NULL, (void*)NULL);
 		if (type != LOCK_XY_LOCAL)
 			create_send_rai_task();
 	}

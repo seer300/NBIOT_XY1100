@@ -196,8 +196,11 @@ int32_t HAL_ADC_GetValue_2(HAL_ADC_HandleTypeDef *hadc)
 
 	//获取转换值
 	convert_val =  ADC_Get_Converte_Value(hadc->Init.Mode, real_val);
-	//no_cal_vol  = ADC_Get_Voltage_Without_Cal(hadc->Init.Mode, hadc->Init.ADCRange, convert_val);
-	cal_vol     = ADC_Get_Voltage_With_Cal(hadc->Init.Mode, hadc->Init.ADCRange, convert_val);
+
+	if(otp_valid_flag == 1)
+	    cal_vol = ADC_Get_Voltage_With_Cal(hadc->Init.Mode, hadc->Init.ADCRange, convert_val);
+	else
+        cal_vol = ADC_Get_Voltage_Without_Cal(hadc->Init.Mode, hadc->Init.ADCRange, convert_val);
 
 	return abs(cal_vol);
 }

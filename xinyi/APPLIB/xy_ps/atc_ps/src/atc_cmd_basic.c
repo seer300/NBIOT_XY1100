@@ -450,9 +450,8 @@ unsigned char ATC_CFUN_LNB_Command(unsigned char *pCommandBuffer, unsigned char 
         {
         case 0:  /* <Fun> value get */
             pucValue  = &(((ST_ATC_CFUN_PARAMETER *)pEventBuffer)->ucFun);
-			//20230113 wjb add: adapt +CFUN:(0,1,5),(0) to +CFUN: (0,1,4),(0)
-            ucResult  = ATC_GetDecimalParameterByte(pCommandBuffer, &usCmdStrLen, 3, pucValue, NULL, 0, 4, 0, 0);  
-            if(0 != *pucValue && 1 != *pucValue && 4 != *pucValue)
+            ucResult  = ATC_GetDecimalParameterByte(pCommandBuffer, &usCmdStrLen, 3, pucValue, NULL, 0, 5, 0, 0);  
+            if(0 != *pucValue && 1 != *pucValue && 5 != *pucValue)
             {
                 return D_ATC_COMMAND_PARAMETER_ERROR;
             }

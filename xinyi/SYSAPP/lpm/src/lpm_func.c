@@ -474,7 +474,7 @@ void get_powerdown_urc(char *at_str)
 {
 	if(g_softap_fac_nv->deepsleep_urc == 1 && g_softap_var_nv->sleep_mode == 1)
 	{
-		sprintf(at_str,"\r\n+QNBIOTEVENT:\"ENTER DEEPSLEEP\"\r\n");
+		sprintf(at_str,"\r\n+QNBIOTEVENT: \"ENTER DEEPSLEEP\"\r\n");
 	}
 }
 

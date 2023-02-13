@@ -374,9 +374,7 @@ int shut_down_dsp_core(void)
 		//if DSP have sleep,or need AT+OFFTIME,or BUSY,not shark with DSP
 		if (!(nearps_ctx.state & SEND_REQ_NOW))
 		{
-			//xy_atc_interface_call("AT+CFUN=5\r\n", NULL, (void*)NULL);
-			//20230113 wjb add: cause +CFUN:(0,1,5),(0) --> +CFUN: (0,1,4),(0)
-			xy_atc_interface_call("AT+CFUN=4\r\n", NULL, (void*)NULL);
+			xy_atc_interface_call("AT+CFUN=5\r\n", NULL, (void*)NULL);
 			g_dsp_off_request++;
 			osMutexRelease(g_dynamic_dsp_load_m);
 			return 1;

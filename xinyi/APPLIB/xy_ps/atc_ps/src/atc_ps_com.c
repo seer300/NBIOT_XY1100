@@ -1686,7 +1686,7 @@ static void AtcAp_OutputIpAddrAndSubMask(unsigned char ucPdpType, unsigned char*
 void AtcAp_CGCONTRDP_Print(EPS_CGCONTRDP_DYNAMIC_INFO *ptPdpDynamicInfo, unsigned char bPdpType, unsigned char *pucAtcRspBuf)
 {
     g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf(pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen,
-        (const unsigned char *)"\r\n+CGCONTRDP:%d,%d", ptPdpDynamicInfo->ucCid, ptPdpDynamicInfo->ucBearerId);
+        (const unsigned char *)"\r\n+CGCONTRDP: %d,%d", ptPdpDynamicInfo->ucCid, ptPdpDynamicInfo->ucBearerId);
 
     g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf(pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen,
         (const unsigned char *)",%c%s%c", D_ATC_N_QUOTATION, ptPdpDynamicInfo->aucApn, D_ATC_N_QUOTATION);

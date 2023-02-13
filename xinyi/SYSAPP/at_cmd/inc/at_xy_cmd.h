@@ -29,10 +29,10 @@
 #if  MODULE_130
 
 #define MODULE 		"SLM130X"
-#define TVERSION 	"T07"
-#define SDATE		"S0919"
+#define TVERSION 	"T06"
+#define SDATE		"S0208"
 #define SDKVERSION	"0.2.2.C21"
-#define MVERSION	"M010"
+#define MVERSION	"M003"
 #define SI_NUM		HAL_GPIO_PIN_NUM_13
 
 #else

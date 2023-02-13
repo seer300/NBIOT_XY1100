@@ -747,12 +747,12 @@ int at_QSCLK_req(char *at_buf, char **prsp_cmd)
 	else if(g_req_type == AT_CMD_QUERY)
 	{
 		*prsp_cmd = xy_zalloc(32);
-		sprintf(*prsp_cmd, "\r\n+QSCLK:%1d\r\n\r\nOK\r\n", g_softap_var_nv->sleep_mode);
+		sprintf(*prsp_cmd, "\r\n+QSCLK: %1d\r\n\r\nOK\r\n", g_softap_var_nv->sleep_mode);
 	}
 	else if(g_req_type == AT_CMD_TEST)
 	{
 		*prsp_cmd = xy_zalloc(32);
-		sprintf(*prsp_cmd, "\r\n+QSCLK:(0-2)\r\n\r\nOK\r\n");
+		sprintf(*prsp_cmd, "\r\n+QSCLK: (0-2)\r\n\r\nOK\r\n");
 	}
 	else
 		*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);

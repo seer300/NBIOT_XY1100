@@ -688,7 +688,7 @@ void sys_up_urc()
 	{
 		if(g_softap_fac_nv->deepsleep_urc == 1 && g_softap_var_nv->sleep_mode == 1)
 		{
-			sprintf(at_str,"\r\n+QNBIOTEVENT:\"EXIT DEEPSLEEP\"\r\n");			
+			sprintf(at_str,"\r\n+QNBIOTEVENT: \"EXIT DEEPSLEEP\"\r\n");			
 
 			if(g_user_nv->atWakeup==1)
 			{

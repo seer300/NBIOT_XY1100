@@ -43,7 +43,7 @@ const ST_ATC_AP_STR_TABLE ATC_ECURC_Table[D_ATC_ECURC_MAX] =
 unsigned char AtcAp_CGSN_T_LNB_Process(unsigned char *pEventBuffer)
 {
     g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,
-        (const unsigned char *)"\r\n+CGSN:(0-3)\r\n");
+        (const unsigned char *)"\r\n+CGSN: (0-3)\r\n");
 
     AtcAp_SendDataInd();
     AtcAp_SendOkRsp();
@@ -141,7 +141,7 @@ unsigned char AtcAp_CGDCONT_T_LNB_Process(unsigned char *pEventBuffer)
 unsigned char AtcAp_CFUN_T_LNB_Process(unsigned char *pEventBuffer)
 {
     g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,
-        (const unsigned char *)"\r\n+CFUN: (0,1,4),(0)\r\n");
+        (const unsigned char *)"\r\n+CFUN: (0,1,5),(0)\r\n");
     AtcAp_SendDataInd();
     AtcAp_SendOkRsp();
 
@@ -1484,7 +1484,7 @@ void AtcAp_MsgProc_CEDRXS_R_Cnf(unsigned char* pRecvMsg)
     {
 #if VER_QUCTL260
         g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,
-           (const unsigned char *)"\r\n+CEDRXS:%d,%c%s%c\r\n", pEdrxsRCnf->stPara.ucActType,
+           (const unsigned char *)"\r\n+CEDRXS: %d,%c%s%c\r\n", pEdrxsRCnf->stPara.ucActType,
            D_ATC_N_QUOTATION,aucStr,D_ATC_N_QUOTATION);
 #else
         g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,
@@ -1560,7 +1560,7 @@ void AtcAp_MsgProc_CGAPNRC_Cnf(unsigned char* pRecvMsg)
     for(i = 0; i < pCgapnrcCnf->ucNum; i++)
     {
         g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(g_AtcApInfo.stAtRspInfo.aucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen), 
-                        (const unsigned char *)"\r\n+CGAPNRC:%d,%d,%d,%d",
+                        (const unsigned char *)"\r\n+CGAPNRC: %d,%d,%d,%d",
                         pCgapnrcCnf->stEpsApnRateCtl[i].ucCid, 
                         pCgapnrcCnf->stEpsApnRateCtl[i].ucAdditionExcepReportFlg,
                         pCgapnrcCnf->stEpsApnRateCtl[i].ulUplinkTimeUnit,
@@ -2366,7 +2366,7 @@ void AtcAp_MsgProc_CEDRXRDP_Cnf(unsigned char* pRecvMsg)
     ATC_MSG_CEDRXRDP_CNF_STRU* pCciotoptRCnf = (ATC_MSG_CEDRXRDP_CNF_STRU*)pRecvMsg;
 
     g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,
-        (const unsigned char *)"\r\n+CEDRXRDP:%d", pCciotoptRCnf->stPara.ucActType);
+        (const unsigned char *)"\r\n+CEDRXRDP: %d", pCciotoptRCnf->stPara.ucActType);
 
     if(pCciotoptRCnf->stPara.ucActType != 0)
     {
@@ -2951,14 +2951,14 @@ void AtcAp_MsgProc_SMS_PDU_Ind(unsigned char* pRecvMsg)
 
 void AtcAp_MsgProc_SIMST_Ind(unsigned char* pRecvMsg)
 {
+//wjb 20230130: bc260y no sim state URC
+#if (!VER_QUCTL260)
     ATC_MSG_SIMST_IND_STRU*    pSimstInd = (ATC_MSG_SIMST_IND_STRU*)pRecvMsg;
 
-    //wjb 20230130: bc260y no sim state URC
-#if (!VER_QUCTL260)
     AtcAp_StrPrintf_AtcRspBuf((const char *)"\r\n^SIMST:%d\r\n", pSimstInd->ucSimStatus);
-#endif
 
     AtcAp_SendDataInd();
+#endif
 }
 
 void AtcAp_MsgProc_NPIN_Cnf(unsigned char* pRecvMsg)
@@ -3038,11 +3038,11 @@ void AtcAp_MsgProc_CPINR_Cnf(unsigned char* pRecvMsg)
     {
         if(pPinRetriesCnf->aPinRetires[index].ucPinType == D_ATC_CPINR_TYPE_PIN1)
         {
-            AtcAp_StrPrintf_AtcRspBuf("+CPINR: %s,%d,3\r\n", "\"SIM PIN\"", pPinRetriesCnf->aPinRetires[index].ucRetriesNum);
+            AtcAp_StrPrintf_AtcRspBuf("+CPINR: %s,%d,3\r\n", "SIM PIN", pPinRetriesCnf->aPinRetires[index].ucRetriesNum);
         }
         if(pPinRetriesCnf->aPinRetires[index].ucPinType == D_ATC_CPINR_TYPE_PUK1)
         {
-            AtcAp_StrPrintf_AtcRspBuf("+CPINR: %s,%d,10\r\n", "\"SIM PUK\"", pPinRetriesCnf->aPinRetires[index].ucRetriesNum);
+            AtcAp_StrPrintf_AtcRspBuf("+CPINR: %s,%d,10\r\n", "SIM PUK", pPinRetriesCnf->aPinRetires[index].ucRetriesNum);
         }
 #if 0	//not need on document		
         if(pPinRetriesCnf->aPinRetires[index].ucPinType == D_ATC_CPINR_TYPE_PIN2)
@@ -3217,7 +3217,7 @@ void AtcAp_MsgProc_CEREG_Ind(unsigned char* pRecvMsg)
 
     //<n>,<stat>
     g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,
-        (const unsigned char *)"\r\n+CEREG:%d", pCeregInd->stPara.ucEPSRegStatus);
+        (const unsigned char *)"\r\n+CEREG: %d", pCeregInd->stPara.ucEPSRegStatus);
 
     //<tac>,<ci>,<Act>
     if (1 < ucERegMode)
@@ -3227,7 +3227,7 @@ void AtcAp_MsgProc_CEREG_Ind(unsigned char* pRecvMsg)
         {
             g_AtcApInfo.stAtRspInfo.ucHexStrLen = 4;
             g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(g_AtcApInfo.stAtRspInfo.aucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen),
-                (const unsigned char *)",%h",pCeregInd->stPara.usTacOrLac);
+                (const unsigned char *)",\"%h\"",pCeregInd->stPara.usTacOrLac);
         }
         else
         {
@@ -3239,7 +3239,7 @@ void AtcAp_MsgProc_CEREG_Ind(unsigned char* pRecvMsg)
         {
             g_AtcApInfo.stAtRspInfo.ucHexStrLen = 8;
             g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(g_AtcApInfo.stAtRspInfo.aucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen),
-                (const unsigned char *)",%h",pCeregInd->stPara.ulCellId);
+                (const unsigned char *)",\"%h\"",pCeregInd->stPara.ulCellId);
         }
         else
         {
@@ -3323,7 +3323,7 @@ void AtcAp_MsgProc_CSCON_Ind(unsigned char* pRecvMsg)
 
     //<n>,<mode>g_AtcMng.ucCsconN 
     g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,
-        (const unsigned char *)"\r\n+CSCON:%d", pCsconInd->stPara.ucMode);
+        (const unsigned char *)"\r\n+CSCON: %d", pCsconInd->stPara.ucMode);
 
     if(pCsconInd->stPara.OP_State == 1)
     {
@@ -3591,9 +3591,10 @@ void AtcAp_MsgProc_CMOLRG_Ind(unsigned char* pRecvMsg)
 
 void AtcAp_MsgProc_PDNIPADDR_Ind(unsigned char* pRecvMsg)
 {
-    /*ATC_MSG_PdnIPAddr_IND_STRU*    pPndIpAddrInd = (ATC_MSG_PdnIPAddr_IND_STRU*)pRecvMsg;
+#if VER_QUCTL260
+    ATC_MSG_PdnIPAddr_IND_STRU*    pPndIpAddrInd = (ATC_MSG_PdnIPAddr_IND_STRU*)pRecvMsg;
 
-     AtcAp_StrPrintf_AtcRspBuf((const char *)"\r\n+CGPADDR:%d", pPndIpAddrInd->ucAtCid);
+    AtcAp_StrPrintf_AtcRspBuf((const char *)"\r\n+IP: %d", pPndIpAddrInd->ucAtCid);
     if (1 == pPndIpAddrInd->ucIPv4Flg)
     {
         AtcAp_OutputAddr(4, pPndIpAddrInd->aucIPv4Addr, g_AtcApInfo.stAtRspInfo.aucAtcRspBuf);
@@ -3606,7 +3607,8 @@ void AtcAp_MsgProc_PDNIPADDR_Ind(unsigned char* pRecvMsg)
     
     AtcAp_StrPrintf_AtcRspBuf((const char *)"\r\n");
     
-    AtcAp_SendDataInd();*/
+    AtcAp_SendDataInd();
+#endif
 }
 
 void AtcAp_MsgProc_NGACTR_Ind(unsigned char* pRecvMsg)
@@ -3668,7 +3670,7 @@ void AtcAp_MsgProc_CSIM_Cnf(unsigned char* pRecvMsg)
     pDataBuff = (unsigned char*)AtcAp_Malloc(pCsimCnf->usRspLen * 2 + 1);
     
     AtcAp_HexToAsc((unsigned short)pCsimCnf->usRspLen, pDataBuff, pCsimCnf->aucRsp);
-    AtcAp_StrPrintf_AtcRspBuf((const char *)"\r\n+CSIM:%d,%s\r\n", pCsimCnf->usRspLen * 2, pDataBuff);
+    AtcAp_StrPrintf_AtcRspBuf((const char *)"\r\n+CSIM: %d,%s\r\n", pCsimCnf->usRspLen * 2, pDataBuff);
     AtcAp_Free(pDataBuff);
 
     AtcAp_SendDataInd();
@@ -3712,13 +3714,13 @@ void AtcAp_MsgProc_CRSM_Cnf(unsigned char* pRecvMsg)
         || D_ATC_CRSM_COMMAND_SET_DATA == pCrsmCnf->ucCommand
         || 0 == pCrsmCnf->usRspLen)
     {
-        AtcAp_StrPrintf_AtcRspBuf("\r\n+CRSM:%d,%d\r\n", pCrsmCnf->sw1, pCrsmCnf->sw2);
+        AtcAp_StrPrintf_AtcRspBuf("\r\n+CRSM: %d,%d\r\n", pCrsmCnf->sw1, pCrsmCnf->sw2);
     }
     else
     {
         pStrData = (unsigned char*)AtcAp_Malloc(pCrsmCnf->usRspLen * 2 + 1);
         AtcAp_HexToAsc(pCrsmCnf->usRspLen, pStrData, pCrsmCnf->aucResponse);
-        AtcAp_StrPrintf_AtcRspBuf("\r\n+CRSM:%d,%d,%s\r\n", pCrsmCnf->sw1, pCrsmCnf->sw2, pStrData);
+        AtcAp_StrPrintf_AtcRspBuf("\r\n+CRSM: %d,%d,%s\r\n", pCrsmCnf->sw1, pCrsmCnf->sw2, pStrData);
         AtcAp_Free(pStrData);
     }
     
@@ -3727,6 +3729,7 @@ void AtcAp_MsgProc_CRSM_Cnf(unsigned char* pRecvMsg)
 
 void AtcAp_MsgProc_LOCALTIMEINFO_Ind(unsigned char* pRecvMsg)
 {
+#if (!VER_QUCTL260)
     ATC_MSG_LOCALTIMEINFO_IND_STRU* pLocalTimeInfo = (ATC_MSG_LOCALTIMEINFO_IND_STRU*)pRecvMsg;
     if(g_NITZ_mode != 0)
     {
@@ -3764,6 +3767,7 @@ void AtcAp_MsgProc_LOCALTIMEINFO_Ind(unsigned char* pRecvMsg)
             AtcAp_SendDataInd();
         }
     }
+#endif
 }
 
 void AtcAp_MsgProc_NoCarrier_Ind(unsigned char* pRecvMsg)
@@ -3906,7 +3910,7 @@ void AtcAp_MsgProc_MNBIOTEVENT_Ind(unsigned char* pRecvMsg)
     
     if(pInd->ucQnbioteventFlg == 1)
     {
-        AtcAp_StrPrintf_AtcRspBuf("\r\n+QNBIOTEVENT:%c%s%c\r\n", D_ATC_N_QUOTATION, pInd->ucPsmState == D_ATC_MNBIOTEVENT_ENTER_PSM ? pPsmState[0] : pPsmState[1], D_ATC_N_QUOTATION);
+        AtcAp_StrPrintf_AtcRspBuf("\r\n+QNBIOTEVENT: %c%s%c\r\n", D_ATC_N_QUOTATION, pInd->ucPsmState == D_ATC_MNBIOTEVENT_ENTER_PSM ? pPsmState[0] : pPsmState[1], D_ATC_N_QUOTATION);
     }
     
     if(pInd->ucPsmStateRptFlg == 1)
@@ -3921,7 +3925,7 @@ void AtcAp_MsgProc_MNBIOTEVENT_R_Cnf(unsigned char* pRecvMsg)
     ATC_MSG_MNBIOTEVENT_R_CNF_STRU*  pMnbiotevevtR =(ATC_MSG_MNBIOTEVENT_R_CNF_STRU*) pRecvMsg;
     if(pMnbiotevevtR->ucQnbioteventFlg == 1)
     {
-        AtcAp_StrPrintf_AtcRspBuf((const char *)"\r\n+QNBIOTEVENT:%d,1\r\n",pMnbiotevevtR->ucPsmStateRptValue);
+        AtcAp_StrPrintf_AtcRspBuf((const char *)"\r\n+QNBIOTEVENT: %d,1\r\n",pMnbiotevevtR->ucPsmStateRptValue);
         AtcAp_SendDataInd();
     }
 }
