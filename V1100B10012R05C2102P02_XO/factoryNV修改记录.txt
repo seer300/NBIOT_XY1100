@@ -1,3 +1,8 @@
+date:   20230214
+1)   将ucCtzrReport由3改为0
+2）新增130X_factoryNV文件，里面led_pin由255改成4，rf_switch_v2_pin由4改成5
+3）新增160X_factoryNV文件，里面led_pin由255改成10，rf_switch_v2_pin由4改成5
+
 date：20230213
 修改ucAtHeaderSpaceFlg由0改成1
 根据芯翼文档说明开启后+xxx:冒号后面自带空格

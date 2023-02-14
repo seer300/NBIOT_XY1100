@@ -708,7 +708,7 @@ unsigned char AtcAp_CEDRXRDP_T_LNB_Process(unsigned char *pEventBuffer)
 *******************************************************************************/
 unsigned char AtcAp_CTZR_T_LNB_Process(unsigned char *pEventBuffer)
 {
-    g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,(const unsigned char *)"\r\n+CTZR:(0,1,2,3)\r\n");
+    g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,(const unsigned char *)"\r\n+CTZR: (0,1,2,3)\r\n");
     AtcAp_SendDataInd();
     AtcAp_SendOkRsp();
     
@@ -2470,7 +2470,7 @@ void AtcAp_MsgProc_CTZR_R_Cnf(unsigned char* pRecvMsg)
 {
     ATC_MSG_CTZR_R_CNF_STRU*      pCtzrTCnf = (ATC_MSG_CTZR_R_CNF_STRU*)pRecvMsg;
 
-    AtcAp_StrPrintf_AtcRspBuf("\r\n+CTZR:%d\r\n", pCtzrTCnf->ucCtzrReport);
+    AtcAp_StrPrintf_AtcRspBuf("\r\n+CTZR: %d\r\n", pCtzrTCnf->ucCtzrReport);
     AtcAp_SendDataInd();
 }
 
@@ -3729,7 +3729,7 @@ void AtcAp_MsgProc_CRSM_Cnf(unsigned char* pRecvMsg)
 
 void AtcAp_MsgProc_LOCALTIMEINFO_Ind(unsigned char* pRecvMsg)
 {
-#if (!VER_QUCTL260)
+#if 1	
     ATC_MSG_LOCALTIMEINFO_IND_STRU* pLocalTimeInfo = (ATC_MSG_LOCALTIMEINFO_IND_STRU*)pRecvMsg;
     if(g_NITZ_mode != 0)
     {
