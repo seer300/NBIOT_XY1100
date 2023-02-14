@@ -257,7 +257,7 @@ typedef struct
     unsigned char    ucCrtdcpRepValue:1;                                   //##0##
     unsigned char    ucEDrxMode:2;                                         //##0##
 
-    unsigned char    ucCtzrReport:2;                                       //##3##
+    unsigned char    ucCtzrReport:2;                                       //##3##  改为##0##    add 20230214
     unsigned char    ucStorageOperType:4;                                  //##0##
     unsigned char    ucPadding6:2;                                         //##1##
 

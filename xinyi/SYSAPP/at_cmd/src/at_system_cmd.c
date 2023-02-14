@@ -617,12 +617,12 @@ int at_CCLK_req(char *at_buf, char **prsp_cmd)
 #if VER_QUCTL260
         if (g_softap_var_nv->g_zone == 0)
         {
-			sprintf(*prsp_cmd, "\r\n+CCLK:%04lu/%02lu/%02lu,%02lu:%02lu:%02lu+00\r\n\r\nOK\r\n", rtctime.tm_year, rtctime.tm_mon, rtctime.tm_mday,
+			sprintf(*prsp_cmd, "\r\n+CCLK: %04lu/%02lu/%02lu,%02lu:%02lu:%02lu+00\r\n\r\nOK\r\n", rtctime.tm_year, rtctime.tm_mon, rtctime.tm_mday,
 					rtctime.tm_hour, rtctime.tm_min, rtctime.tm_sec);
         }
 		else
 		{
-			sprintf(*prsp_cmd, "\r\n+CCLK:%04lu/%02lu/%02lu,%02lu:%02lu:%02lu%s\r\n\r\nOK\r\n", rtctime.tm_year, rtctime.tm_mon, rtctime.tm_mday,
+			sprintf(*prsp_cmd, "\r\n+CCLK: %04lu/%02lu/%02lu,%02lu:%02lu:%02lu%s\r\n\r\nOK\r\n", rtctime.tm_year, rtctime.tm_mon, rtctime.tm_mday,
 					rtctime.tm_hour, rtctime.tm_min, rtctime.tm_sec, zone);
 		}
 #else
@@ -630,19 +630,19 @@ int at_CCLK_req(char *at_buf, char **prsp_cmd)
         if (g_softap_var_nv->g_zone == 0)
         {
             if (tm_year_diff >= 0)
-                sprintf(*prsp_cmd, "\r\n+CCLK:%02d/%02lu/%02lu,%02lu:%02lu:%02lu+00\r\n\r\nOK\r\n", tm_year_diff, rtctime.tm_mon, rtctime.tm_mday,
+                sprintf(*prsp_cmd, "\r\n+CCLK: %02d/%02lu/%02lu,%02lu:%02lu:%02lu+00\r\n\r\nOK\r\n", tm_year_diff, rtctime.tm_mon, rtctime.tm_mday,
                         rtctime.tm_hour, rtctime.tm_min, rtctime.tm_sec);
             else
-                sprintf(*prsp_cmd, "\r\n+CCLK:%02d/%02lu/%02lu,%02lu:%02lu:%02lu+00\r\n\r\nOK\r\n", 100 + tm_year_diff, rtctime.tm_mon, rtctime.tm_mday,
+                sprintf(*prsp_cmd, "\r\n+CCLK: %02d/%02lu/%02lu,%02lu:%02lu:%02lu+00\r\n\r\nOK\r\n", 100 + tm_year_diff, rtctime.tm_mon, rtctime.tm_mday,
                         rtctime.tm_hour, rtctime.tm_min, rtctime.tm_sec);
         }
         else
         {
             if (tm_year_diff >= 0)
-                sprintf(*prsp_cmd, "\r\n+CCLK:%02d/%02lu/%02lu,%02lu:%02lu:%02lu%s\r\n\r\nOK\r\n", tm_year_diff, rtctime.tm_mon, rtctime.tm_mday,
+                sprintf(*prsp_cmd, "\r\n+CCLK: %02d/%02lu/%02lu,%02lu:%02lu:%02lu%s\r\n\r\nOK\r\n", tm_year_diff, rtctime.tm_mon, rtctime.tm_mday,
                         rtctime.tm_hour, rtctime.tm_min, rtctime.tm_sec, zone);
             else
-                sprintf(*prsp_cmd, "\r\n+CCLK:%02d/%02lu/%02lu,%02lu:%02lu:%02lu%s\r\n\r\nOK\r\n", 100 + tm_year_diff, rtctime.tm_mon, rtctime.tm_mday,
+                sprintf(*prsp_cmd, "\r\n+CCLK: %02d/%02lu/%02lu,%02lu:%02lu:%02lu%s\r\n\r\nOK\r\n", 100 + tm_year_diff, rtctime.tm_mon, rtctime.tm_mday,
                         rtctime.tm_hour, rtctime.tm_min, rtctime.tm_sec, zone);
         }
 #endif
