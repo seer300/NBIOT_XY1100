@@ -135,7 +135,7 @@ endif
 	@$(MV) arm.img     $(BIN_DIR)
 	@$(MV) $(TARGET).* $(ELF_DIR)
 	@echo "compiling done!!!"
-
+	@$(CP) $(BIN_DIR)/arm.img ../../../../../V*_XO/allbins
 
 # use --start-group and --end-group to resolve the interdependencies between libraries
 LINK_WITH_LIBRARY += -Wl,--start-group $(LIBRARY_PATH) $(SRCS_LIBS_INC) -Wl,--end-group

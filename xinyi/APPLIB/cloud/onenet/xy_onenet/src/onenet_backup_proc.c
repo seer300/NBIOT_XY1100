@@ -292,6 +292,7 @@ void onenet_bak_user_config()
     g_onenet_regInfo->onenet_user_config.reg_timeout= onenet_context_refs[0].onenet_user_config.reg_timeout;
     g_onenet_regInfo->onenet_user_config.device_type = onenet_context_refs[0].onenet_user_config.device_type;
     g_onenet_regInfo->onenet_user_config.al_bs_flag = onenet_context_refs[0].onenet_user_config.al_bs_flag;
+	g_onenet_regInfo->onenet_user_config.bs_timeout = onenet_context_refs[0].onenet_user_config.bs_timeout; 
 }
 
 void onenet_resume_user_config()
@@ -301,6 +302,7 @@ void onenet_resume_user_config()
     onenet_context_refs[0].onenet_user_config.reg_timeout = g_onenet_regInfo->onenet_user_config.reg_timeout;
     onenet_context_refs[0].onenet_user_config.device_type = g_onenet_regInfo->onenet_user_config.device_type;
     onenet_context_refs[0].onenet_user_config.al_bs_flag = g_onenet_regInfo->onenet_user_config.al_bs_flag;
+	onenet_context_refs[0].onenet_user_config.bs_timeout = g_onenet_regInfo->onenet_user_config.bs_timeout; 
 }
 
 //we assume checksum has been checked before

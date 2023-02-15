@@ -1279,6 +1279,16 @@ uint32_t    cis_pump(void* context)
 		case STATE_BS_INITIATED:
 		{
 			//wait;
+			/******** cjh add 20230215 for bc260y *********/
+			 if(onenet_context_refs[0].onenet_user_config.bs_timeout > 0) 
+            {
+                if(ctx->lasttime == 0 || tv_sec - ctx->lasttime > onenet_context_refs[0].onenet_user_config.bs_timeout)
+                {
+                    core_callbackEvent(context,CIS_EVENT_BOOTSTRAP_FAILED,NULL);
+                    core_updatePumpState(ctx, PUMP_STATE_UNREGISTER);
+                }
+            }
+			 /***** add end ******/
 		}
 		break;
 		case STATE_BS_PENDING:
@@ -1687,7 +1697,7 @@ uint32_t    cis_pump(void* context)
 
 		case STATE_REG_PENDING:
 		{
-#if VER_QUECTEL
+#if VER_QUECTEL||VER_QUCTL260   //add 20230214
             if(onenet_context_refs[0].onenet_user_config.reg_timeout > 0) 
             {
                 if(ctx->lasttime == 0 || tv_sec - ctx->lasttime > onenet_context_refs[0].onenet_user_config.reg_timeout)

@@ -143,6 +143,7 @@ typedef struct onenet_user_config_s {
     uint16_t reg_timeout;	//注册超时时间，从连接成功（输出+MIPLEVENT: 0,4）开始计时
     uint32_t device_type;  //ANDLINK 设备类型
     uint32_t al_bs_flag;  //ANDLINK BS模式
+    uint16_t bs_timeout;	//引导超时时间，从引导开始（+MIPLEVENT: 0,1）开始计时    	//cjh add 20230215 for bc260y 
 } onenet_user_config_t;
 
 typedef struct onenet_context_config_s {
