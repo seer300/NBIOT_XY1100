@@ -1835,7 +1835,7 @@ int at_CMVER_req(char *at_buf, char **prsp_cmd)
 		*prsp_cmd = xy_zalloc(60);
 #if VER_QUCTL260
 		//snprintf(*prsp_cmd, 60, "\r\nVersion:%s\r\n\r\nOK\r\n", g_softap_fac_nv->versionExt);
-		snprintf(*prsp_cmd, 60, "\r\nRevision: "MODULE"_%s\r\n\r\nOK\r\n", TVERSION, SDATE);
+		snprintf(*prsp_cmd, 60, "\r\nRevision: %s_%s%s\r\n\r\nOK\r\n", MODULE, TVERSION, SDATE);
 #else
 		snprintf(*prsp_cmd, 60, "\r\nSoftware Version:%s\r\n\r\nOK\r\n", g_softap_fac_nv->versionExt);
 #endif

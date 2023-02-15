@@ -1261,8 +1261,11 @@ int at_CBC_req(char *at_buf, char **prsp_cmd)
 	{
 		voltage = xy_getVbat();
 		*prsp_cmd = xy_zalloc(32);
-
+#if !VER_QUCTL260
 		sprintf(*prsp_cmd  + strlen(*prsp_cmd ), "\r\n+CBC:%d\r\n", voltage);
+#else
+		sprintf(*prsp_cmd  + strlen(*prsp_cmd ), "\r\n+CBC: %d\r\n", voltage);
+#endif
 		sprintf(*prsp_cmd  + strlen(*prsp_cmd ), "\r\nOK\r\n");
 	}
 	else
@@ -1278,12 +1281,20 @@ int do_QADC_REQ(int adc_Mode,char **prsp_cmd)
 	if(otp_valid_flag != 1)  //缺乏AD校验信息，则报错
 	{
 //		*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
+#if !VER_QUCTL260
 		sprintf(*prsp_cmd + strlen(*prsp_cmd), "\r\n+QADC:%d\r\n", -1);
+#else
+		sprintf(*prsp_cmd + strlen(*prsp_cmd), "\r\n+QADC: %d\r\n", -1);
+#endif
 		return AT_END;
 	}
 	if(adc_Mode == 0)
 	{
+#if !VER_QUCTL260
 		sprintf(*prsp_cmd + strlen(*prsp_cmd), "\r\n+QADC:%d,%d\r\n", 0,get_ADC_val(HAL_ADC_MODE_TYPE_DOUBLE_PN));
+#else
+		sprintf(*prsp_cmd + strlen(*prsp_cmd), "\r\n+QADC: %d,%d\r\n", 0,get_ADC_val(HAL_ADC_MODE_TYPE_DOUBLE_PN));
+#endif
 		sprintf(*prsp_cmd + strlen(*prsp_cmd), "\r\nOK\r\n");
 	}
 	else
@@ -1312,9 +1323,13 @@ int at_QADC_req(char *at_buf, char **prsp_cmd)
 		do_QADC_REQ(0,prsp_cmd);
 	}
 	else if (g_req_type == AT_CMD_TEST)
-	{
+	{	
 		*prsp_cmd = xy_zalloc(32);
+#if !VER_QUCTL260
 		sprintf(*prsp_cmd + strlen(*prsp_cmd), "\r\n+QADC:(%d)\r\n",0 );
+#else
+		sprintf(*prsp_cmd + strlen(*prsp_cmd), "\r\n+QADC: (%d)\r\n",0 );
+#endif
 		sprintf(*prsp_cmd + strlen(*prsp_cmd), "\r\nOK\r\n");
 	}
 	else if(g_req_type==AT_CMD_REQ)

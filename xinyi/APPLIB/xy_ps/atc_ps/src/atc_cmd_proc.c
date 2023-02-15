@@ -1050,7 +1050,7 @@ unsigned char AtcAp_NCONFIG_LNB_Process(unsigned char *pEventBuffer)
 
 unsigned char AtcAp_MNBIOTEVENT_T_LNB_Process(unsigned char *pEventBuffer)
 {
-    AtcAp_StrPrintf_AtcRspBuf((const char *)"\r\n+MNBIOTEVENT:(0,1),(1)\r\n");
+    AtcAp_StrPrintf_AtcRspBuf((const char *)"\r\n+QNBIOTEVENT:(0,1),(1)\r\n");
     AtcAp_SendDataInd();
     AtcAp_SendOkRsp();
 
@@ -1199,8 +1199,13 @@ void AtcAp_MsgProc_CEREG_R_Cnf(unsigned char* pRecvMsg)
         if (pCeregRCnf->tRegisterState.OP_TacLac)
         {
             g_AtcApInfo.stAtRspInfo.ucHexStrLen = 4;
+#if !VER_QUCTL260
             g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(g_AtcApInfo.stAtRspInfo.aucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen),
                 (const unsigned char *)",%h", pCeregRCnf->tRegisterState.usTacOrLac);
+#else
+			g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(g_AtcApInfo.stAtRspInfo.aucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen),
+				(const unsigned char *)",%c%h%c", D_ATC_N_QUOTATION, pCeregRCnf->tRegisterState.usTacOrLac, D_ATC_N_QUOTATION);
+#endif
         }
         else
         {
@@ -1211,8 +1216,13 @@ void AtcAp_MsgProc_CEREG_R_Cnf(unsigned char* pRecvMsg)
         if (pCeregRCnf->tRegisterState.OP_CellId)
         {
             g_AtcApInfo.stAtRspInfo.ucHexStrLen = 8;
+#if !VER_QUCTL260
             g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(g_AtcApInfo.stAtRspInfo.aucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen),
                 (const unsigned char *)",%h", pCeregRCnf->tRegisterState.ulCellId);
+#else
+			g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(g_AtcApInfo.stAtRspInfo.aucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen),
+				(const unsigned char *)",%c%h%c", D_ATC_N_QUOTATION, pCeregRCnf->tRegisterState.ulCellId, D_ATC_N_QUOTATION);
+#endif
         }
         else
         {

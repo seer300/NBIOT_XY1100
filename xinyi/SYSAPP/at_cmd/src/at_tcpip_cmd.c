@@ -135,7 +135,7 @@ static void query_ntp_task(void *para)
     else if (cmntpparm->ntp_type == QNTP)
     {
         strcpy(rsp_cmd, "\r\n+QNTP: 0,");
-        sprintf(rsp_cmd + strlen(rsp_cmd), "\"%02lu/%02lu/%02lu,%02lu:%02lu:%02lu\"\r\n", rtctime.tm_year - 2000, rtctime.tm_mon, rtctime.tm_mday, rtctime.tm_hour, rtctime.tm_min, rtctime.tm_sec);
+        sprintf(rsp_cmd + strlen(rsp_cmd), "\"%lu/%02lu/%02lu,%02lu:%02lu:%02lu\"\r\n", rtctime.tm_year , rtctime.tm_mon, rtctime.tm_mday, rtctime.tm_hour, rtctime.tm_min, rtctime.tm_sec);
     }
     if (cmntpparm->update_rtc == 1)
         reset_universal_timer(&rtctime,zone_sec);

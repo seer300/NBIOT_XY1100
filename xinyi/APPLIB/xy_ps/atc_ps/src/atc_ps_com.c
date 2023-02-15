@@ -324,18 +324,29 @@ void AtcAp_SendCmeeErr(unsigned short usErrCode)
             {
                 if (usErrCode == PCmeErrorTextTbl[i].usErrCode)
                 {
+#if !VER_QUCTL260
                     g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,
                         (const unsigned char *)"\r\n+CME ERROR:%c%s%c\r\n",
                         D_ATC_N_QUOTATION, PCmeErrorTextTbl[i].pCmeErrorText, D_ATC_N_QUOTATION);
+#else
+					g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,
+						(const unsigned char *)"\r\n+CME ERROR: %s\r\n",PCmeErrorTextTbl[i].pCmeErrorText);
+
+#endif
                     break;
                 }
             }
             
             if (i ==  D_ATC_CME_ERROR_TBL_SIZE)
             {
+#if !VER_QUCTL260
                  g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,
                     (const unsigned char *)"\r\n+CME ERROR:%c%s%c\r\n",
                     D_ATC_N_QUOTATION, "unknown", D_ATC_N_QUOTATION);
+#else
+				g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,
+				   (const unsigned char *)"\r\n+CME ERROR: unknown\r\n");
+#endif
             }
         }
         else
@@ -1272,7 +1283,7 @@ void AtcAp_OutputAddr(unsigned char ucDataLen, unsigned char *pData, unsigned ch
 {   
     if(4 == ucDataLen)
     {
-#if VER_QUCTL260 //MG 20221115 add by LGF 
+#if !VER_QUCTL260 //MG 20221115 add by LGF 
         g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen),
             (const unsigned char *)",%d.%d.%d.%d",
             pData[0], pData[1], 
@@ -1294,7 +1305,7 @@ void AtcAp_OutputAddr(unsigned char ucDataLen, unsigned char *pData, unsigned ch
     }
     else if(16 == ucDataLen && g_factory_nv->tNvData.tNasNv.ucIpv6AddressFormat == 0)
     {
-#if VER_QUCTL260 //MG 20221115 add by LGF
+#if !VER_QUCTL260 //MG 20221115 add by LGF
 		g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen),
 			(const unsigned char *)",%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d",
 			pData[0], pData[1], pData[2], pData[3], pData[4], pData[5], pData[6], pData[7], 

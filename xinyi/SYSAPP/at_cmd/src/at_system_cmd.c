@@ -552,7 +552,7 @@ int at_CCLK_req(char *at_buf, char **prsp_cmd)
         	*prsp_cmd = xy_zalloc(60);
         	struct rtc_time local_rtctime = {0};
         	rtc_timer_read(&local_rtctime);
-			sprintf(*prsp_cmd, "\r\n+CCLK:\"%04lu/%02lu/%02lu,%02lu:%02lu:%02lu+00\"\r\n\r\nOK\r\n", local_rtctime.tm_year, local_rtctime.tm_mon, local_rtctime.tm_mday,
+			sprintf(*prsp_cmd, "\r\n+CCLK: \"%04lu/%02lu/%02lu,%02lu:%02lu:%02lu+00\"\r\n\r\nOK\r\n", local_rtctime.tm_year, local_rtctime.tm_mon, local_rtctime.tm_mday,
 					local_rtctime.tm_hour, local_rtctime.tm_min, local_rtctime.tm_sec);
 #elif !VER_QUECTEL
 			*prsp_cmd = AT_ERR_BUILD(ATERR_NOT_ALLOWED);
@@ -617,12 +617,12 @@ int at_CCLK_req(char *at_buf, char **prsp_cmd)
 #if VER_QUCTL260
         if (g_softap_var_nv->g_zone == 0)
         {
-			sprintf(*prsp_cmd, "\r\n+CCLK: %04lu/%02lu/%02lu,%02lu:%02lu:%02lu+00\r\n\r\nOK\r\n", rtctime.tm_year, rtctime.tm_mon, rtctime.tm_mday,
+			sprintf(*prsp_cmd, "\r\n+CCLK: \"%04lu/%02lu/%02lu,%02lu:%02lu:%02lu+00\"\r\n\r\nOK\r\n", rtctime.tm_year, rtctime.tm_mon, rtctime.tm_mday,
 					rtctime.tm_hour, rtctime.tm_min, rtctime.tm_sec);
         }
 		else
 		{
-			sprintf(*prsp_cmd, "\r\n+CCLK: %04lu/%02lu/%02lu,%02lu:%02lu:%02lu%s\r\n\r\nOK\r\n", rtctime.tm_year, rtctime.tm_mon, rtctime.tm_mday,
+			sprintf(*prsp_cmd, "\r\n+CCLK: \"%04lu/%02lu/%02lu,%02lu:%02lu:%02lu%s\"\r\n\r\nOK\r\n", rtctime.tm_year, rtctime.tm_mon, rtctime.tm_mday,
 					rtctime.tm_hour, rtctime.tm_min, rtctime.tm_sec, zone);
 		}
 #else
@@ -783,7 +783,7 @@ int at_QRST_req(char *at_buf, char **prsp_cmd)
 	else if(g_req_type == AT_CMD_TEST)
 	{
 		*prsp_cmd = xy_zalloc(32);
-		sprintf(*prsp_cmd, "\r\n+QRST:(1)\r\n\r\nOK\r\n");
+		sprintf(*prsp_cmd, "\r\n+QRST: (1)\r\n\r\nOK\r\n");
 	}
 	else
 		*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
