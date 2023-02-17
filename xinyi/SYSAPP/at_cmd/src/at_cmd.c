@@ -336,7 +336,7 @@ struct at_serv_proc_e at_basic_req[] = {
 	{"AT+QSETPSK", at_QSETPSK_req},
 	{"AT+QRESETDTLS", at_QRESETDTLS_req},
 	{"AT+QDTLSSTAT", at_QDTLSSTAT_req},
-//	{"AT+QCFG", at_QCFG_req},
+	{"AT+QCFG", at_QCFG_req},
 	{"AT+QLWFOTAIND", at_QLWFOTAIND_req},
 	{"AT+QLWEVTIND", at_QLWEVTIND_req},
 	{"AT+QCRITICALDATA", at_QCRITICALDATA_req},

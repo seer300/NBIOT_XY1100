@@ -790,6 +790,8 @@ int at_QRST_req(char *at_buf, char **prsp_cmd)
 	return AT_END;
 }
 
+//20230217 MG add: part function supported
+// "dsevent"/"epco"
 int at_QCFG_req(char *at_buf, char **prsp_cmd)
 {
 	char function[20] = {0};
@@ -802,14 +804,10 @@ int at_QCFG_req(char *at_buf, char **prsp_cmd)
 			*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
 			return AT_END;
 		}
-		if(strcmp(function, "dsevent") == 0)
+		
+		if(strcmp(function, "dsevent") == 0 && strlen(function) == strlen("dsevent"))
 		{
-			if(value == -1)
-			{
-				*prsp_cmd = xy_zalloc(48);
-				sprintf(*prsp_cmd, "\r\n+QCFG: \"dsevent\",%d\r\n\r\nOK\r\n",g_softap_fac_nv->deepsleep_urc);
-			}
-			else if(value != 0 && value != 1)
+			if(value != 0 && value != 1)
 			{
 				*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
 			}
@@ -818,9 +816,53 @@ int at_QCFG_req(char *at_buf, char **prsp_cmd)
 				g_softap_fac_nv->deepsleep_urc = value;
 				SAVE_FAC_PARAM(deepsleep_urc);
 			}
-			return AT_END;
 		}
+
+		else if(strcmp(function, "epco") == 0 && strlen(function) == strlen("epco")){
+			if(value != 0 && value != 1)
+				*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
+			
+			else if(value == 0){
+				if(xy_atc_interface_call("AT+NCONFIG=PCO_IE_TYPE,0\r\n", NULL, NULL) != XY_OK)
+				{
+				    *prsp_cmd = AT_ERR_BUILD(ATERR_XY_ERR);
+					return AT_END;
+				}
+				g_softap_fac_nv->epco_ind = 0;
+				SAVE_FAC_PARAM(epco_ind);
+			}
+
+			else if(value == 1){
+				if(xy_atc_interface_call("AT+NCONFIG=PCO_IE_TYPE,1\r\n", NULL, NULL) != XY_OK)
+				{
+				    *prsp_cmd = AT_ERR_BUILD(ATERR_XY_ERR);
+					return AT_END;
+				}
+				g_softap_fac_nv->epco_ind = 1;
+				SAVE_FAC_PARAM(epco_ind);
+			}
+		}
+
+		else
+			*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
 	}
-	return AT_FORWARD;
+
+	else if(AT_CMD_TEST == g_req_type){
+		*prsp_cmd = xy_zalloc(96);
+
+	    sprintf(*prsp_cmd, "\r\n+QCFG:\r\n\"dsevent\",<0,1>\r\n\"epco\",<0,1>\r\n\r\nOK\r\n");
+	}
+
+	else if(AT_CMD_QUERY == g_req_type){
+	    *prsp_cmd = xy_zalloc(96);
+
+	    sprintf(*prsp_cmd, "\r\n+QCFG:\r\n\"dsevent\",%d\r\n\"epco\",%d\r\n\r\nOK\r\n", g_softap_fac_nv->deepsleep_urc, g_softap_fac_nv->epco_ind);
+	}
+
+	else
+		*prsp_cmd = AT_ERR_BUILD(ATERR_NOT_ALLOWED);
+		
+	return AT_END;
 }
+//add end
 

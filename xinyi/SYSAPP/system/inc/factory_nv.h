@@ -554,8 +554,8 @@ typedef struct {
     uint32_t ref_pridns4;   //##1920103026("114.114.114.114"字节形式)## ipv4默认主dns服务器地址。以字节形式保存
     uint32_t ref_secdns4;   //##134744072("8.8.8.8"字节形式)## ipv4默认辅dns服务器地址。以字节形式保存
     
-    uint8_t   reserved[44];		//##0## 
-
+    uint8_t   reserved[127];		//##0## 
+    uint8_t   epco_ind;    //20230217 MG add for:AT+QCFG="epco",0/1
 }softap_fac_nv_t;
 
 //use  2332 bytes,all is 4080 bytes
