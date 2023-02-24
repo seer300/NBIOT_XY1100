@@ -517,6 +517,12 @@ void AtcAp_FreeEventBuffer(unsigned char* pCmdEvent)
                 AtcAp_Free(pCmdComEvent->stNsnpdParam.pucNonIpData);
             }
             break;
+        case D_ATC_EVENT_QNIDD:
+            if(NULL != pCmdComEvent->stQniddParam.pucData)
+            {
+                AtcAp_Free(pCmdComEvent->stQniddParam.pucData);
+            }
+            break;
         default:
             break;
     }
@@ -829,6 +835,8 @@ static unsigned short AtcAp_GetCmdEventBuffSize(UN_ATC_CMD_EVENT *pCmdEvent)
         case D_ATC_EVENT_MNBIOTEVENT:
         case D_ATC_EVENT_MNBIOTEVENT_R:
             return sizeof(ST_ATC_MNBIOTEVENT_PARAMETER);
+        case D_ATC_EVENT_QNIDD:
+            return offsetof(ST_ATC_QNIDD_PARAMETER, pucData) + pCmdEvent->stQniddParam.usDataLen;
         default:
             return sizeof(ST_ATC_CMD_COM_EVENT);
     }
@@ -932,6 +940,14 @@ void AtcAp_Encode_UN_ATC_CMD_EVENT(UN_ATC_CMD_EVENT *pCmdEvent, unsigned char** 
             AtcAp_MemCpy(pCodeStream, pCmdEvent, usOffset);
             break;
 #endif
+        case D_ATC_EVENT_QNIDD:
+            usOffset = offsetof(ST_ATC_QNIDD_PARAMETER, pucData);
+            AtcAp_MemCpy(pCodeStream, pCmdEvent, usOffset);
+            if(0 != pCmdEvent->stQniddParam.usDataLen)
+            {
+                AtcAp_MemCpy(pCodeStream + usOffset, pCmdEvent->stQniddParam.pucData, pCmdEvent->stQniddParam.usDataLen);
+            }
+            break;
         default:
             AtcAp_MemCpy(pCodeStream, pCmdEvent, usLen);
             break;
@@ -3263,7 +3279,7 @@ unsigned char ATC_CheckStrParameter(unsigned char *pCommandBuffer,  signed int i
 
     if(0 == ucOptFlg)
     {
-        if(D_ATC_PARAM_EMPTY == ucResult || 0 == pParamLen)
+        if(D_ATC_PARAM_EMPTY == ucResult || 0 == *pParamLen)
         {
             return D_ATC_PARAM_ERROR;
         }

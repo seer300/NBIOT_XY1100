@@ -281,6 +281,8 @@ extern void AtcAp_MsgProc_QPLMNS_R_Cnf(unsigned char* pRecvMsg);
 extern void AtcAp_MsgProc_QLOCKF_R_Cnf(unsigned char* pRecvMsg);
 extern void AtcAp_MsgProc_ECURC_R_Cnf(unsigned char* pRecvMsg);
 extern void AtcAp_MsgProc_QENG_Cnf(unsigned char* pRecvMsg);
+extern void AtcAp_MsgProc_QNIDD_Cnf(unsigned char* pRecvMsg);
+extern void AtcAp_MsgProc_QNIDD_Ind(unsigned char* pRecvMsg);
 
 /*************** atc_ap_cmd_proc.c  end *************************************/
 
@@ -429,6 +431,7 @@ extern unsigned char ATC_ECURC_LNB_Command(unsigned char *pCommandBuffer, unsign
 extern unsigned char ATC_QENG_LNB_Command(unsigned char *pCommandBuffer, unsigned char *pEventBuffer);
 extern unsigned char ATC_QNBIOTEVENT_LNB_Command(unsigned char *pCommandBuffer, unsigned char *pEventBuffer);
 extern unsigned char ATC_QEDRXCFG_LNB_Command(unsigned char *pCommandBuffer, unsigned char *pEventBuffer);
+extern unsigned char ATC_QNIDD_LNB_Command(unsigned char *pCommandBuffer, unsigned char *pEventBuffer);
 
 /*************************** atc_ap_com.c start ************************************/
 extern void ATC_SendApDataReq(unsigned char ucExternalFlg, unsigned long ulAppSemaId, unsigned short usDataLen, unsigned char*pucData);

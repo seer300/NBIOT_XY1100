@@ -48,7 +48,7 @@ void HAL_GPIO_Init(HAL_GPIO_InitTypeDef *GPIO_Init)
 				{
 					GPIOConflictStatusClear(ucTemp);
 				}
-				GPIOPeripheralPad(0XFF, GPIO_Init->Pin);
+				GPIOPeripheralPad(0XFF, ucTemp);
 			}
 		}
 		GPIOPeripheralPad(GPIO_Init->Alternate, GPIO_Init->Pin);

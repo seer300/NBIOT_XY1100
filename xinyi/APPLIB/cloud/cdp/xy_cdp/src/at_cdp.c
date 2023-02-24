@@ -540,7 +540,7 @@ int at_NSMI_req(char *at_buf, char **prsp_cmd)
 	else if(g_req_type == AT_CMD_QUERY)
 	{	
 		*prsp_cmd = xy_zalloc(40);
-		snprintf(*prsp_cmd, 40, "\r\n+NSMI:%d\r\n\r\nOK\r\n", g_softap_var_nv->cdp_nsmi);
+		snprintf(*prsp_cmd, 40, "\r\n+NSMI: %d\r\n\r\nOK\r\n", g_softap_var_nv->cdp_nsmi);
 	}
 	
 	return AT_END;

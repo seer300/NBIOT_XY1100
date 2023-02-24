@@ -36,6 +36,7 @@ unsigned char g_udp_send_rai[NUM_SOCKETS] = {0};
 struct ps_netif ps_if[PS_PDP_CID_MAX] = {{INVALID_CID, NULL}, {INVALID_CID, NULL}};
 nonip_uplink_func g_nonip_func = NULL;
 int g_cp_or_up = 0;
+uint8_t g_ipv6_addr_restore_flag = 0;
 osMutexId_t g_udp_send_m = NULL;
 uint16_t g_udp_latest_seq = 0;  //当最后一个上行报文被PS处理完毕后(参加urc_UDPRAI_Callback)，触发RAI的发送
 uint16_t g_udp_seq = 0XA000;	//非socket UDP sequence以外的上行报文的起始序列号，用于RAI的触发
@@ -644,7 +645,9 @@ int ps_netif_deactivate(unsigned char cid, unsigned short ip46flag)
 		softap_printf(USER_LOG, WARN_LOG, "deactive cid:%u pdp fail", cid);
 		return XY_ERR;
 	}
-
+    /* 去激活前删除可能存在的nd6 ra定时器，避免超时后访问非法地址 */
+    sys_untimeout(nd6_ra_timeout_handler, netif_tmp->ps_eth);
+	
 	netifapi_netif_remove(netif_tmp->ps_eth);
 	delete_netif(cid);
 
@@ -700,10 +703,12 @@ bool ipv6_recovery_from_bakmem(ip6_addr_t* ip6_addr)
 	{
 		return false;
 	}
-	if (is_powenon_from_deepsleep() == XY_OK)
+
+	if (g_ipv6_addr_restore_flag == 1)
 	{
 		//check ipv6 后64位是否变化
-		ip6_addr_t ipv6_addr = {0};
+        g_ipv6_addr_restore_flag = 0;
+        ip6_addr_t ipv6_addr = {0};
 		memcpy(&ipv6_addr, g_softap_var_nv->ipv6_addr, sizeof(g_softap_var_nv->ipv6_addr));
 		if (ip6_addr_nethostcmp(&ipv6_addr, ip6_addr))
 		{
@@ -771,4 +776,5 @@ void netif_regist_init()
 {
 	g_out_OOS_sem = osSemaphoreNew(1, 0, NULL);
 	g_netif_callbacklist_mutex = osMutexNew(NULL);
+    g_ipv6_addr_restore_flag = (is_powenon_from_deepsleep() == XY_OK) ? 1 :0;
 }

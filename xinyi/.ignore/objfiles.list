@@ -411,13 +411,11 @@
 ../object/APPLIB/at_socket/src/at_socket_ram.o.ram
 ../object/APPLIB/at_socket/src/at_socket_rcv.o.flash
 ../object/APPLIB/cJSON/cJSON.o.flash
-../object/APPLIB/http/atcmd/at_http.o.flash
-../object/APPLIB/http/atcmd/http_socket.o.flash
-../object/APPLIB/http/http_api.o.flash
-../object/APPLIB/http/stringx.o.flash
-../object/APPLIB/http/urlparser.o.flash
-../object/APPLIB/http/user_task_demo_http.o.flash
-../object/APPLIB/http/xy_http_client.o.flash
+../object/APPLIB/http/httpcore/src/http_aos_wrapper.o.flash
+../object/APPLIB/http/httpcore/src/http_client.o.flash
+../object/APPLIB/http/httpcore/src/http_formdata.o.flash
+../object/APPLIB/http/httpcore/src/http_method_api.o.flash
+../object/APPLIB/http/xy_http/src/at_http.o.flash
 ../object/APPLIB/mqtt/MQTTPacket/src/MQTTConnectClient.o.flash
 ../object/APPLIB/mqtt/MQTTPacket/src/MQTTConnectServer.o.flash
 ../object/APPLIB/mqtt/MQTTPacket/src/MQTTDeserializePublish.o.flash
@@ -470,7 +468,6 @@
 ../object/USERAPP/examples/xy_cloud_demo/mqtt_opencpu_demo.o.flash
 ../object/USERAPP/examples/xy_cloud_demo/onenet/cis_opencpu_demo.o.flash
 ../object/USERAPP/examples/xy_cloud_demo/onenet/cis_opencpu_simple_demo.o.flash
-../object/USERAPP/examples/xy_fota_demo/by_http/xy_fota_by_http.o.flash
 ../object/USERAPP/examples/xy_opencpu_demo/user_netif_demo.o.flash
 ../object/USERAPP/examples/xy_opencpu_demo/user_task_demo.o.flash
 ../object/USERAPP/examples/xy_opencpu_demo/user_task_demo2.o.flash

@@ -1283,6 +1283,8 @@ void AtcAp_MsgProc_CEREG_R_Cnf(unsigned char* pRecvMsg)
     AtcAp_SendDataInd();
 }
 
+ATC_MSG_CGATT_R_CNF_STRU tCgattRCnf = { 0 };
+
 void AtcAp_MsgProc_CGATT_R_Cnf(unsigned char* pRecvMsg)
 {
     ATC_MSG_CGATT_R_CNF_STRU* ptCgattRCnf;
@@ -3048,11 +3050,11 @@ void AtcAp_MsgProc_CPINR_Cnf(unsigned char* pRecvMsg)
     {
         if(pPinRetriesCnf->aPinRetires[index].ucPinType == D_ATC_CPINR_TYPE_PIN1)
         {
-            AtcAp_StrPrintf_AtcRspBuf("+CPINR: %s,%d,3\r\n", "SIM PIN", pPinRetriesCnf->aPinRetires[index].ucRetriesNum);
+            AtcAp_StrPrintf_AtcRspBuf("+CPINR: %s,%d,3\r\n", "\"SIM PIN\"", pPinRetriesCnf->aPinRetires[index].ucRetriesNum);
         }
         if(pPinRetriesCnf->aPinRetires[index].ucPinType == D_ATC_CPINR_TYPE_PUK1)
         {
-            AtcAp_StrPrintf_AtcRspBuf("+CPINR: %s,%d,10\r\n", "SIM PUK", pPinRetriesCnf->aPinRetires[index].ucRetriesNum);
+            AtcAp_StrPrintf_AtcRspBuf("+CPINR: %s,%d,10\r\n", "\"SIM PUK\"", pPinRetriesCnf->aPinRetires[index].ucRetriesNum);
         }
 #if 0	//not need on document		
         if(pPinRetriesCnf->aPinRetires[index].ucPinType == D_ATC_CPINR_TYPE_PIN2)
@@ -3680,7 +3682,7 @@ void AtcAp_MsgProc_CSIM_Cnf(unsigned char* pRecvMsg)
     pDataBuff = (unsigned char*)AtcAp_Malloc(pCsimCnf->usRspLen * 2 + 1);
     
     AtcAp_HexToAsc((unsigned short)pCsimCnf->usRspLen, pDataBuff, pCsimCnf->aucRsp);
-    AtcAp_StrPrintf_AtcRspBuf((const char *)"\r\n+CSIM: %d,%s\r\n", pCsimCnf->usRspLen * 2, pDataBuff);
+    AtcAp_StrPrintf_AtcRspBuf((const char *)"\r\n+CSIM: %d,\"%s\"\r\n", pCsimCnf->usRspLen * 2, pDataBuff);
     AtcAp_Free(pDataBuff);
 
     AtcAp_SendDataInd();
@@ -3730,7 +3732,7 @@ void AtcAp_MsgProc_CRSM_Cnf(unsigned char* pRecvMsg)
     {
         pStrData = (unsigned char*)AtcAp_Malloc(pCrsmCnf->usRspLen * 2 + 1);
         AtcAp_HexToAsc(pCrsmCnf->usRspLen, pStrData, pCrsmCnf->aucResponse);
-        AtcAp_StrPrintf_AtcRspBuf("\r\n+CRSM: %d,%d,%s\r\n", pCrsmCnf->sw1, pCrsmCnf->sw2, pStrData);
+        AtcAp_StrPrintf_AtcRspBuf("\r\n+CRSM: %d,%d,\"%s\"\r\n", pCrsmCnf->sw1, pCrsmCnf->sw2, pStrData);
         AtcAp_Free(pStrData);
     }
     
@@ -4094,5 +4096,42 @@ void AtcAp_MsgProc_QENG_Cnf(unsigned char* pRecvMsg)
     }
     AtcAp_StrPrintf_AtcRspBuf("\r\n");
     AtcAp_SendDataInd();
+}
+
+void AtcAp_MsgProc_QNIDD_Cnf(unsigned char* pRecvMsg)
+{
+    ATC_MSG_QNIDD_CNF_STRU* pCnf = (ATC_MSG_QNIDD_CNF_STRU*)pRecvMsg;
+
+    AtcAp_StrPrintf_AtcRspBuf((const char *)"\r\n+QNIDD:%d,%d\r\n", pCnf->ucOption, pCnf->ucValue);
+    AtcAp_SendDataInd();
+}
+
+void AtcAp_MsgProc_QNIDD_Ind(unsigned char* pRecvMsg)
+{
+    unsigned char           index    = 0;
+    unsigned short          offset   = 0;
+    unsigned short          len      = 0;
+    unsigned char          *pInd     = NULL;
+    ATC_MSG_QNIDD_IND_STRU  tQnidd   = { 0 };
+
+    AtcAp_MemCpy((unsigned char*)&tQnidd, pRecvMsg, offsetof(ATC_MSG_QNIDD_IND_STRU, pucData));
+    tQnidd.pucData = pRecvMsg + offsetof(ATC_MSG_QNIDD_IND_STRU, pucData);
+
+    pInd = (unsigned char *)AtcAp_Malloc(D_ATC_QNIDD_IND_LENGTH + 512 * 2 + 1);
+    while(offset < tQnidd.usDataLen)
+    {
+        AtcAp_MemSet(pInd, 0, D_ATC_QNIDD_IND_LENGTH + 512 * 2 + 1);
+        
+        len = (tQnidd.usDataLen - offset > 512 ? 512 : tQnidd.usDataLen - offset);
+        g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)pInd, (const unsigned char *)"\r\n+QNIDD:4,%d,%d,%d,\"", tQnidd.ucNIDD_ID,len,index++);
+        AtcAp_HexToAsc(len, pInd + g_AtcApInfo.stAtRspInfo.usRspLen, tQnidd.pucData + offset);
+        g_AtcApInfo.stAtRspInfo.usRspLen += len * 2;            
+        g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)pInd + g_AtcApInfo.stAtRspInfo.usRspLen, (const unsigned char *)"\"\r\n");
+        AtcAp_SendLongDataInd(&pInd, D_ATC_CRTDCP_IND_LENGTH + len * 2);
+
+        offset += len;
+    }
+    
+    AtcAp_Free(pInd);
 }
 

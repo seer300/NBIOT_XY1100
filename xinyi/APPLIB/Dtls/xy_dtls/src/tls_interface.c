@@ -262,9 +262,9 @@ int xy_tls_shakehand(mbedtls_ssl_context *ssl, const tls_shakehand_info_s *info)
 
     XY_TLS_LOG("connecting to server");
 
-    server_fd = xy_mbedtls_net_connect(info->host, info->port, MBEDTLS_NET_PROTO_TCP);
+	server_fd = mbedtls_calloc(1, sizeof(mbedtls_net_context));
 
-    if (server_fd == NULL)
+    if((ret = xy_mbedtls_net_connect(server_fd, info->host, info->port, MBEDTLS_NET_PROTO_TCP)) != 0)
     {
         XY_TLS_LOG("connect failed! mode %d", info->client_or_server);
         ret = MBEDTLS_ERR_NET_CONNECT_FAILED;
@@ -328,6 +328,7 @@ exit_fail:
     if (server_fd)
     {
         xy_mbedtls_net_free(server_fd);
+		mbedtls_free(server_fd);
         ssl->p_bio = NULL;
     }
 
@@ -373,6 +374,7 @@ void xy_tls_ssl_destroy(mbedtls_ssl_context *ssl)
     if (server_fd)
     {
         xy_mbedtls_net_free(server_fd);
+		mbedtls_free(server_fd);
     }
 
     if (conf)

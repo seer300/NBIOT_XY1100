@@ -152,7 +152,7 @@ int match_net_app_by_touple(net_app_type_t type, void *data)
     return 0;
 }
 
-#if VER_QUCTL260
+#if VER_QUCTL260 && MOBILE_VER
 int check_onenet_reginfo()
 {
 	int curtime = utils_gettime_s();

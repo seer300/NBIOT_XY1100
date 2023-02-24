@@ -23,7 +23,7 @@
 #include "xy_ctwing_adapt.h"
 #endif
 
-#if VER_QUCTL260
+#if VER_QUCTL260 && TELECOM_VER
 #include "agent_tiny_demo.h"
 #endif
 
@@ -98,7 +98,7 @@ void  erase_flash_by_abnormal(int state)
 	xy_flash_erase(NV_FLASH_DSP_NON_VOLATILE_BASE,NV_FLASH_DSP_NON_VOLATILE_LEN);
 	xy_flash_erase(NV_FLASH_NET_BASE,NV_FLASH_NET_LEN);
 	g_softap_var_nv->app_recovery_flag = 0;//清除云恢复标志位
-#if VER_QUCTL260
+#if VER_QUCTL260 && TELECOM_VER
 	//清除下行缓存
 	xy_flash_erase(FOTA_BACKUP_BASE, DOWNSTREAM_LEN_MAX*8);
 #endif
@@ -271,7 +271,7 @@ void nv_restore()
 
 		xy_flash_erase(NV_FLASH_NET_BASE,NV_FLASH_NET_LEN);
 		g_softap_var_nv->app_recovery_flag = 0;//清除云恢复标志位
-#if VER_QUCTL260
+#if VER_QUCTL260 && TELECOM_VER
 		//清除下行缓存
 		xy_flash_erase(FOTA_BACKUP_BASE, DOWNSTREAM_LEN_MAX*8);
 #endif
@@ -305,7 +305,7 @@ void nv_restore()
 		{
 			xy_flash_erase(NV_FLASH_NET_BASE,NV_FLASH_NET_LEN);
 			g_softap_var_nv->app_recovery_flag = 0;//清除云恢复标志位
-#if VER_QUCTL260
+#if VER_QUCTL260 && TELECOM_VER
 			//清除下行缓存
 			xy_flash_erase(FOTA_BACKUP_BASE, DOWNSTREAM_LEN_MAX*8);
 #endif
@@ -441,7 +441,7 @@ void nv_write_to_flash()
 	        //擦除云NV数据
             xy_flash_erase(NV_FLASH_NET_BASE, NV_FLASH_NET_LEN);
             g_softap_var_nv->app_recovery_flag = 0;//清除云恢复标志位
-#if VER_QUCTL260
+#if VER_QUCTL260 && TELECOM_VER
 			//清除下行缓存
 			xy_flash_erase(FOTA_BACKUP_BASE, DOWNSTREAM_LEN_MAX*8);
 #endif
@@ -451,7 +451,7 @@ void nv_write_to_flash()
 	        save_net_app_infos();
 			save_ipv6_to_bakmem();
 
-#if VER_QUCTL260
+#if VER_QUCTL260 && TELECOM_VER
 			cdp_downbuffered_save();
 #endif
 

@@ -154,6 +154,7 @@ int bc26_socket_send_data(char *data, uint32_t len, int rai_flag, socket_context
     {
 		ioctl(ctx->fd, FIOREADSN, &pre_sn);
 	}
+
     int ret = send2(ctx->fd, hex_data, len, 0, sequence_no, rai_flag);
     if (ret < 0)
     {

@@ -61,6 +61,7 @@
 #include "../cis_internals.h"
 #include "std_object.h"
 #include "factory_nv.h"
+#include "at_onenet.h"
 
 #if CIS_ENABLE_UPDATE
 /*
@@ -92,6 +93,7 @@
 
 #define PRV_VERSION_MAXLEN   28 //+HH:MM\0 at max
 
+extern onenet_context_reference_t onenet_context_refs[0];
 
 typedef struct _device_data_
 {
@@ -246,6 +248,17 @@ static uint8_t prv_device_get_value(st_context_t * contextP,
 				result = COAP_205_CONTENT;
 				break;
 			}
+		case RES_O_ANDLINK_DEV_TYPE:
+            {
+                char str[16] = {0};
+                if(onenet_context_refs[0].onenet_user_config.device_type > 0)
+                {
+                    itoa(onenet_context_refs[0].onenet_user_config.device_type, str, 10);
+                    data_encode_string(str, dataP);
+                }
+                result = COAP_205_CONTENT;
+                break;
+            }
 #if CIS_ENABLE_UPDATE_MCU
        	case RES_O_MEMORY_FREE_MCU:
 		  {
@@ -323,9 +336,9 @@ uint8_t std_device_read(st_context_t * contextP,
 			#if CIS_ENABLE_UPDATE_MCU
 				RES_O_SOFTWARE_VERSION,
                 RES_O_MEMORY_FREE_MCU,
-            #endif    
-                RES_O_MEMORY_FREE
-              
+            #endif
+                RES_O_MEMORY_FREE,
+                RES_O_ANDLINK_DEV_TYPE
         };
         int nbRes = sizeof(resList)/sizeof(uint16_t);
 		(*dataArrayP)->id = 0;

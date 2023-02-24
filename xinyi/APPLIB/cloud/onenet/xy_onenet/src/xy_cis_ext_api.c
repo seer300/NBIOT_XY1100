@@ -205,6 +205,7 @@ static int cis_ext_pro()
 			xy_printf("[CIS_OPENCPU]err: process ret(%d)", ret);
 		
 	}
+	cis_work_state = 0;
 	return XY_OK;
 }
 
@@ -279,18 +280,18 @@ int cis_ext_reg(int timeout)
 			cis_ext_dereg();
 			return XY_ERR;
     	}
-        if(rcv_msg->type == CIS_EVENT_REG_TIMEOUT)
-        {
-            xy_printf("cis simplified api register timeout");
-            return XY_ERR;
-        }
-		else if(rcv_msg->type == CIS_EVENT_BOOTSTRAP_FAILED)
-        {
-            xy_printf("cis simplified api register bs failed");
-            return XY_ERR;
-        }
         evtType = rcv_msg->type;
         xy_free(rcv_msg);
+
+        if(evtType == CIS_EVENT_REG_TIMEOUT || evtType == CIS_EVENT_BOOTSTRAP_FAILED
+                || evtType == CIS_EVENT_CONNECT_FAILED || evtType == CIS_EVENT_REG_FAILED)
+        {
+            xy_printf("cis simplified api register failed event[%d]", evtType);
+            cis_ext_dereg();
+            return XY_ERR;
+        }
+        else
+            xy_printf("cis simplified api registering event[%d]", evtType);
     }
     
     xy_printf("cis simplified api register success");
@@ -352,13 +353,16 @@ int cis_ext_send(char *data, int data_len, int timeout)
 			xy_printf("cis simplified api send data timeout");
 			return XY_ERR;
 		}
-        if(rcv_msg->type == CIS_EVENT_NOTIFY_FAILED)
+
+		evtType = rcv_msg->type;
+		xy_free(rcv_msg);
+
+        if(evtType == CIS_EVENT_NOTIFY_FAILED)
         {
             xy_printf("cis simplified api send data error");
             return XY_ERR;
         }
-        evtType = rcv_msg->type;
-        xy_free(rcv_msg);
+
     }
     
     xy_printf("cis simplified api send date success");

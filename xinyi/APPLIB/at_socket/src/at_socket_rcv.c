@@ -189,6 +189,8 @@ void at_sock_recv_thread(void)
                     size += 3;
                     at_write_all_to_uart(rsp_cmd, size);
                     xy_free(rsp_cmd);
+                    xy_free(buf);
+                    xy_free(remote_info);
                     continue;
                 }
                 else if (g_data_recv_mode == HEX_ASCII_STRING)

@@ -125,7 +125,8 @@ typedef enum
 									osCoreEnterCritical();				   \
 									if((__HANDLE__)->Lock == HAL_LOCKED)   \
 									{                                      \
-									   return HAL_BUSY;                    \
+                    osCoreExitCritical();		             \
+									  return HAL_BUSY;                    \
 									}                                      \
 									else                                   \
 									{                                      \

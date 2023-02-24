@@ -39,6 +39,7 @@
 #define EMM_SIM_UICC_ID_LEN                     10
 #define D_ATC_CRTDCP_IND_LENGTH                 26
 #define D_ATC_NRNPDM_IND_LENGTH                 26
+#define D_ATC_QNIDD_IND_LENGTH                  26
 
 #define D_ATC_P_CSCA_IND_SCA_SIZE_MAX           22
 
@@ -347,7 +348,8 @@ enum {
     D_ATC_EVENT_QEDRXCFG,
     D_ATC_EVENT_QEDRXCFG_R,
     D_ATC_EVENT_QEDRXCFG_T,
-    D_ATC_EVENT_NULL            /* 207 */
+    D_ATC_EVENT_QNIDD,
+    D_ATC_EVENT_NULL
 };
 
 typedef enum {
@@ -385,7 +387,8 @@ typedef enum {
     D_ATC_AP_NQPODCP_IND,
     D_ATC_AP_CNEC_IND,
 	D_ATC_AP_NRNPDM_IND,
-	D_ATC_AP_MNBIOTEVENT_IND,                                                               /* 259 */
+	D_ATC_AP_MNBIOTEVENT_IND,
+    D_ATC_AP_QNIDD_IND,
 } ATC_AP_EXTEND_EVENT_ID;
 
 enum 
@@ -1230,6 +1233,25 @@ typedef struct
     unsigned char   ucVal;
 }ST_ATC_QENG_PARAMETER;
 
+typedef struct {
+    unsigned short                usEvent;
+#define D_QNIDD_OPTION_CREATE_ACCOUNT       0
+#define D_QNIDD_OPTION_ESTABLISH_CONNECT    1
+#define D_QNIDD_OPTION_ACTIVE_CONNECT       2
+#define D_QNIDD_OPTION_SEND_NONIP_DATA      3
+    unsigned char                 ucOption;
+    unsigned char                 ucApnLen;
+    unsigned char                 aucApnValue[64];
+    unsigned char                 ucUsernameLen;
+    unsigned char                 aucUsername[16];
+    unsigned char                 ucPasswordLen;
+    unsigned char                 aucPassword[16];
+    unsigned char                 ucAccountID;
+    unsigned char                 ucNIDD_ID;
+    unsigned short                usDataLen;
+    unsigned char                *pucData;
+} ST_ATC_QNIDD_PARAMETER;
+
 typedef union
 {
     ST_ATC_CGDCONT_PARAMETER           stCgdcontParam;
@@ -1275,10 +1297,10 @@ typedef union
     ST_ATC_CGEREP_PARAMETER            stCgerepParam;
     ST_ATC_CTZR_PARAMETER              stCtzrParam;
     ST_ATC_CGCONTRDP_PARAMETER         stCgcontrdpParam;
-    ST_ATC_NUESTATS_PARAMETER               stNuestatsParam;
-    ST_ATC_NEARFCN_PARAMETER                stNearfcnParam;
-    ST_ATC_NBAND_PARAMETER                  stNbandParam;
-    ST_ATC_NCONFIG_PARAMETER                stNconfigParam;
+    ST_ATC_NUESTATS_PARAMETER          stNuestatsParam;
+    ST_ATC_NEARFCN_PARAMETER           stNearfcnParam;
+    ST_ATC_NBAND_PARAMETER             stNbandParam;
+    ST_ATC_NCONFIG_PARAMETER           stNconfigParam;
     //ST_ATC_SOCKET_INFO_STRU            stSocketInfoParam;
     //ST_ATC_UDP_DATA_STRU               stUdpDataParam;
     //ST_ATC_PING_DATA_STRU              stPingDataParam;
@@ -1301,6 +1323,7 @@ typedef union
     ST_ATC_QLOCKF_PARAMETER            stQlockfParam;
     ST_ATC_ECURC_PARAMETER             stEcurcParam;
     ST_ATC_QENG_PARAMETER              stQengParam;
+    ST_ATC_QNIDD_PARAMETER             stQniddParam;
 }UN_ATC_CMD_EVENT;
 
 /*******************************************************************************
@@ -2857,6 +2880,21 @@ typedef struct {
     unsigned char                 ucPsmStateRptValue;
     unsigned char                 ucQnbioteventFlg;
 } ATC_MSG_MNBIOTEVENT_R_CNF_STRU;
+
+typedef struct 
+{
+    unsigned short                usEvent;
+    unsigned char                 ucOption;
+    unsigned char                 ucValue;
+} ATC_MSG_QNIDD_CNF_STRU;
+
+typedef struct 
+{
+    unsigned short                usEvent;
+    unsigned char                 ucNIDD_ID;
+    unsigned short                usDataLen;
+    unsigned char                *pucData;
+} ATC_MSG_QNIDD_IND_STRU;
 
 #ifdef LCS_MOLR_ENABLE
 typedef struct

@@ -79,7 +79,10 @@ coap_status_t object_asynAckReadData(st_context_t * context,st_request_t* reques
         {
 			if (context->cloud_platform == CLOUD_PLATFORM_COMMON)
 			{
-				formatP = request->accept_type == -1 ? LWM2M_CONTENT_TLV_NEW : request->accept_type;
+			    if(context->platform_common_type == CLOUD_PLATFORM_COMMON_ANDLINK && !std_object_isStdObject(request->uri.objectId))
+			        formatP = request->accept_type = LWM2M_CONTENT_OPAQUE;
+			    else
+			        formatP = request->accept_type == (uint16_t)-1 ? LWM2M_CONTENT_TLV_NEW : request->accept_type;
 			}
 			else
 				formatP = request->format;
@@ -108,8 +111,13 @@ coap_status_t object_asynAckReadData(st_context_t * context,st_request_t* reques
 	coap_set_header_token(packet, request->token, request->tokenLen);
 	if (length > 0)
 	{
-		coap_set_header_content_type(packet, formatP);
+	    if(context->platform_common_type == CLOUD_PLATFORM_COMMON_ANDLINK && !std_object_isStdObject(request->uri.objectId))
+	        coap_set_header_content_type(packet, LWM2M_CONTENT_TEXT);
+	    else
+	        coap_set_header_content_type(packet, formatP);
+
 		coap_set_payload(packet, bufferP, length);
+
 	}
 	// else if (context->cloud_platform == CLOUD_PLATFORM_COMMON)
 	// {

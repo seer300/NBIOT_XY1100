@@ -80,6 +80,13 @@ MQTT是mqtt开源协议栈https://github.com/eclipse/paho.mqtt.embedded-c/tree/master
 版本：  
 路径：https://github.com/eclipse/paho.mqtt.embedded-c/tree/master
 
+HTTP开源库
+======
+  HTTP协议是一款用于传输超文本的应用层协议。
+  HTTP开源库是集成在AliOS Things内的，版本与获取路径参照AliOS Things。
+版本：rel_3.3.0
+路径：http://gitee.com/alios-things-admin/AliOS-Things/tree/rel_3.3.0/
+
 test
 
  

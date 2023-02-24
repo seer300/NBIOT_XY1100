@@ -187,11 +187,17 @@ int NetworkConnect(Network* n, char* addr, unsigned short port)
 
         freeaddrinfo(result);
     }
+	else {
+		softap_printf(USER_LOG, WARN_LOG, "[MQTT] getaddrinfo failed\n");
+	}
 
     if (rc == 0)
     {
         if (n->my_socket != -1)
-            rc = connect(n->my_socket, (struct sockaddr*)&address, sizeof(address));
+        {
+        	softap_printf(USER_LOG, WARN_LOG, "[MQTT] tcp connecting \n");
+			rc = connect(n->my_socket, (struct sockaddr*)&address, sizeof(address));
+		}
         else
             rc = -1;
     }

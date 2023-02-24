@@ -222,6 +222,8 @@ const ST_ATC_AP_CMD_PROC_TABLE AtcAp_DataIndProcTable[D_ATC_DATAIND_PROC_TBL_SIZ
     { D_ATC_EVENT_ECURC_R,                      AtcAp_MsgProc_ECURC_R_Cnf       },
     { D_ATC_EVENT_QENG,                         AtcAp_MsgProc_QENG_Cnf          },
     { D_ATC_EVENT_QEDRXCFG_R,                   AtcAp_MsgProc_QEDRXCFG_R_Cnf    },
+    { D_ATC_EVENT_QNIDD,                        AtcAp_MsgProc_QNIDD_Cnf         },
+    { D_ATC_AP_QNIDD_IND,                       AtcAp_MsgProc_QNIDD_Ind         },
 };
 
 const ST_ATC_COMMAND_ANAL_TABLE ATC_Plus_CommandTable[] =
@@ -348,6 +350,7 @@ const ST_ATC_COMMAND_ANAL_TABLE ATC_Plus_CommandTable[] =
     { {(unsigned char *)"+QCCID"      },     ATC_QCCID_LNB_Command          },
     { {(unsigned char *)"+QBAND"      },     ATC_QBAND_LNB_Command          },
     { {(unsigned char *)"+QEDRXCFG"  },      ATC_QEDRXCFG_LNB_Command       },
+    { {(unsigned char *)"+QNIDD"     },      ATC_QNIDD_LNB_Command          },
     { {(unsigned char *)""            },(unsigned char (*)(unsigned char *,unsigned char *))NULL   }
 };
 
@@ -481,6 +484,7 @@ const ST_ATC_EVENT_TABLE ATC_Event_Table[] =
     {   D_ATC_EVENT_ECURC,             D_ATC_EVENT_ECURC_R,     D_ATC_EVENT_ECURC_T,      0xFF},                 /* EVENT_ECURC */
     {   D_ATC_EVENT_QENG,              0xFF,                    D_ATC_EVENT_QENG_T,       0xFF},                 /* EVENT_QENG */
     {   D_ATC_EVENT_QEDRXCFG,          D_ATC_EVENT_QEDRXCFG_R,  D_ATC_EVENT_QEDRXCFG_T,   0xFF},                 /* EVNET_QEDRXCFG */
+    {   D_ATC_EVENT_QNIDD,             0xFF,                    0xFF,                     0xFF},                 /* EVENT_QNIDD */
 };
 
 /* FAC */

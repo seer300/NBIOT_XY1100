@@ -1007,6 +1007,7 @@ int at_QMTPUB_req(char *at_buf, char **prsp_cmd)
 			mqtt_passthr.proc = mqtt_client_publish_passthr_proc;
 			
 			into_Passthr_Mode(mqtt_passthr);
+			xy_free(message);
 			send_urc_to_ext("\r\n>\r\n");
 #if VER_QUCTL260
 /********** add by cjh for bc260y 20221119 **********/

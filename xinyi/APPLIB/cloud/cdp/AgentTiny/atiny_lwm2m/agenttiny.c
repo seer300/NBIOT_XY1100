@@ -494,8 +494,7 @@ void app_downdata_recv(void)
             }
 #endif
             //select Blocking waiting signal
-         //   numBytes = lwm2m_buffer_recv(connP, recv_buffer, MAX_PACKET_SIZE, 1);
-            numBytes = lwm2m_buffer_recv(connP, recv_buffer, MAX_PACKET_SIZE, 3);		//wsl  修改接收超时
+            numBytes = lwm2m_buffer_recv(connP, recv_buffer, MAX_PACKET_SIZE, 1);
             if (numBytes <= 0)
             {
                if(numBytes == -2)

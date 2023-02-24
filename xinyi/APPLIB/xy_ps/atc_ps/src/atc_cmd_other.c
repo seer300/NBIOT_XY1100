@@ -3670,3 +3670,78 @@ unsigned char ATC_QNBIOTEVENT_LNB_Command(unsigned char *pCommandBuffer, unsigne
     }
     return D_ATC_COMMAND_OK;
 }
+
+unsigned char ATC_QNIDD_LNB_Command(unsigned char *pCommandBuffer, unsigned char *pEventBuffer)
+{
+    unsigned short usCmdStrLen = 6;  //+QNIDD
+    unsigned char ucResult;                                                                     /* command analysis result              */
+    unsigned char ucCmdFunc;                                                                    /* command form                         */
+    unsigned long ulDataLen;
+    
+    ST_ATC_QNIDD_PARAMETER* pParam = (ST_ATC_QNIDD_PARAMETER *)pEventBuffer;
+    ucResult = ATC_CmdFuncInf(pCommandBuffer + usCmdStrLen,EVENT_QNIDD,pEventBuffer,&ucCmdFunc);
+    if(D_ATC_CMD_FUNC_SET != ucCmdFunc)
+    {
+        return  ucResult;
+    }
+    usCmdStrLen += 1; 
+
+    if(D_ATC_COMMAND_OK != ATC_GetDecimalParameterByte(pCommandBuffer, &usCmdStrLen, 4, &pParam->ucOption, NULL, 0, 3, 0, 0))
+    {
+        return D_ATC_COMMAND_PARAMETER_ERROR;
+    }
+
+    if(D_QNIDD_OPTION_CREATE_ACCOUNT == pParam->ucOption)
+    {
+        //APN
+        if(D_ATC_COMMAND_OK != ATC_GetStrParameter(pCommandBuffer, &usCmdStrLen, 64, &(pParam->ucApnLen), pParam->aucApnValue, 1, 0))
+        {
+            return D_ATC_COMMAND_PARAMETER_ERROR;
+        }
+
+        //username
+        if(D_ATC_COMMAND_OK != ATC_GetStrParameter(pCommandBuffer, &usCmdStrLen, D_PCO_AUTH_MAX_LEN, &(pParam->ucUsernameLen), pParam->aucUsername, 1, 0))
+        {
+            return D_ATC_COMMAND_PARAMETER_ERROR;
+        }
+
+        //password
+        if(D_ATC_COMMAND_OK != ATC_GetStrParameter(pCommandBuffer, &usCmdStrLen, D_PCO_AUTH_MAX_LEN, &(pParam->ucPasswordLen), pParam->aucPassword, 1, 1))
+        {
+            return D_ATC_COMMAND_PARAMETER_ERROR;
+        }
+    }
+    else if(D_QNIDD_OPTION_ESTABLISH_CONNECT == pParam->ucOption)
+    {
+        if(D_ATC_COMMAND_OK != ATC_GetDecimalParameterByte(pCommandBuffer, &usCmdStrLen, 4, &pParam->ucAccountID, NULL, 0, 3, 0, 1))
+        {
+            return D_ATC_COMMAND_PARAMETER_ERROR;
+        }
+    }
+    else if(D_QNIDD_OPTION_ACTIVE_CONNECT == pParam->ucOption)
+    {
+        if(D_ATC_COMMAND_OK != ATC_GetDecimalParameterByte(pCommandBuffer, &usCmdStrLen, 4, &pParam->ucNIDD_ID, NULL, 0, 3, 0, 1))
+        {
+            return D_ATC_COMMAND_PARAMETER_ERROR;
+        }
+    }
+    else
+    {
+        if(D_ATC_COMMAND_OK != ATC_GetDecimalParameterByte(pCommandBuffer, &usCmdStrLen, 4, &pParam->ucNIDD_ID, NULL, 0, 3, 0, 0))
+        {
+            return D_ATC_COMMAND_PARAMETER_ERROR;
+        }
+    
+        pParam->pucData = (unsigned char*)AtcAp_Malloc(512 * 2);
+        if(D_ATC_PARAM_OK != ATC_GetHexStrParameter(pCommandBuffer, &usCmdStrLen, 512 * 2, &pParam->usDataLen, pParam->pucData, 1, 1))
+        {
+            if(NULL != pParam->pucData)
+            {
+                AtcAp_Free(pParam->pucData);
+            }
+            return D_ATC_COMMAND_PARAMETER_ERROR;
+        }
+    }
+
+    return D_ATC_COMMAND_OK;
+}

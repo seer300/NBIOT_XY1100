@@ -302,9 +302,9 @@ void cisnet_destroy(cisnet_t netctx)
 		cis_free(temp->buffer);
 		cis_free(temp);
 	}
-	cissys_free(netctx);
-	osMutexDelete(netctx->onenet_socket_mutex);
-	netctx->onenet_socket_mutex = NULL;
+    osMutexDelete(netctx->onenet_socket_mutex);
+    netctx->onenet_socket_mutex = NULL;
+    cissys_free(netctx);
 }
 
 cis_ret_t cisnet_connect(cisnet_t netctx)

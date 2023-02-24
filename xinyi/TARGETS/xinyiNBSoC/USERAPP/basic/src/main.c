@@ -23,9 +23,9 @@
 #if ABUP_FOTA
 #include "abup_fota.h"
 #endif
-
+#if DEMO_TEST
 #include "xy_demo.h"
-
+#endif
 
 
 //extern void user_led_demo_init(void);
@@ -45,10 +45,7 @@ void user_peripheral_init()
 	
 #if DEMO_TEST	
 	if((g_softap_fac_nv != NULL) && (!(g_softap_fac_nv->peri_remap_enable & 0x0100)) && (g_softap_fac_nv->led_pin <= HAL_GPIO_PIN_NUM_63))
-		{
-				
-			user_led_demo_init();
-		}
+		user_led_demo_init();
 #endif
 	
 }

@@ -10,8 +10,8 @@ HTTP_SRC_DIR := $(APPLIB_SRC_DIR)/http
 SRCS_HTTP_C_RAM = \
 
 SRCS_HTTP_C_FLASH = \
-	$(wildcard $(HTTP_SRC_DIR)/*.c) \
-	$(wildcard $(HTTP_SRC_DIR)/atcmd/*.c) \
+	$(wildcard $(HTTP_SRC_DIR)/httpcore/src/*.c) \
+	$(wildcard $(HTTP_SRC_DIR)/xy_http/src/*.c) \
 #----------------------------------------------------------------------- \
 # if need add more file, move the bottom row to the top \
 #----------------------------------------------------------------------- \
@@ -54,8 +54,9 @@ HTTP_EXCLUDE_LIB_FLASH += $(TMP_HTTP_FILE)
 ####################################################################################################
 # include path
 ####################################################################################################
-DEPS_PATH_HTTP += $(HTTP_SRC_DIR)
-DEPS_PATH_HTTP += $(HTTP_SRC_DIR)/atcmd
+DEPS_PATH_HTTP += $(HTTP_SRC_DIR)/httpcore/include
+DEPS_PATH_HTTP += $(HTTP_SRC_DIR)/httpcore/internal
+DEPS_PATH_HTTP += $(HTTP_SRC_DIR)/xy_http/inc
 
 
 ####################################################################################################

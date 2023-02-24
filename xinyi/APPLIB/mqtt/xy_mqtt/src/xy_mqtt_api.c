@@ -480,7 +480,7 @@ int xy_mqtt_publish(MQTTClient* c, const char* topicName, MQTTMessage* message,i
     if (message->qos == QOS1 || message->qos == QOS2)
         message->id = getNextPacketId(c);
 
-    len = MQTTSerialize_publish(c->buf, c->buf_size, 0, message->qos, message->retained, message->id,
+    len = MQTTSerialize_publish(c->buf, c->buf_size, message->dup, message->qos, message->retained, message->id,
               topic, (unsigned char*)message->payload, message->payloadlen);
     if (len <= 0)
     {

@@ -668,14 +668,6 @@ int new_message_indication(char *data, int data_len)
     char *rsp_cmd = NULL;
     char *data_copy = NULL;
 
-//	if(data != NULL && data_len >= MAX_REPORT_DATA_LEN)
-	if(data != NULL && data_len > MAX_REPORT_DATA_LEN)   // modify the max num 
-
-	{
-		softap_printf(USER_LOG, WARN_LOG, "recv data len too large,len=%d\r\n",data_len);
-		return 0;
-	}
-
     //If opencpu is used, the data is not cached and is output directly through the hook function
     //opencpu与AT隔离
     if(g_cdp_downstream_callback != NULL)
@@ -931,7 +923,9 @@ int get_downstream_message_dropped_num()
 	}
 	else
 #endif
-		dropped_num = downstream_info->dropped_num;
+        //20230217 MG add: avoid dropped_num minus
+		dropped_num = (downstream_info->dropped_num > 0) ? downstream_info->dropped_num : 0;
+
     return dropped_num;
 }
 
@@ -1140,6 +1134,8 @@ int cdp_init()
 	g_send_status = NOT_SENT;
 #endif
 
+//20230220 MG cancle the cdp downbuffered resume, +NMGS will resume former data
+//and look like not read out the total data
 #if VER_QUCTL260
 	//当需要恢复的时候需要把缓存链表恢复，再此基础上继续挂链表
 	if(NET_NEED_RECOVERY(CDP_TASK))

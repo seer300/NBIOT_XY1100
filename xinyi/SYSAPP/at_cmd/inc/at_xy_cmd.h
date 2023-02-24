@@ -31,7 +31,7 @@
 #define MODULE 		"SLM130X"
 #define TVERSION 	"T06"
 #define SDATE		"S0208"
-#define SDKVERSION	"0.2.2.C21"
+#define SDKVERSION	"0.2.3.C21"  /*20230224 patch03*/
 #define MVERSION	"M003"
 #define SI_NUM		HAL_GPIO_PIN_NUM_13
 
@@ -40,7 +40,7 @@
 #define MODULE 		"SLM160X"
 #define TVERSION 	"T05"
 #define SDATE		"S0105"
-#define SDKVERSION	"0.2.2.C21"
+#define SDKVERSION	"0.2.3.C21"
 #define MVERSION	"M003"
 #define SI_NUM		HAL_GPIO_PIN_NUM_11
 #define LED_NUM		HAL_GPIO_PIN_NUM_10

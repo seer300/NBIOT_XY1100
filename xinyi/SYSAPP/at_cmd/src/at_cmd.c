@@ -31,7 +31,7 @@
 #include "at_cdp.h"
 #endif
 
-#if VER_QUCTL260
+#if VER_QUCTL260 && TELECOM_VER
 #include "at_cdp_bc26.h"
 #endif
 
@@ -69,8 +69,8 @@
 #include "at_coap.h"
 #endif
 
-#if TENCENT_VER
-#include "at_tencent_mqtt.h"
+#if HTTP
+#include "at_http.h"
 #endif
 
 /*******************************************************************************
@@ -380,9 +380,20 @@ struct at_serv_proc_e at_basic_req[] = {
     {"AT+XYSEND", at_XYSEND_req},
     {"AT+XYRECV", at_XYRECV_req},
 #endif
+
+#if HTTP
+	{"AT+HTTPCREATE",at_http_create},
+	{"AT+HTTPCFG", at_http_cfg},
+	{"AT+HTTPHEADER", at_http_header},
+	{"AT+HTTPCONTENT", at_http_content},
+	{"AT+HTTPSEND", at_http_send},
+	{"AT+HTTPCLOSE", at_http_close},
+#endif
+
 	{"AT+SGSW", at_SGSW_req},     //add new command wsl 20220330
 	{"AT+QATWAKEUP", at_QATWAKEUP_req},     
 	{"AT+QCGDEFCONT", at_QCGDEFCONT_req},
+	
 	{0, 0} //can not delete!!!
 };
 

@@ -25,9 +25,6 @@
 #if ABUP_FOTA
 #include "abup_fota.h"
 #endif
-#if XY_HTTP
-#include "at_http.h"
-#endif
 
 #if TELECOM_VER	
 #include "agent_tiny_demo.h"
@@ -81,10 +78,6 @@ void network_task_init()
 		socket_init();
 #endif //AT_SOCKET
 
-#if XY_HTTP
-		at_http_init();
-#endif //XY_HTTP
-
 #if XY_DM
 		dm_ctl_init();
 #endif //XY_DM
@@ -108,10 +101,6 @@ void network_task_init()
 		at_mqtt_init();
 		at_xy_mqtt_init();
 #endif //MQTT
-
-#if TENCENT_VER
-	   at_tencent_mqtt_init();
-#endif
 
 #if LIBCOAP
 		at_coap_init();

@@ -870,7 +870,7 @@ int at_proc_qlaconfig_req(char *at_buf, char **rsp_cmd)
 			}
 			init_xy_lwm2m_object_info_list();
 #else
-			rsp_cmd = AT_ERR_BUILD(ATERR_NOT_ALLOWED);
+			*rsp_cmd = AT_ERR_BUILD(ATERR_NOT_ALLOWED);
 			return AT_END;   
 #endif         
         }

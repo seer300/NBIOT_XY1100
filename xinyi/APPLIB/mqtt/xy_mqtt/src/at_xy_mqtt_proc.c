@@ -294,11 +294,12 @@ int mqttOpenClient(mqtt_context_t *pctx)
 	NetworkInit(mqttCurContext->ipstack);  
 
 	if (SUCCESS != NetworkConnect(mqttCurContext->ipstack, mqttCurContext->addrinfo_data.host, mqttCurContext->addrinfo_data.port)) {
+		softap_printf(USER_LOG, WARN_LOG, "[MQTT] tcp connect failed\n");
         if (mqttCurContext->ipstack != NULL && mqttCurContext->ipstack->my_socket >= 0) {
             softap_printf(USER_LOG, WARN_LOG, "[MQTT] close socket %d\n", mqttCurContext->ipstack->my_socket);
             close(mqttCurContext->ipstack->my_socket);
-			return FAILURE;
         }
+		return FAILURE;
     }
 
 	MQTTClientInit(mqttCurContext->mqtt_client, mqttCurContext->ipstack, mqttCurContext->timeout_data.pkt_timeout * 1000, mqttCurContext->sendbuf, mqttCurContext->sendbuf_size, mqttCurContext->readbuf, mqttCurContext->readbuf_size);
@@ -690,9 +691,10 @@ int mqttKeepalive(mqtt_context_t *pctx)
         }
         else {			
 				softap_printf(USER_LOG, WARN_LOG, "[MQTT]mqtt keep alive send ...");
-				mqtt_req_param_t data = {0};
-				data.req_type = MQTT_KEEPALIVE_REQ;
-				data.pContext = (void *)mqttCurContext;
+				mqtt_req_param_t *data = NULL;
+				data = xy_malloc(sizeof(mqtt_req_param_t));
+				data->req_type = MQTT_KEEPALIVE_REQ;
+				data->pContext = (void *)mqttCurContext;
 			
 				if (mqtt_send_msg_q != NULL) {
 					osMessageQueuePut(mqtt_send_msg_q, (const void*)(&data), 0, osWaitForever);
@@ -723,10 +725,11 @@ int mqttCycle(mqtt_context_t *pctx, Timer *timer)
         	/* no more data to read, unrecoverable. Or read packet fails due to unexpected network error */
 			if (errno == ECONNABORTED || errno == ECONNRESET || errno == ENOTCONN || errno == EBADE) {
 				softap_printf(USER_LOG, WARN_LOG, "[MQTT]mqttCycle socket read errno : %d", errno);
-				mqtt_req_param_t data = {0};
-				data.req_type = MQTT_TCP_DISCONN_UNEXPECTED_REQ;
-				data.tcpconnectID = mqttCurContext->tcpconnectID;
-				data.pContext = (void *)mqttCurContext;
+				mqtt_req_param_t *data = NULL;
+				data = xy_malloc(sizeof(mqtt_req_param_t));
+				data->req_type = MQTT_TCP_DISCONN_UNEXPECTED_REQ;
+				data->tcpconnectID = mqttCurContext->tcpconnectID;
+				data->pContext = (void *)mqttCurContext;
 	
 				if (mqtt_send_msg_q != NULL) {
 					osMessageQueuePut(mqtt_send_msg_q, (const void*)(&data), 0, osWaitForever);
@@ -804,22 +807,24 @@ int mqttCycle(mqtt_context_t *pctx, Timer *timer)
             msg.qos = (enum QoS)intQoS;
             if (msg.qos != QOS0) {
             	if (msg.qos == QOS1) {
-					mqtt_req_param_t data = {0};
-					data.req_type = MQTT_PUB_ACK;
-					data.server_ack_mode = PUBACK;
-					data.msg_id = msg.id;
-					data.pContext = (void *)mqttCurContext;
+					mqtt_req_param_t *data = NULL;
+					data = xy_malloc(sizeof(mqtt_req_param_t));
+					data->req_type = MQTT_PUB_ACK;
+					data->server_ack_mode = PUBACK;
+					data->msg_id = msg.id;
+					data->pContext = (void *)mqttCurContext;
 	
 					if (mqtt_send_msg_q != NULL) {
 						osMessageQueuePut(mqtt_send_msg_q, (const void*)(&data), 0, osWaitForever);
 					}
 				}
 				else if (msg.qos == QOS2) {
-					mqtt_req_param_t data = {0};
-					data.req_type = MQTT_PUB_REC;
-					data.server_ack_mode = PUBREC;
-					data.msg_id = msg.id;
-					data.pContext = (void *)mqttCurContext;
+					mqtt_req_param_t *data = NULL;
+					data = xy_malloc(sizeof(mqtt_req_param_t));
+					data->req_type = MQTT_PUB_REC;
+					data->server_ack_mode = PUBREC;
+					data->msg_id = msg.id;
+					data->pContext = (void *)mqttCurContext;
 	
 					if (mqtt_send_msg_q != NULL) {
 						osMessageQueuePut(mqtt_send_msg_q, (const void*)(&data), 0, osWaitForever);
@@ -841,11 +846,12 @@ int mqttCycle(mqtt_context_t *pctx, Timer *timer)
 				goto exit;
 			}
 
-			mqtt_req_param_t data = {0};
-			data.req_type = MQTT_PUB_COMP;
-			data.server_ack_mode = PUBCOMP;
-			data.msg_id = mypacketid;
-			data.pContext = (void *)mqttCurContext;
+			mqtt_req_param_t *data = NULL;
+			data = xy_malloc(sizeof(mqtt_req_param_t));
+			data->req_type = MQTT_PUB_COMP;
+			data->server_ack_mode = PUBCOMP;
+			data->msg_id = mypacketid;
+			data->pContext = (void *)mqttCurContext;
 	
 			if (mqtt_send_msg_q != NULL) {
 				osMessageQueuePut(mqtt_send_msg_q, (const void*)(&data), 0, osWaitForever);
@@ -864,10 +870,11 @@ int mqttCycle(mqtt_context_t *pctx, Timer *timer)
 	if (rc == FAILURE) {
 	  if (errno == ECONNABORTED || errno == ECONNRESET || errno == ENOTCONN || errno == EBADE) {
 		 softap_printf(USER_LOG, WARN_LOG,"[MQTT] mqttCycle socket read errno : %d", errno);
-		 mqtt_req_param_t data = {0};
-	     data.req_type = MQTT_TCP_DISCONN_UNEXPECTED_REQ;
-		 data.tcpconnectID = mqttCurContext->tcpconnectID;
-		 data.pContext = (void *)mqttCurContext;
+		 mqtt_req_param_t *data = NULL;
+		 data = xy_malloc(sizeof(mqtt_req_param_t));
+	     data->req_type = MQTT_TCP_DISCONN_UNEXPECTED_REQ;
+		 data->tcpconnectID = mqttCurContext->tcpconnectID;
+		 data->pContext = (void *)mqttCurContext;
 	
 		 if (mqtt_send_msg_q != NULL) {
 			osMessageQueuePut(mqtt_send_msg_q, (const void *)(&data), 0, osWaitForever);
@@ -881,7 +888,7 @@ exit:
     return rc;
 }
 
-int mqttYield(mqtt_context_t *pctx, int timeout_ms)
+void mqttYield(mqtt_context_t *pctx, int timeout_ms)
 {
 	mqtt_context_t* mqttCurContext = pctx;
 	
@@ -891,15 +898,7 @@ int mqttYield(mqtt_context_t *pctx, int timeout_ms)
     TimerInit(&timer);
     TimerCountdownMS(&timer, timeout_ms);
 
-	do
-    {
-    	if (mqttCycle(mqttCurContext, &timer) < 0) {
-            rc = FAILURE;
-            break;
-        }
-  	} while (!TimerIsExpired(&timer));
-
-    return rc;
+	mqttCycle(mqttCurContext, &timer);
 }
 
 void mqttTaskRecvProcess(void *argument)
@@ -937,7 +936,7 @@ void mqttTaskSendProcess(void* argument)
 {
 	int res = -1;
 	int idx = -1;
-	mqtt_req_param_t msg = {0};
+	mqtt_req_param_t *msg = NULL;
 	MQTTConnackData Connackdata = {0};
 	int grantedQoSs[MQTT_MAX_SUBSCRIBE_NUM] = {0};
 	mqtt_context_t *mqttCurContext = NULL;
@@ -947,9 +946,9 @@ void mqttTaskSendProcess(void* argument)
 	{	
 		osMessageQueueGet(mqtt_send_msg_q, (void *)&msg, NULL, osWaitForever);
 		
-		mqttCurContext = (mqtt_context_t *)msg.pContext;
+		mqttCurContext = (mqtt_context_t *)msg->pContext;
 		
-		switch (msg.req_type) {
+		switch (msg->req_type) {
 			case MQTT_OPEN_REQ: {
 				mqttCurContext->state |= MQTT_STATE_OPEN;
 				osMutexAcquire(mqtt_mutex, osWaitForever);
@@ -961,7 +960,7 @@ void mqttTaskSendProcess(void* argument)
 				if (res == SUCCESS) {
 					mqttCurContext->is_used = MQTT_CONTEXT_OPENED;
 					char *rsp = xy_malloc(48);
-					snprintf(rsp, 48, "\r\n+QMTOPEN: %d,%d\r\n", msg.tcpconnectID, 0);
+					snprintf(rsp, 48, "\r\n+QMTOPEN: %d,%d\r\n", msg->tcpconnectID, 0);
 					send_urc_to_ext(rsp);
 					xy_free(rsp);
 
@@ -977,7 +976,7 @@ void mqttTaskSendProcess(void* argument)
 					mqttCurContext->is_used = MQTT_CONTEXT_NOT_USED;
 					mqttDeleteContext(mqttCurContext);
 					char *rsp = xy_malloc(48);
-					snprintf(rsp, 48, "\r\n+QMTOPEN: %d,%d\r\n", msg.tcpconnectID, -1);
+					snprintf(rsp, 48, "\r\n+QMTOPEN: %d,%d\r\n", msg->tcpconnectID, -1);
 					send_urc_to_ext(rsp);
 					xy_free(rsp);
  				} 
@@ -1013,13 +1012,13 @@ void mqttTaskSendProcess(void* argument)
 					mqttDeleteContext(mqttCurContext);
 #endif
 					char *rsp = xy_malloc(48);
-					snprintf(rsp, 48, "\r\n+QMTCLOSE: %d,%d\r\n", msg.tcpconnectID, 0);
+					snprintf(rsp, 48, "\r\n+QMTCLOSE: %d,%d\r\n", msg->tcpconnectID, 0);
 					send_urc_to_ext(rsp);
 					xy_free(rsp);
 				}
 				else {
 					char *rsp = xy_malloc(48);
-					snprintf(rsp, 48, "\r\n+QMTCLOSE: %d,%d\r\n", msg.tcpconnectID, -1);
+					snprintf(rsp, 48, "\r\n+QMTCLOSE: %d,%d\r\n", msg->tcpconnectID, -1);
 					send_urc_to_ext(rsp);
 					xy_free(rsp);  
 				}
@@ -1036,16 +1035,17 @@ void mqttTaskSendProcess(void* argument)
 				mqttCurContext->state &= ~MQTT_STATE_CONNECT;
 				if (res != SUCCESS) {
 					mqttCurContext->is_used = MQTT_CONTEXT_NOT_USED;
+					mqttCloseClient(mqttCurContext);
 					mqttDeleteContext(mqttCurContext);
 					char *rsp = xy_malloc(48);
-					snprintf(rsp, 48, "\r\n+QMTCONN: %d,%d\r\n", msg.tcpconnectID, 2);
+					snprintf(rsp, 48, "\r\n+QMTCONN: %d,%d\r\n", msg->tcpconnectID, 2);
 					send_urc_to_ext(rsp);
 					xy_free(rsp);
 				}
 				else {
 					mqttCurContext->is_used = MQTT_CONTEXT_CONNECTED;
 					char *rsp = xy_malloc(48);
-					snprintf(rsp, 48, "\r\n+QMTCONN: %d,%d,%d\r\n", msg.tcpconnectID, 0, Connackdata.rc);
+					snprintf(rsp, 48, "\r\n+QMTCONN: %d,%d,%d\r\n", msg->tcpconnectID, 0, Connackdata.rc);
 					send_urc_to_ext(rsp);
 					xy_free(rsp);
 				}
@@ -1081,13 +1081,13 @@ void mqttTaskSendProcess(void* argument)
 #endif
 
 					char* rsp = xy_malloc(48);
-					snprintf(rsp, 48, "\r\n+QMTDISC: %d,%d\r\n", msg.tcpconnectID, 0);
+					snprintf(rsp, 48, "\r\n+QMTDISC: %d,%d\r\n", msg->tcpconnectID, 0);
 					send_urc_to_ext(rsp);
 					xy_free(rsp);
 				}
 				else {
 					char* rsp = xy_malloc(48);
-					snprintf(rsp, 48, "\r\n+QMTDISC: %d,%d\r\n", msg.tcpconnectID, -1);
+					snprintf(rsp, 48, "\r\n+QMTDISC: %d,%d\r\n", msg->tcpconnectID, -1);
 					send_urc_to_ext(rsp);
 					xy_free(rsp);
 				}
@@ -1097,7 +1097,7 @@ void mqttTaskSendProcess(void* argument)
 				mqttCurContext->state |= MQTT_STATE_SUBSCRIBE;
 				osMutexAcquire(mqtt_mutex, osWaitForever);
 				
-				res = mqttClientSubscribe(mqttCurContext, msg.msg_id, msg.count, msg.topicFilters, msg.qos, grantedQoSs);
+				res = mqttClientSubscribe(mqttCurContext, msg->msg_id, msg->count, msg->topicFilters, msg->qos, grantedQoSs);
 			
 				osMutexRelease(mqtt_mutex);
 
@@ -1105,31 +1105,31 @@ void mqttTaskSendProcess(void* argument)
 				if (res != SUCCESS) {
 					//mqttDeleteContext(mqttCurContext);
 					char* rsp = xy_malloc(48);
-					snprintf(rsp, 48, "\r\n+QMTSUB: %d,%d,%d\r\n", msg.tcpconnectID, msg.msg_id, 2);
+					snprintf(rsp, 48, "\r\n+QMTSUB: %d,%d,%d\r\n", msg->tcpconnectID, msg->msg_id, 2);
 					send_urc_to_ext(rsp);
 					xy_free(rsp);
 				}
 				else {
 					char *rsp = xy_malloc(48);
-					if (msg.count == 4) {
-						snprintf(rsp, 48, "\r\n+QMTSUB: %d,%d,%d,%d,%d,%d,%d\r\n", msg.tcpconnectID, msg.msg_id, 0, grantedQoSs[0], grantedQoSs[1], grantedQoSs[2], grantedQoSs[3]);
+					if (msg->count == 4) {
+						snprintf(rsp, 48, "\r\n+QMTSUB: %d,%d,%d,%d,%d,%d,%d\r\n", msg->tcpconnectID, msg->msg_id, 0, grantedQoSs[0], grantedQoSs[1], grantedQoSs[2], grantedQoSs[3]);
 					}
-					else if (msg.count == 3) {
-						snprintf(rsp, 48, "\r\n+QMTSUB: %d,%d,%d,%d,%d,%d\r\n", msg.tcpconnectID, msg.msg_id, 0, grantedQoSs[0], grantedQoSs[1], grantedQoSs[2]);
+					else if (msg->count == 3) {
+						snprintf(rsp, 48, "\r\n+QMTSUB: %d,%d,%d,%d,%d,%d\r\n", msg->tcpconnectID, msg->msg_id, 0, grantedQoSs[0], grantedQoSs[1], grantedQoSs[2]);
 					}
-					else if (msg.count == 2) {
-						snprintf(rsp, 48, "\r\n+QMTSUB: %d,%d,%d,%d,%d\r\n", msg.tcpconnectID, msg.msg_id, 0, grantedQoSs[0], grantedQoSs[1]);
+					else if (msg->count == 2) {
+						snprintf(rsp, 48, "\r\n+QMTSUB: %d,%d,%d,%d,%d\r\n", msg->tcpconnectID, msg->msg_id, 0, grantedQoSs[0], grantedQoSs[1]);
 					}
 					else {
-						snprintf(rsp, 48, "\r\n+QMTSUB: %d,%d,%d,%d\r\n", msg.tcpconnectID, msg.msg_id, 0, grantedQoSs[0]);
+						snprintf(rsp, 48, "\r\n+QMTSUB: %d,%d,%d,%d\r\n", msg->tcpconnectID, msg->msg_id, 0, grantedQoSs[0]);
 					}
 					send_urc_to_ext(rsp);
 					xy_free(rsp);
 				}
 
-				for (idx = 0; idx < msg.count; idx++) {
-					if (msg.topicFilters[idx] != NULL) {
-						xy_free(msg.topicFilters[idx]);
+				for (idx = 0; idx < msg->count; idx++) {
+					if (msg->topicFilters[idx] != NULL) {
+						xy_free(msg->topicFilters[idx]);
 					}
 				}
 			}
@@ -1138,7 +1138,7 @@ void mqttTaskSendProcess(void* argument)
 				mqttCurContext->state |= MQTT_STATE_UNSUBSCRIBE;
 				osMutexAcquire(mqtt_mutex, osWaitForever);
 				
-				res = mqttClientUnSubscribe(mqttCurContext, msg.msg_id, msg.count, msg.topicFilters);
+				res = mqttClientUnSubscribe(mqttCurContext, msg->msg_id, msg->count, msg->topicFilters);
 			
 				osMutexRelease(mqtt_mutex);
 
@@ -1146,20 +1146,20 @@ void mqttTaskSendProcess(void* argument)
 				if (res != SUCCESS) {
 					//mqttDeleteContext(mqttCurContext);
 					char *rsp = xy_malloc(48);
-					snprintf(rsp, 48, "\r\n+QMTUNS: %d,%d,%d\r\n", msg.tcpconnectID, msg.msg_id, 2);
+					snprintf(rsp, 48, "\r\n+QMTUNS: %d,%d,%d\r\n", msg->tcpconnectID, msg->msg_id, 2);
 					send_urc_to_ext(rsp);
 					xy_free(rsp);
 				}
 				else {
 					char *rsp = xy_malloc(48);
-					snprintf(rsp, 48, "\r\n+QMTUNS: %d,%d,%d\r\n", msg.tcpconnectID, msg.msg_id, 0);
+					snprintf(rsp, 48, "\r\n+QMTUNS: %d,%d,%d\r\n", msg->tcpconnectID, msg->msg_id, 0);
 					send_urc_to_ext(rsp);
 					xy_free(rsp);
 				}
 
-				for (idx = 0; idx < msg.count; idx++) {
-					if (msg.topicFilters[idx] != NULL) {
-						xy_free(msg.topicFilters[idx]);
+				for (idx = 0; idx < msg->count; idx++) {
+					if (msg->topicFilters[idx] != NULL) {
+						xy_free(msg->topicFilters[idx]);
 					}
 				}
 			}
@@ -1168,7 +1168,7 @@ void mqttTaskSendProcess(void* argument)
 				mqttCurContext->state |= MQTT_STATE_PUBLISH;
 				osMutexAcquire(mqtt_mutex, osWaitForever);
 				
-				res = mqttClientPublish(mqttCurContext, msg.msg_id, msg.qos[0], msg.retained, msg.topicFilters[0], msg.message_len, msg.message);
+				res = mqttClientPublish(mqttCurContext, msg->msg_id, msg->qos[0], msg->retained, msg->topicFilters[0], msg->message_len, msg->message);
 			
 				osMutexRelease(mqtt_mutex);
 
@@ -1176,22 +1176,22 @@ void mqttTaskSendProcess(void* argument)
 				if (res != SUCCESS) {
 					//mqttDeleteContext(mqttCurContext);
 					char *rsp = xy_malloc(48);
-					snprintf(rsp, 48, "\r\n+QMTPUB: %d,%d,%d\r\n", msg.tcpconnectID, msg.msg_id, 2);
+					snprintf(rsp, 48, "\r\n+QMTPUB: %d,%d,%d\r\n", msg->tcpconnectID, msg->msg_id, 2);
 					send_urc_to_ext(rsp);	
 					xy_free(rsp);
 				}
 				else {
 					char *rsp = xy_malloc(48);
-					snprintf(rsp, 48, "\r\n+QMTPUB: %d,%d,%d\r\n", msg.tcpconnectID, msg.msg_id, 0);
+					snprintf(rsp, 48, "\r\n+QMTPUB: %d,%d,%d\r\n", msg->tcpconnectID, msg->msg_id, 0);
 					send_urc_to_ext(rsp);	
 					xy_free(rsp);
 				}
 
-				if (msg.topicFilters[0] != NULL) {
-					xy_free(msg.topicFilters[0]);
+				if (msg->topicFilters[0] != NULL) {
+					xy_free(msg->topicFilters[0]);
    				} 
-				if (msg.message != NULL) {
-					xy_free(msg.message);
+				if (msg->message != NULL) {
+					xy_free(msg->message);
 				}
 			}
 			break;
@@ -1206,13 +1206,14 @@ void mqttTaskSendProcess(void* argument)
                     TimerInit(&timer);
                     TimerCountdownMS(&timer, mqttCurContext->mqtt_client->command_timeout_ms);
 
-					len = MQTTSerialize_ack(mqttCurContext->mqtt_client->buf, mqttCurContext->mqtt_client->buf_size, msg.server_ack_mode, 0, msg.msg_id);            
+					len = MQTTSerialize_ack(mqttCurContext->mqtt_client->buf, mqttCurContext->mqtt_client->buf_size, msg->server_ack_mode, 0, msg->msg_id);            
                     res = MQTTSendPacket(mqttCurContext->mqtt_client, len, &timer);
 					if (res == FAILURE) {
 						if (errno == ECONNABORTED || errno == ECONNRESET || errno == ENOTCONN || errno == EBADE) {
+							mqttCloseClient(mqttCurContext);
 							mqttDeleteContext(mqttCurContext);
 							char* rsp = xy_malloc(48);
-							snprintf(rsp, 48, "\r\n+QMTSTAT: %d,%d\r\n", msg.tcpconnectID, 1);
+							snprintf(rsp, 48, "\r\n+QMTSTAT: %d,%d\r\n", msg->tcpconnectID, 1);
 							send_urc_to_ext(rsp);
 							xy_free(rsp);
 						}
@@ -1230,18 +1231,20 @@ void mqttTaskSendProcess(void* argument)
 					mqttCurContext->mqtt_client->ping_outstanding = 1;
 				}
 				else {
+						mqttCloseClient(mqttCurContext);
 						mqttDeleteContext(mqttCurContext);
 						char *rsp = xy_malloc(48);
-						snprintf(rsp, 48, "\r\n+QMTSTAT: %d,%d\r\n", msg.tcpconnectID, 2);
+						snprintf(rsp, 48, "\r\n+QMTSTAT: %d,%d\r\n", msg->tcpconnectID, 2);
 						send_urc_to_ext(rsp);
 						xy_free(rsp);
 				}
 			}
 			break;
 			case MQTT_TCP_DISCONN_UNEXPECTED_REQ: {
+				mqttCloseClient(mqttCurContext);
 				mqttDeleteContext(mqttCurContext);
 				char *rsp = xy_malloc(48);
-				snprintf(rsp, 48, "\r\n+QMTSTAT: %d,%d\r\n", msg.tcpconnectID, 1);
+				snprintf(rsp, 48, "\r\n+QMTSTAT: %d,%d\r\n", msg->tcpconnectID, 1);
 				send_urc_to_ext(rsp);
 				xy_free(rsp);	
 			}
@@ -1250,6 +1253,8 @@ void mqttTaskSendProcess(void* argument)
 
 			}
 		}
+		
+		xy_free(msg);
 
 		int hasBusyClient = 0;
 		for (idx = 0; idx < MQTT_CONTEXT_NUM_MAX; idx++) {
@@ -1294,11 +1299,11 @@ int mqtt_client_open(int tcpconnectID, char *mqttUri, int mqttPort)
 	int res = -1;
 	mqtt_context_t *mqttCurContext = NULL;
 	mqtt_addrinfo_param_t addinfo_data = {0};
-	mqtt_req_param_t open_data = {0};
+	mqtt_req_param_t *open_data = NULL;
 	
 	mqttCurContext = mqttFindContextBytcpid(tcpconnectID);
 	if (mqttCurContext == NULL) {
-       mqttCurContext = mqttCreateContext(tcpconnectID, mqttUri, mqttPort, MQTT_TX_BUF_DEFAULT, MQTT_RX_BUF_DEFAULT, MQTT_CONTEXT_CONFIGED);
+       mqttCurContext = mqttCreateContext(tcpconnectID, NULL, mqttPort, MQTT_TX_BUF_DEFAULT, MQTT_RX_BUF_DEFAULT, MQTT_CONTEXT_CONFIGED);
 	   if (mqttCurContext == NULL) {
 			return XY_ERR;
 	   }
@@ -1308,18 +1313,16 @@ int mqtt_client_open(int tcpconnectID, char *mqttUri, int mqttPort)
 		return XY_ERR;
 	}
 			
-	if (mqttCurContext != NULL) {
-		if (mqttCurContext->is_used == MQTT_CONTEXT_OPENED || mqttCurContext->is_used == MQTT_CONTEXT_CONNECTED) {
-			return XY_ERR; 
-		}
-
-		addinfo_data.host = mqttUri;
-		addinfo_data.port = mqttPort;
-        mqttConfigContext(tcpconnectID, MQTT_CONFIG_OPEN, (void *)&addinfo_data);
+	if (mqttCurContext->is_used == MQTT_CONTEXT_OPENED || mqttCurContext->is_used == MQTT_CONTEXT_CONNECTED) {
+		return XY_ERR;
 	}
 
+	addinfo_data.host = mqttUri;
+	addinfo_data.port = mqttPort;
+    mqttConfigContext(tcpconnectID, MQTT_CONFIG_OPEN, (void *)&addinfo_data);
+
 	if (mqtt_send_msg_q == NULL) {
-		mqtt_send_msg_q = osMessageQueueNew(16, sizeof(mqtt_req_param_t), NULL);
+		mqtt_send_msg_q = osMessageQueueNew(16, sizeof(void *), NULL);
 	}
 	
 	if (mqtt_at_thread_handle == NULL) {
@@ -1331,9 +1334,10 @@ int mqtt_client_open(int tcpconnectID, char *mqttUri, int mqttPort)
     	mqtt_at_thread_handle = osThreadNew((osThreadFunc_t)mqttTaskSendProcess, NULL, &thread_attr);
 	}
 
-	open_data.req_type = MQTT_OPEN_REQ;
-	open_data.tcpconnectID = tcpconnectID;
-	open_data.pContext = (void *)mqttCurContext;
+	open_data = xy_malloc(sizeof(mqtt_req_param_t));
+	open_data->req_type = MQTT_OPEN_REQ;
+	open_data->tcpconnectID = tcpconnectID;
+	open_data->pContext = (void *)mqttCurContext;
 	
 	if (mqtt_send_msg_q != NULL) {
 		osMessageQueuePut(mqtt_send_msg_q, (const void*)(&open_data), 0, osWaitForever);
@@ -1344,7 +1348,7 @@ int mqtt_client_open(int tcpconnectID, char *mqttUri, int mqttPort)
 
 int mqtt_client_close(int tcpconnectID)
 {
-	mqtt_req_param_t close_data = {0};
+	mqtt_req_param_t *close_data = NULL;
 	mqtt_context_t *mqttCurContext = NULL;
 	
 	mqttCurContext = mqttFindContextBytcpid(tcpconnectID);
@@ -1360,9 +1364,10 @@ int mqtt_client_close(int tcpconnectID)
 		return XY_ERR;	
 	}
 		
-	close_data.req_type = MQTT_CLOSE_REQ;
-	close_data.tcpconnectID = tcpconnectID;
-	close_data.pContext = (void *)mqttCurContext;
+	close_data = xy_malloc(sizeof(mqtt_req_param_t));
+	close_data->req_type = MQTT_CLOSE_REQ;
+	close_data->tcpconnectID = tcpconnectID;
+	close_data->pContext = (void *)mqttCurContext;
    	      
 	if (mqtt_send_msg_q != NULL) {
 		osMessageQueuePut(mqtt_send_msg_q, (const void*)(&close_data), 0, osWaitForever);
@@ -1373,7 +1378,7 @@ int mqtt_client_close(int tcpconnectID)
 
 int mqtt_client_connect(int tcpconnectID, char *clientId, char *userName, char *passWord)
 {
-	mqtt_req_param_t conn_data = {0};
+	mqtt_req_param_t *conn_data = NULL;
 	mqtt_context_t *mqttCurContext = NULL;
 	
 	mqttCurContext = mqttFindContextBytcpid(tcpconnectID);
@@ -1451,9 +1456,10 @@ int mqtt_client_connect(int tcpconnectID, char *clientId, char *userName, char *
 		}
 	}
 
-	conn_data.req_type = MQTT_CONN_REQ;
-	conn_data.tcpconnectID = tcpconnectID;
-	conn_data.pContext = (void *)mqttCurContext;
+	conn_data = xy_malloc(sizeof(mqtt_req_param_t));
+	conn_data->req_type = MQTT_CONN_REQ;
+	conn_data->tcpconnectID = tcpconnectID;
+	conn_data->pContext = (void *)mqttCurContext;
 	
 	if (mqtt_send_msg_q != NULL) {
 		osMessageQueuePut(mqtt_send_msg_q, (const void *)(&conn_data), 0, osWaitForever);
@@ -1464,7 +1470,7 @@ int mqtt_client_connect(int tcpconnectID, char *clientId, char *userName, char *
 
 int mqtt_client_disconnect(int tcpconnectID)
 {
-	mqtt_req_param_t disc_data = {0};
+	mqtt_req_param_t *disc_data = NULL;
 	mqtt_context_t *mqttCurContext = NULL;
 	
 	mqttCurContext = mqttFindContextBytcpid(tcpconnectID);
@@ -1480,9 +1486,10 @@ int mqtt_client_disconnect(int tcpconnectID)
 		return XY_ERR;	
 	}
 	
-	disc_data.req_type = MQTT_DISC_REQ;
-	disc_data.tcpconnectID = tcpconnectID;
-	disc_data.pContext = (void *)mqttCurContext;
+	disc_data = xy_malloc(sizeof(mqtt_req_param_t));
+	disc_data->req_type = MQTT_DISC_REQ;
+	disc_data->tcpconnectID = tcpconnectID;
+	disc_data->pContext = (void *)mqttCurContext;
 	
 	if (mqtt_send_msg_q != NULL) {
 		osMessageQueuePut(mqtt_send_msg_q, (const void*)(&disc_data), 0, osWaitForever);
@@ -1495,7 +1502,7 @@ int mqtt_client_subscribe(int tcpconnectID, int msgId, int count, char *topicFil
 {
 	int idx = 0;
 	int SubTopic_len = 0;
-	mqtt_req_param_t sub_data = {0};
+	mqtt_req_param_t *sub_data = NULL;
 	mqtt_context_t *mqttCurContext = NULL;
 
 	mqttCurContext = mqttFindContextBytcpid(tcpconnectID);
@@ -1511,18 +1518,19 @@ int mqtt_client_subscribe(int tcpconnectID, int msgId, int count, char *topicFil
 		return XY_ERR;	
 	}
 	
-	sub_data.req_type = MQTT_SUB_REQ;
-	sub_data.tcpconnectID = tcpconnectID;
-	sub_data.msg_id = msgId;
-	sub_data.pContext = (void *)mqttCurContext;
-	sub_data.count = count;
+	sub_data = xy_malloc(sizeof(mqtt_req_param_t));
+	sub_data->req_type = MQTT_SUB_REQ;
+	sub_data->tcpconnectID = tcpconnectID;
+	sub_data->msg_id = msgId;
+	sub_data->pContext = (void *)mqttCurContext;
+	sub_data->count = count;
 
 	for (idx = 0; idx < count; idx++ ) {
-		sub_data.qos[idx] = requestedQoSs[idx];	
+		sub_data->qos[idx] = requestedQoSs[idx];	
 		SubTopic_len = strlen(topicFilters[idx]);
-		sub_data.topicFilters[idx] = xy_malloc(SubTopic_len + 1);
-		memset(sub_data.topicFilters[idx], 0, SubTopic_len + 1);
-		memcpy(sub_data.topicFilters[idx], topicFilters[idx], SubTopic_len);
+		sub_data->topicFilters[idx] = xy_malloc(SubTopic_len + 1);
+		memset(sub_data->topicFilters[idx], 0, SubTopic_len + 1);
+		memcpy(sub_data->topicFilters[idx], topicFilters[idx], SubTopic_len);
 	}
 
 	if (mqtt_send_msg_q != NULL) {
@@ -1536,7 +1544,7 @@ int mqtt_client_unsubscribe(int tcpconnectID, int msgId, int count, char *topicF
 {
 	int idx = 0;
 	int   unSubTopic_len = 0;
-	mqtt_req_param_t unsub_data = {0};
+	mqtt_req_param_t *unsub_data = NULL;
 	mqtt_context_t *mqttCurContext = NULL;
 	
 	mqttCurContext = mqttFindContextBytcpid(tcpconnectID);
@@ -1552,17 +1560,18 @@ int mqtt_client_unsubscribe(int tcpconnectID, int msgId, int count, char *topicF
 		return XY_ERR;	
 	}
 
-	unsub_data.req_type = MQTT_UNSUB_REQ;
-	unsub_data.tcpconnectID = tcpconnectID;
-	unsub_data.msg_id = msgId;
-	unsub_data.pContext = (void *)mqttCurContext;
-	unsub_data.count = count;
+	unsub_data = xy_malloc(sizeof(mqtt_req_param_t));
+	unsub_data->req_type = MQTT_UNSUB_REQ;
+	unsub_data->tcpconnectID = tcpconnectID;
+	unsub_data->msg_id = msgId;
+	unsub_data->pContext = (void *)mqttCurContext;
+	unsub_data->count = count;
 
 	for (idx = 0; idx < count; idx++ ) {
 		unSubTopic_len = strlen(topicFilters[idx]);
-		unsub_data.topicFilters[idx] = xy_malloc(unSubTopic_len + 1);
-		memset(unsub_data.topicFilters[idx], 0, unSubTopic_len + 1);
-		memcpy(unsub_data.topicFilters[idx], topicFilters[idx], unSubTopic_len);
+		unsub_data->topicFilters[idx] = xy_malloc(unSubTopic_len + 1);
+		memset(unsub_data->topicFilters[idx], 0, unSubTopic_len + 1);
+		memcpy(unsub_data->topicFilters[idx], topicFilters[idx], unSubTopic_len);
 	}
 	
 	if (mqtt_send_msg_q != NULL) {
@@ -1574,7 +1583,7 @@ int mqtt_client_unsubscribe(int tcpconnectID, int msgId, int count, char *topicF
 
 int mqtt_client_publish(int tcpconnectID, int msgId, int qos, int retained, char *mqttPubTopic, int message_len, char *mqttMessage)
 {
-	mqtt_req_param_t pub_data = {0};
+	mqtt_req_param_t *pub_data = NULL;
 	mqtt_context_t *mqttCurContext = NULL;
 	int   pubTopic_len = 0;
 	char* pubTopic = NULL;
@@ -1604,21 +1613,22 @@ int mqtt_client_publish(int tcpconnectID, int msgId, int qos, int retained, char
             memcpy(hex_data, mqttMessage, message_len);
     }
 	
-	pub_data.req_type = MQTT_PUB_REQ;
-	pub_data.tcpconnectID = tcpconnectID;
-	pub_data.msg_id = msgId;
-	pub_data.retained = retained;
-	pub_data.pContext = (void *)mqttCurContext;
-	pub_data.qos[0] = qos;
+	pub_data = xy_malloc(sizeof(mqtt_req_param_t));
+	pub_data->req_type = MQTT_PUB_REQ;
+	pub_data->tcpconnectID = tcpconnectID;
+	pub_data->msg_id = msgId;
+	pub_data->retained = retained;
+	pub_data->pContext = (void *)mqttCurContext;
+	pub_data->qos[0] = qos;
 
 	pubTopic_len = strlen(mqttPubTopic);
 	pubTopic = xy_malloc(pubTopic_len + 1);
 	memset(pubTopic, 0, pubTopic_len + 1);
 	memcpy(pubTopic, mqttPubTopic, pubTopic_len);
-	pub_data.topicFilters[0] = pubTopic;
-	pub_data.message_len = message_len;
+	pub_data->topicFilters[0] = pubTopic;
+	pub_data->message_len = message_len;
 
-	pub_data.message = hex_data;
+	pub_data->message = hex_data;
 	
 	if (mqtt_send_msg_q != NULL) {
 		osMessageQueuePut(mqtt_send_msg_q, (const void*)(&pub_data), 0, osWaitForever);
@@ -1659,6 +1669,9 @@ int mqtt_client_publish_passthr_proc(char* buf, uint32_t len, void *param)
 		xy_free(publish_params);
 		publish_params = NULL;
 	}
+	if (payload != NULL) {
+		xy_free(payload);
+	}
 	
 	return XY_OK;
 	
@@ -1671,7 +1684,9 @@ exit:
 		xy_free(publish_params);
 		publish_params = NULL;
 	}
-
+	if (payload != NULL) {
+		xy_free(payload);
+	}
 	return XY_ERR;
 }
 
