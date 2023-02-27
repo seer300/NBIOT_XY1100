@@ -760,6 +760,61 @@ int at_QSCLK_req(char *at_buf, char **prsp_cmd)
 	return AT_END;
 }
 
+//20230227 wjb add for mg inter calibration
+// note: if AT+MGSLEEP="disable", then do not go to sleep anyway and save(reset and work)
+//       but AT+MGSLEEP="enable" will work after reset and do not go to sleep currently
+int at_MGSLEEP_req(char *at_buf,char **prsp_cmd)
+{
+    char mode[10] = {0};
+	
+    if(AT_CMD_REQ == g_req_type){
+		if(at_parse_param("%s", at_buf, mode) != AT_OK){
+		    *prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
+		    return AT_END;
+		}
+
+		if(strcmp("disable", mode) !=0 && strcmp("enable", mode) != 0){
+		    *prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
+		    return AT_END;
+		}
+
+		if(strcmp("enable", mode) == 0 && strlen(mode) == strlen("enable")){
+			if(1 != g_softap_fac_nv->deepsleep_enable){
+			    g_softap_fac_nv->deepsleep_enable = 1;
+			    SAVE_FAC_PARAM(deepsleep_enable); 
+			}
+		}
+		 
+		else if(strcmp("disable", mode) == 0 && strlen(mode) == strlen("disable")){
+			if(0 != g_softap_fac_nv->deepsleep_enable){
+			    g_softap_fac_nv->deepsleep_enable = 0;
+			    SAVE_FAC_PARAM(deepsleep_enable); 
+			}
+		}
+	}
+	
+	else if(AT_CMD_QUERY == g_req_type){
+	    *prsp_cmd = xy_zalloc(32);
+
+		if(g_softap_fac_nv->deepsleep_enable == 1)
+			sprintf(*prsp_cmd, "\r\n+MGSLEEP: enable\r\n\r\nOK\r\n");
+		else
+			sprintf(*prsp_cmd, "\r\n+MGSLEEP: disable\r\n\r\nOK\r\n");
+			
+	}
+	
+	else if(AT_CMD_TEST == g_req_type){
+	    *prsp_cmd = xy_zalloc(32);
+		
+		sprintf(*prsp_cmd, "\r\n+MGSLEEP: <sleepmode>\r\n\r\nOK\r\n");
+	}
+	else
+		*prsp_cmd = AT_ERR_BUILD(ATERR_NOT_ALLOWED);
+
+	return AT_END;
+}
+//add end
+
 int at_QRST_req(char *at_buf, char **prsp_cmd)
 {
 	uint8_t rst_mode;
@@ -850,13 +905,13 @@ int at_QCFG_req(char *at_buf, char **prsp_cmd)
 	else if(AT_CMD_TEST == g_req_type){
 		*prsp_cmd = xy_zalloc(96);
 
-	    sprintf(*prsp_cmd, "\r\n+QCFG:\r\n\"dsevent\",<0,1>\r\n\"epco\",<0,1>\r\n\r\nOK\r\n");
+	    sprintf(*prsp_cmd, "\r\n+QCFG:\r\n\"dsevent\", <0,1>\r\n\"epco\", <0,1>\r\n\r\nOK\r\n");
 	}
 
 	else if(AT_CMD_QUERY == g_req_type){
 	    *prsp_cmd = xy_zalloc(96);
 
-	    sprintf(*prsp_cmd, "\r\n+QCFG:\r\n\"dsevent\",%d\r\n\"epco\",%d\r\n\r\nOK\r\n", g_softap_fac_nv->deepsleep_urc, g_softap_fac_nv->epco_ind);
+	    sprintf(*prsp_cmd, "\r\n+QCFG:\r\n\"dsevent\", %d\r\n\"epco\", %d\r\n\r\nOK\r\n", g_softap_fac_nv->deepsleep_urc, g_softap_fac_nv->epco_ind);
 	}
 
 	else

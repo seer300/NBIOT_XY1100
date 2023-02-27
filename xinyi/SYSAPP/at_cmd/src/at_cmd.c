@@ -112,6 +112,7 @@ struct at_serv_proc_e at_basic_req[] = {
 	{"AT+CTZU", at_CTZU_req},
 #endif
 	{"AT+QSCLK", at_QSCLK_req},
+	{"AT+MGSLEEP", at_MGSLEEP_req},
 	{"AT+QRST", at_QRST_req},
 	{"AT+QCFG", at_QCFG_req},
 	{"AT+CCLK", at_CCLK_req},

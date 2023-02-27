@@ -18,3 +18,4 @@ int at_CPOFF_req(char *at_buf, char **prsp_cmd);
 int at_QSCLK_req(char *at_buf, char **prsp_cmd);
 int at_QRST_req(char *at_buf, char **prsp_cmd);
 int at_QCFG_req(char *at_buf, char **prsp_cmd);
+int at_MGSLEEP_req(char *at_buf, char **prsp_cmd);
