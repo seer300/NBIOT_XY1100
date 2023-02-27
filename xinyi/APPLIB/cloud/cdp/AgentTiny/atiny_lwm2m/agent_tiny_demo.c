@@ -1136,7 +1136,7 @@ int cdp_init()
 
 //20230220 MG cancle the cdp downbuffered resume, +NMGS will resume former data
 //and look like not read out the total data
-#if VER_QUCTL260
+#if !VER_QUCTL260
 	//当需要恢复的时候需要把缓存链表恢复，再此基础上继续挂链表
 	if(NET_NEED_RECOVERY(CDP_TASK))
 	{

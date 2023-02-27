@@ -435,7 +435,8 @@ int at_NMGR_req(char *at_buf, char **prsp_cmd)
 
     if (data_len > 0)
     {
-        *prsp_cmd = xy_zalloc(20 + data_len*2);
+        //*prsp_cmd = xy_zalloc(20 + data_len*2);
+        *prsp_cmd = xy_zalloc(30 + data_len*2);
 		sprintf(*prsp_cmd,"\r\n+NMGR: %d,", data_len);
 		bytes2hexstr(data, data_len, *prsp_cmd + strlen(*prsp_cmd), data_len * 2+1);
 		strcat(*prsp_cmd, "\r\n\r\nOK\r\n");
