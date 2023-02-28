@@ -483,6 +483,16 @@ int at_QICLOSE_req(char *at_buf, char **prsp_cmd)
     {
         uint8_t sockId;
         int sock_ctx_id;
+
+	//20230228 MG add
+#if VER_QUCTL260
+	    if(NET_NEED_RECOVERY(SOCKET_TASK)){
+	        //printf("\r\n[QICLOSE]need recovery SOCKET_TASK\r\n");
+	        resume_net_app(SOCKET_TASK);
+	    }
+#endif
+    //add end
+
         if (at_parse_param("%1d(0-4)", at_buf, &sockId) != XY_OK)
         {
             *prsp_cmd = BC26_AT_ERR_BUILD();
@@ -523,6 +533,16 @@ int at_QISTATE_req(char *at_buf, char **prsp_cmd)
         uint8_t query_type = 0;
         int contextId = 0;
         int socketId = 0;
+
+	    //20230228 MG add
+#if VER_QUCTL260
+		if(NET_NEED_RECOVERY(SOCKET_TASK)){
+			//printf("\r\n[QISTATE]request recovery SOCKET_TASK\r\n");
+			resume_net_app(SOCKET_TASK);
+		}
+#endif
+        //add end
+        
         if (at_parse_param("%1d(0-1)", at_buf, &query_type) != XY_OK)
         {
             *prsp_cmd = BC26_AT_ERR_BUILD();
@@ -615,6 +635,16 @@ int at_QISTATE_req(char *at_buf, char **prsp_cmd)
         *prsp_cmd = xy_zalloc(320);
 		int socket_id = 0;
         int sock_ctx_id = 0;
+		
+	    //20230228 MG add
+#if VER_QUCTL260
+		if(NET_NEED_RECOVERY(SOCKET_TASK)){
+			//printf("\r\n[QISTATE]query recovery SOCKET_TASK\r\n");
+			resume_net_app(SOCKET_TASK);
+		}
+#endif
+        //add end
+
         for (socket_id = 0; socket_id < SOCK_NUM; socket_id++)
 		{
 			if ((sock_ctx_id = find_sock_ctx_id_by_sock_id(socket_id)) != -1)
@@ -659,6 +689,15 @@ int at_QISEND_req(char *at_buf, char **prsp_cmd)
 		int mode = 0;
         char *data = xy_zalloc(strlen(at_buf));
         socket_context_t *socket_ctx = NULL;
+
+		//20230228 MG add
+#if VER_QUCTL260
+		if(NET_NEED_RECOVERY(SOCKET_TASK)){
+			//printf("\r\n[QISEND]need recovery SOCKET_TASK\r\n");
+			resume_net_app(SOCKET_TASK);
+		}
+#endif
+        //add end
 
         if (g_data_send_mode == ASCII_STRING)
         {

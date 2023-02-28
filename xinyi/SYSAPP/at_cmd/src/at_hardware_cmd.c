@@ -665,7 +665,7 @@ int at_RESETCTL_req(char *at_buf, char **prsp_cmd)
 	else if (g_req_type == AT_CMD_QUERY)
 	{
 		*prsp_cmd = xy_zalloc(32);
-		sprintf(*prsp_cmd, "\r\n+RESETCTL:%d\r\n\r\nOK\r\n", g_softap_fac_nv->resetctl);
+		sprintf(*prsp_cmd, "\r\n+RESETCTL: %d\r\n\r\nOK\r\n", g_softap_fac_nv->resetctl);
 	}
 	else
 		*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
