@@ -58,6 +58,7 @@ typedef struct
 	uint8_t 		ipv6_addr[20];
 #if VER_QUCTL260 //MG 20221116 add by LGF
 	char            g_Echo_mode;
+    uint8_t         g_send_status;//20230301 MG add
 #endif	
 }softap_var_nv_t;
 

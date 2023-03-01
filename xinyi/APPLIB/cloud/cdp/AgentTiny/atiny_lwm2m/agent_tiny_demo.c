@@ -67,7 +67,9 @@ extern osSemaphoreId_t cdp_api_sendasyn_sem;
 extern osMutexId_t g_observe_mutex;
 extern osMutexId_t g_transaction_mutex;
 
+#if !VER_QUCTL260
 extern int g_send_status;
+#endif
 extern cdp_fota_info_t* g_fota_info;
 extern uint8_t* g_endpointName;
 extern atiny_fota_manager_s *g_fota_manager;
@@ -420,7 +422,11 @@ int send_message_via_lwm2m(char *data, int data_len, cdp_msg_type_e type, uint8_
 	else
 	{
         upstream_info->pending_num++;
-        g_send_status = 1;
+#if VER_QUCTL260
+		g_softap_var_nv->g_send_status = 1;
+#else
+		g_send_status = 1;
+#endif
 	}
     osMutexRelease(g_upstream_mutex);
     if(cdp_wait_sem != NULL)
@@ -1269,7 +1275,11 @@ void ack_callback(atiny_report_type_e type, int cookie, data_send_status_e statu
 	{
 		if(mid != -1) //过滤掉NON 带seq_num 的上报
 		{
+#if VER_QUCTL260
+			if(g_softap_var_nv->g_send_status == 5)
+#else
 			if(g_send_status == 5) //5(平台主动取消订阅/19/0/0)
+#endif
 			{
 #if VER_QUECTEL
 				at_send_NSMI(3,cookie);
@@ -1279,7 +1289,11 @@ void ack_callback(atiny_report_type_e type, int cookie, data_send_status_e statu
 			}
 			else
 			{
-				g_send_status = 4;	
+#if VER_QUCTL260
+				g_softap_var_nv->g_send_status = 4;
+#else
+				g_send_status = 4;
+#endif
 				//是为了区别SENT和空口上报只能选其一,不带seq_num上报SENT,带seq_num走seq_callback上报
 				if(cookie == 0)
 					at_send_NSMI(0,cookie);
@@ -1293,7 +1307,11 @@ void ack_callback(atiny_report_type_e type, int cookie, data_send_status_e statu
 	{
 		if(mid != -1) //过滤掉NON 带seq_num 的上报
 		{
+#if VER_QUCTL260
+			g_softap_var_nv->g_send_status = 3;
+#else
 			g_send_status = 3;
+#endif
 			at_send_NSMI(1,cookie);
 		}
 	
@@ -1304,7 +1322,11 @@ void ack_callback(atiny_report_type_e type, int cookie, data_send_status_e statu
 	{
 		if(mid != -1) //过滤掉NON 带seq_num 的上报
 		{
+#if VER_QUCTL260
+			g_softap_var_nv->g_send_status = 2;
+#else
 			g_send_status = 2;
+#endif
 			at_send_NSMI(2,cookie);
 		}
 		
@@ -1647,7 +1669,8 @@ void agent_tiny_entry(void)
 out:
 #if VER_QUCTL260
 	cdp_downbuffered_clear();
-    g_send_status = NOT_SENT;
+    //g_send_status = NOT_SENT;
+	g_softap_var_nv->g_send_status = NOT_SENT;
 #endif
 	cdp_clear();
 	atiny_deinit(g_phandle);

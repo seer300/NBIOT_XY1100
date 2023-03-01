@@ -25,7 +25,12 @@
 
 #define CDP_NO_RUNNING -2
 
+#if VER_QUCTL260
+//
+#else
 int g_send_status = 0;
+#endif
+
 extern cdp_regInfo_t *g_cdp_regInfo;
 extern osThreadId_t g_lwm2m_TskHandle;
 
@@ -297,7 +302,11 @@ int at_NMGS_EXT_req(char *at_buf, char **prsp_cmd)
 		goto ERR_PROC;
 	}
 
+#if VER_QUCTL260
+	g_softap_var_nv->g_send_status = 0;
+#else
 	g_send_status = 0;
+#endif
 
 	ret = send_message_via_lwm2m(tans_data, len, type,0);
 
@@ -1327,16 +1336,16 @@ int at_QLWULDATASTATUS_req(char *at_buf, char **prsp_cmd)
 	seq_num = cdp_get_cur_seq_num();
 	if(seq_num != 0 && cdp_find_match_udp_node(seq_num) == XY_OK)
 	{
-       	 sprintf(*prsp_cmd, "\r\n+QLWULDATASTATUS:0,%d\r\n\r\nOK\r\n",seq_num);
+       	 sprintf(*prsp_cmd, "\r\n+QLWULDATASTATUS: 0,%d\r\n\r\nOK\r\n",seq_num);
 	}
 	
 	if(!seq_num)
 	{
-		sprintf(*prsp_cmd, "\r\n+QLWULDATASTATUS: %d\r\n\r\nOK\r\n", g_send_status);
+		sprintf(*prsp_cmd, "\r\n+QLWULDATASTATUS: %d\r\n\r\nOK\r\n", g_softap_var_nv->g_send_status);
 	}
 	else
 	{
-		sprintf(*prsp_cmd, "\r\n+QLWULDATASTATUS:%d,%d\r\n\r\nOK\r\n", g_send_status,seq_num);
+		sprintf(*prsp_cmd, "\r\n+QLWULDATASTATUS: %d,%d\r\n\r\nOK\r\n", g_softap_var_nv->g_send_status,seq_num);
 	}
 #else
 	if(upstream_info->pending_num > 0)

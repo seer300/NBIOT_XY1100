@@ -81,7 +81,9 @@ extern cdp_fota_info_t* g_fota_info;              //fota data info
 extern osSemaphoreId_t cdp_wait_sem;
 extern int cdp_deregister_flag;
 extern int g_FOTAing_flag;
+#if !VER_QUCTL260
 extern int g_send_status;
+#endif
 
 static int err_code = ATINY_OK;
 static int64_t g_current_time = ATINY_TIME_CODE;
@@ -612,7 +614,11 @@ void atiny_event_notify(atiny_event_e event, const char* arg, int len)
             if (rpt_type == APP_DATA)
             {
 				if(cdp_get_con_send_flag())
+#if VER_QUCTL260
+					g_softap_var_nv->g_send_status = 5;
+#else
 					g_send_status = 5;//发送CON包，收到重置或从平台主动取消订阅
+#endif
             }
 #if VER_QUCTL260
           //  snprintf(rsp_cmd, buf_len, "\r\n+QLWEVTIND: 9\r\n");
