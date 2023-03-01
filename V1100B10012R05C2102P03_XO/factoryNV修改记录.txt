@@ -1,3 +1,7 @@
+date:20230301
+1）增加130G_factoryNV，除了band信息为3,5,8,20,28外，其余与130X nv保持一致。
+2）130G软件与130X软件相同
+
 date:20230224
 1）合入新的sdk V1100B10012R05C2102P03，已使用sdk中的factoryNV，并在此基础上按以前记录修改
 2）130X_factoryNV与160X_factoryNV的factoryNV文件均已更新

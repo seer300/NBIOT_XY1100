@@ -24,7 +24,7 @@
 ** [2]MODEM模块，优化调整，R16后向兼容处理优化
 */
 
-#define MODULE_130  0
+#define MODULE_130  1
 
 #if  MODULE_130
 
