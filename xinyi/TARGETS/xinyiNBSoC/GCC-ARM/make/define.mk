@@ -98,7 +98,7 @@ ifeq ($(ABUP_FOTA_SUPPORT),y)
 endif
 
 ifeq ($(HTTP_VER_SUPPORT),y)
-	DEFINES += -DXY_HTTP=1
+	DEFINES += -DHTTP=1
 endif
 
 ifeq ($(FLASH_4M),y)
