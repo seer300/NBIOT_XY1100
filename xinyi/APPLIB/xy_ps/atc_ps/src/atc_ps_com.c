@@ -1354,6 +1354,60 @@ void AtcAp_OutputAddr(unsigned char ucDataLen, unsigned char *pData, unsigned ch
     return;
 }
 
+/*******************************************************************************
+  MODULE    : AtcAp_OutputAddr
+  FUNCTION  : 
+  NOTE      :
+  HISTORY   :
+      1. MG 20230310 create
+*******************************************************************************/
+void AtcAp_OutputAddr_NO_QUOTATION(unsigned char ucDataLen, unsigned char *pData, unsigned char *pucAtcRspBuf)
+{   
+    if(4 == ucDataLen)
+    {
+        g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen),
+            (const unsigned char *)"%d.%d.%d.%d",
+            pData[0], pData[1], 
+            pData[2], pData[3]);
+    }
+	
+    else if (8 == ucDataLen)
+    {
+        g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen),
+            (const unsigned char *)",%c%d.%d.%d.%d.%d.%d.%d.%d%c",
+            D_ATC_N_QUOTATION,  pData[0], pData[1], 
+            pData[2], pData[3], pData[4],
+            pData[5], pData[6], pData[7], D_ATC_N_QUOTATION);
+    }
+	
+    else if(16 == ucDataLen && g_factory_nv->tNvData.tNasNv.ucIpv6AddressFormat == 0)
+    {
+		g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen),
+			(const unsigned char *)"%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d",
+			pData[0], pData[1], pData[2], pData[3], pData[4], pData[5], pData[6], pData[7], 
+			pData[8], pData[9], pData[10], pData[11], pData[12], pData[13], pData[14], pData[15]);
+	}
+    else if (32 == ucDataLen && g_factory_nv->tNvData.tNasNv.ucIpv6AddressFormat == 0)
+    {
+        g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen),
+            (const unsigned char *)",%c%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d.%d%c",
+            D_ATC_N_QUOTATION, pData[0], pData[1], pData[2], pData[3], pData[4], pData[5], pData[6], pData[7], 
+            pData[8], pData[9], pData[10], pData[11], pData[12], pData[13], pData[14], pData[15], pData[16], 
+            pData[17], pData[18], pData[19], pData[20], pData[21], pData[22], pData[23], pData[24], pData[25],
+            pData[26], pData[27], pData[28], pData[29], pData[30], pData[31], D_ATC_N_QUOTATION);
+    }
+    else if(ucDataLen >=16 && g_factory_nv->tNvData.tNasNv.ucIpv6AddressFormat == 1)
+    {
+        AtcAp_OutputAddr_IPv6(ucDataLen, pData, pucAtcRspBuf);
+    }
+    else
+    {
+        g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)(pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen),
+            (const unsigned char *)",%c%c", D_ATC_N_QUOTATION, D_ATC_N_QUOTATION);
+    }
+    return;
+}
+
 void AtcAp_OutputAddr_IPv6(unsigned char ucDataLen, unsigned char *pData, unsigned char *pucAtcRspBuf)
 {
     int     i = 0,j = 0;

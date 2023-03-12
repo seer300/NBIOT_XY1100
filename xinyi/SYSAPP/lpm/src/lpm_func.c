@@ -472,10 +472,13 @@ void  force_into_deep_sleep()
 
 void get_powerdown_urc(char *at_str)
 {
-	if(g_softap_fac_nv->deepsleep_urc == 1 && g_softap_var_nv->sleep_mode == 1)
-	{
-		sprintf(at_str,"\r\n+QNBIOTEVENT: \"ENTER DEEPSLEEP\"\r\n");
-	}
+    if(get_sys_up_stat() != UTC_WAKEUP)/*20230310 MG*/
+    {
+	    if(g_softap_fac_nv->deepsleep_urc == 1 && g_softap_var_nv->sleep_mode == 1)
+	    {
+		    sprintf(at_str,"\r\n+QNBIOTEVENT: \"ENTER DEEPSLEEP\"\r\n");
+	    }
+    }
 }
 
 void lpm_add_ticks(uint64_t utc_cnt_sleep)

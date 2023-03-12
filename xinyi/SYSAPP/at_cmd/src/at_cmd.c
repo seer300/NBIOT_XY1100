@@ -113,6 +113,7 @@ struct at_serv_proc_e at_basic_req[] = {
 #endif
 	{"AT+QSCLK", at_QSCLK_req},
 	{"AT+MGSLEEP", at_MGSLEEP_req},
+	{"AT+CFUN", at_CFUN_req},/*20230311 MG*/
 	{"AT+QRST", at_QRST_req},
 	{"AT+QCFG", at_QCFG_req},
 	{"AT+CCLK", at_CCLK_req},

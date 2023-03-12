@@ -683,8 +683,9 @@ void sys_up_urc()
 	
 	init_user_flash();
 	read_user_nv_demo();
-	
-	if(get_sys_up_stat() == UTC_WAKEUP || get_sys_up_stat() == EXTPIN_WAKEUP)
+
+	//20230309 MG add
+	if(/*get_sys_up_stat() == UTC_WAKEUP ||*/ get_sys_up_stat() == EXTPIN_WAKEUP)
 	{
 		if(g_softap_fac_nv->deepsleep_urc == 1 && g_softap_var_nv->sleep_mode == 1)
 		{
@@ -696,7 +697,7 @@ void sys_up_urc()
 			}
 		}
 	}
-	else
+	else if(get_sys_up_stat() != UTC_WAKEUP)
 	{
 		sprintf(at_str,"\r\nRDY\r\n");
 #if VER_QUCTL260 //MG 20221116 add by LGF
@@ -709,7 +710,7 @@ void sys_up_urc()
 		memcpy(g_softap_fac_nv->onenet_config_hex, (char*)cis_cfg_tool("183.230.40.39", 5683, 1, NULL, 0, NULL, NULL), 69);
 
 #endif
-}
+    }
 
 	if(strlen(at_str) != 0)
 		at_rsp_info_broadcast(at_str, strlen(at_str));

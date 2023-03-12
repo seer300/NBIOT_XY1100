@@ -1038,8 +1038,8 @@ void cdp_netif_event_callback(PsNetifStateChangeEvent event)
 	}
 
 
-
-	if((get_sys_up_stat() == UTC_WAKEUP || get_sys_up_stat() == EXTPIN_WAKEUP) && CDP_NEED_RECOVERY(g_softap_var_nv->cdp_lwm2m_event_status))
+    //20230310 MG
+	if((/*get_sys_up_stat() == UTC_WAKEUP ||*/ get_sys_up_stat() == EXTPIN_WAKEUP) && CDP_NEED_RECOVERY(g_softap_var_nv->cdp_lwm2m_event_status))
 	{
 		static uint8_t register_notify = 0;
 		if(!register_notify)
@@ -1087,7 +1087,8 @@ void cdp_netif_event_callback(PsNetifStateChangeEvent event)
     }
 }
 
-
+//20230310 MG
+extern uint8_t g_send_resume_flag;
 int cdp_init()
 {
 	cdp_clear();
@@ -1142,7 +1143,9 @@ int cdp_init()
 
 //20230220 MG cancle the cdp downbuffered resume, +NMGS will resume former data
 //and look like not read out the total data
-#if !VER_QUCTL260
+#if VER_QUCTL260
+if(g_send_resume_flag != 1)
+{
 	//当需要恢复的时候需要把缓存链表恢复，再此基础上继续挂链表
 	if(NET_NEED_RECOVERY(CDP_TASK))
 	{
@@ -1152,7 +1155,13 @@ int cdp_init()
 			memset(downstream_info, 0, sizeof(downstream_info_t));
 		osMutexRelease(g_downstream_mutex);
 	}
+
+	g_send_resume_flag = 0;
+}
 #endif
+
+if(g_send_resume_flag == 1)
+	g_send_resume_flag = 0;
 	
     return 0;
 

@@ -525,6 +525,7 @@ extern void AtcAp_ConvertInDotFormat(char* pStrBuff, unsigned char* pAddr, unsig
 extern void AtcAp_OutputLocalTime(LNB_NAS_LOCAL_TIME_STRU* pLocalTime);
 extern void AtcAp_OutputUniversalTime(LNB_NAS_LOCAL_TIME_STRU* pLocalTime);
 extern void AtcAp_OutputAddr(unsigned char ucDataLen, unsigned char *pData, unsigned char *pucAtcRspBuf);
+extern void AtcAp_OutputAddr_NO_QUOTATION(unsigned char ucDataLen, unsigned char *pData, unsigned char *pucAtcRspBuf);/*20230310 MG*/
 extern void AtcAp_OutputAddr_IPv6(unsigned char ucDataLen, unsigned char *pData, unsigned char *pucAtcRspBuf);
 extern void AtcAp_OutputAddr_IPv6ColonFormat(unsigned char *pData, unsigned char *pucAtcRspBuf);
 extern void AtcAp_OutputPortRange(unsigned char ucDataLen, unsigned short *pData, unsigned char* pRespBuff);

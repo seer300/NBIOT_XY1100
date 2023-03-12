@@ -140,8 +140,13 @@ unsigned char AtcAp_CGDCONT_T_LNB_Process(unsigned char *pEventBuffer)
 *******************************************************************************/
 unsigned char AtcAp_CFUN_T_LNB_Process(unsigned char *pEventBuffer)
 {
-    g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,
-        (const unsigned char *)"\r\n+CFUN: (0,1,5),(0)\r\n");
+    //g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,
+        //(const unsigned char *)"\r\n+CFUN: (0,1,5),(0,1)\r\n");
+
+	//20230311 MG add
+	g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,
+		(const unsigned char *)"\r\n+CFUN: (0,1,4),(0,1)\r\n");
+	// add end
     AtcAp_SendDataInd();
     AtcAp_SendOkRsp();
 
@@ -1344,9 +1349,14 @@ void AtcAp_MsgProc_CFUN_R_Cnf(unsigned char* pRecvMsg)
     ATC_MSG_CFUN_R_CNF_STRU*       ptCfunRCnf;
 
     ptCfunRCnf = (ATC_MSG_CFUN_R_CNF_STRU*)pRecvMsg;
-    
-    g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,
-        (const unsigned char *)"\r\n+CFUN: %d\r\n", ptCfunRCnf->ucFunMode);
+
+    //20230311 MG: AT+CFUN=4 repalce AT+CFUN=5
+	if(5 == ptCfunRCnf->ucFunMode)
+		g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,
+			(const unsigned char *)"\r\n+CFUN: 4\r\n");
+	else
+        g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,
+            (const unsigned char *)"\r\n+CFUN: %d\r\n", ptCfunRCnf->ucFunMode);
 
     AtcAp_SendDataInd();
 }
@@ -3606,15 +3616,19 @@ void AtcAp_MsgProc_PDNIPADDR_Ind(unsigned char* pRecvMsg)
 #if VER_QUCTL260
     ATC_MSG_PdnIPAddr_IND_STRU*    pPndIpAddrInd = (ATC_MSG_PdnIPAddr_IND_STRU*)pRecvMsg;
 
-    AtcAp_StrPrintf_AtcRspBuf((const char *)"\r\n+IP: %d", pPndIpAddrInd->ucAtCid);
     if (1 == pPndIpAddrInd->ucIPv4Flg)
     {
-        AtcAp_OutputAddr(4, pPndIpAddrInd->aucIPv4Addr, g_AtcApInfo.stAtRspInfo.aucAtcRspBuf);
+        AtcAp_StrPrintf_AtcRspBuf((const char *)"\r\n+IP: ");
+        //AtcAp_OutputAddr(4, pPndIpAddrInd->aucIPv4Addr, g_AtcApInfo.stAtRspInfo.aucAtcRspBuf);
+        AtcAp_OutputAddr_NO_QUOTATION(4, pPndIpAddrInd->aucIPv4Addr, g_AtcApInfo.stAtRspInfo.aucAtcRspBuf);
     }
     
     if (1 == pPndIpAddrInd->ucIPv6Flg)
     {
-        AtcAp_OutputAddr(16, pPndIpAddrInd->aucIPv6Addr, g_AtcApInfo.stAtRspInfo.aucAtcRspBuf);
+    
+        AtcAp_StrPrintf_AtcRspBuf((const char *)"\r\n+IP: ");
+        //AtcAp_OutputAddr(16, pPndIpAddrInd->aucIPv6Addr, g_AtcApInfo.stAtRspInfo.aucAtcRspBuf);
+        AtcAp_OutputAddr_NO_QUOTATION(16, pPndIpAddrInd->aucIPv6Addr, g_AtcApInfo.stAtRspInfo.aucAtcRspBuf);
     }
     
     AtcAp_StrPrintf_AtcRspBuf((const char *)"\r\n");

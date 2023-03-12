@@ -815,6 +815,43 @@ int at_MGSLEEP_req(char *at_buf,char **prsp_cmd)
 }
 //add end
 
+//20230311 MG: AT+CFUN=4 repalce AT+CFUN=5
+int at_CFUN_req(char *at_buf, char **prsp_cmd)
+{
+    if(AT_CMD_REQ == g_req_type)
+    {
+        uint8_t cfun_mode = 9;
+		
+        if(at_parse_param("%1d", at_buf, &cfun_mode) != AT_OK)
+        {
+		    *prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
+		    return AT_END;
+        }
+        
+		if(cfun_mode != 0 && cfun_mode != 1 && cfun_mode!= 4)
+		{
+		    *prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
+		    return AT_END;
+		}
+
+		
+		if(cfun_mode == 4)
+		{
+		    xy_atc_interface_call("AT+CFUN=5\r\n", NULL, (void*)NULL);
+		    //return AT_FORWARD;
+		    return AT_END;
+		}
+
+		else
+			return AT_FORWARD;
+		
+    }
+
+	else
+		return AT_FORWARD;
+}
+//add end
+
 int at_QRST_req(char *at_buf, char **prsp_cmd)
 {
 	uint8_t rst_mode;
@@ -905,13 +942,15 @@ int at_QCFG_req(char *at_buf, char **prsp_cmd)
 	else if(AT_CMD_TEST == g_req_type){
 		*prsp_cmd = xy_zalloc(96);
 
-	    sprintf(*prsp_cmd, "\r\n+QCFG:\r\n\"dsevent\", <0,1>\r\n\"epco\", <0,1>\r\n\r\nOK\r\n");
+	    //+QCFG: "dsevent",(0,1)
+	    //+QCFG: "epco",(0,1)
+	    sprintf(*prsp_cmd, "\r\n+QCFG: \"dsevent\",(0,1)\r\n+QCFG: \"epco\",(0,1)\r\n\r\nOK\r\n");
 	}
 
 	else if(AT_CMD_QUERY == g_req_type){
 	    *prsp_cmd = xy_zalloc(96);
 
-	    sprintf(*prsp_cmd, "\r\n+QCFG:\r\n\"dsevent\", %d\r\n\"epco\", %d\r\n\r\nOK\r\n", g_softap_fac_nv->deepsleep_urc, g_softap_fac_nv->epco_ind);
+	    sprintf(*prsp_cmd, "\r\n+QCFG: \"dsevent\",%d\r\n+QCFG: \"epco\",%d\r\n\r\nOK\r\n", g_softap_fac_nv->deepsleep_urc, g_softap_fac_nv->epco_ind);
 	}
 
 	else

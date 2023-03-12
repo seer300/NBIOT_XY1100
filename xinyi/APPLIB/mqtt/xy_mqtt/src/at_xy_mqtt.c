@@ -1033,7 +1033,9 @@ int at_QMTPUB_req(char *at_buf, char **prsp_cmd)
 	}
 	else if (g_req_type == AT_CMD_TEST) {
 		*prsp_cmd = xy_malloc(80);
-		snprintf(*prsp_cmd, 80, "\r\n+QMTPUB: (0-4),(0-65535),(0-2),(0,1),<topic>,(0-1460),<msg>\r\n\r\nOK\r\n");
+		//snprintf(*prsp_cmd, 80, "\r\n+QMTPUB: (0-4),(0-65535),(0-2),(0,1),<topic>,(0-1460),<msg>\r\n\r\nOK\r\n");
+		//20230310 MG: MSS limit and reduce the max length
+		snprintf(*prsp_cmd, 80, "\r\n+QMTPUB: (0-4),(0-65535),(0-2),(0,1),<topic>,(0-1349),<msg>\r\n\r\nOK\r\n");
 		return AT_END;
 	}
 	else {

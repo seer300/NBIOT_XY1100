@@ -130,6 +130,7 @@ int cdp_send_data(char *data, int len, int msg_type, uint8_t seq_num)
     return XY_OK;
 }
 
+uint8_t g_send_resume_flag = 0;
 
 /*****************************************************************************
  Function    : +NMGS=<length>,<data>
@@ -148,6 +149,8 @@ int at_NMGS_req(char *at_buf, char **prsp_cmd)
     char *chr = at_buf;
     char *src_data = xy_zalloc(strlen(at_buf));
     char *tans_data = NULL;
+
+	g_send_resume_flag = 1;
 
     if(g_req_type != AT_CMD_REQ)
     {
