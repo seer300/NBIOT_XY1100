@@ -685,7 +685,11 @@ void sys_up_urc()
 	read_user_nv_demo();
 
 	//20230309 MG add
-	if(/*get_sys_up_stat() == UTC_WAKEUP ||*/ get_sys_up_stat() == EXTPIN_WAKEUP)
+	//g_RTC_wakeup_type 0,NULL;1,wakeup by PS;2,wakeup by other UTC
+	//printf("\r\n[EXIT]ps_deepsleep_state=%d, g_RTC_wakeup_type=%d\r\n", g_softap_var_nv->ps_deepsleep_state, g_RTC_wakeup_type);
+	//if(/*get_sys_up_stat() == UTC_WAKEUP ||*/ get_sys_up_stat() == EXTPIN_WAKEUP)
+	if((get_sys_up_stat() == UTC_WAKEUP && g_softap_var_nv->ps_deepsleep_state != 2) || get_sys_up_stat() == EXTPIN_WAKEUP 
+		|| (g_softap_var_nv->ps_deepsleep_state == 2 && g_RTC_wakeup_type == 2))
 	{
 		if(g_softap_fac_nv->deepsleep_urc == 1 && g_softap_var_nv->sleep_mode == 1)
 		{
@@ -697,6 +701,8 @@ void sys_up_urc()
 			}
 		}
 	}
+	//add end
+	
 	else if(get_sys_up_stat() != UTC_WAKEUP)
 	{
 		sprintf(at_str,"\r\nRDY\r\n");

@@ -1,3 +1,7 @@
+date: 20230319
+1）同步修改130X/160X/130G的NV参数ucEdrxEnableFlag，由1改成0。即目前不默认开启edrx，PSM是默认启用的。于用户的影响是使用edrx时需要主动设置该模式。
+2）上述改动是去除edrx默认开启时对URC"Enter/Exit Deepsleep"的影响（PS/EDRX rtc timer在作用）。同时实际情况下用户一般使用PSM，且PSM与EDRX不同时使用，如果需要edrx，主动设置即可。改动没有负面影响。
+
 date:20230301
 1）增加130G_factoryNV，除了band信息为3,5,8,20,28外，其余与130X nv保持一致。
 2）130G软件与130X软件相同
