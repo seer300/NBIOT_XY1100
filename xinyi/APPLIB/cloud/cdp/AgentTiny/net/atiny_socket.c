@@ -537,9 +537,10 @@ void *atiny_net_connect(const char *host, const char *port, int proto)
 			hints.ai_family = AF_INET;
 		else if(ipaddr.type == IPADDR_TYPE_V6)
 			hints.ai_family = AF_INET6;
-		getaddrinfo(host, port, &hints, &addr_list);
+		if(getaddrinfo(host, port, &hints, &addr_list) != XY_OK)
+			return NULL;
 	}
-   
+    
 
     SOCKET_LOG("try to do name resolution now...");
 		
