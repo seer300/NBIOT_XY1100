@@ -2016,17 +2016,17 @@ int at_SGSW_req(char *at_buf, char **prsp_cmd)
 //kt
 int at_QCGDEFCONT_req(char *at_buf, char **prsp_cmd)
 {	
-	unsigned char				   aPdpType[][7] = {"IP","IPV6","IPV4V6","PPP","Non-IP"};//已有类型
-	unsigned char                  aucPdpType[][7] = {"RESERV","IP","IPV6","IPV4V6","RESERV","Non-IP"};//CGDCONT显示类型数组
+	unsigned char aPdpType[][7] = {"IP","IPV6","IPV4V6","PPP","Non-IP"};//已有类型
+	unsigned char aucPdpType[][7] = {"RESERV","IP","IPV6","IPV4V6","RESERV","Non-IP"};//CGDCONT显示类型数组
 
 	if (g_req_type == AT_CMD_REQ)
 	{
 		int i;
 		int val;
-		unsigned char  	PdpType[1][7] = {0};
-		unsigned char   aucApnValue[D_APN_LEN] = {0};
-		unsigned char   aucUserName[D_PCO_AUTH_MAX_LEN] = {0};
-		unsigned char   aucPassword[D_PCO_AUTH_MAX_LEN] = {0};
+		unsigned char PdpType[7] = {0};
+		unsigned char aucApnValue[D_APN_LEN] = {0};
+		unsigned char aucUserName[D_PCO_AUTH_MAX_LEN] = {0};
+		unsigned char aucPassword[D_PCO_AUTH_MAX_LEN] = {0};
 		
 		char at_QCGDEFCONT[150]={0};
 	
@@ -2038,7 +2038,7 @@ int at_QCGDEFCONT_req(char *at_buf, char **prsp_cmd)
 		
 		for(i=0;i<5;i++)
 		{
-			if(strcmp(PdpType,aPdpType[i]) == 0)
+			if(strcmp((const char *)PdpType,(const char *)aPdpType[i]) == 0)
 			{
 				val = 1;
 				break;
@@ -2052,7 +2052,7 @@ int at_QCGDEFCONT_req(char *at_buf, char **prsp_cmd)
 
 		}
 		
-		if((strlen(aucApnValue)>100) || (strlen(aucUserName)>16) || (strlen(aucPassword)>16))
+		if((strlen((const char *)aucApnValue)>100) || (strlen((const char *)aucUserName)>16) || (strlen((const char *)aucPassword)>16))
 		{
 			*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
 			return AT_END;
@@ -2065,17 +2065,17 @@ int at_QCGDEFCONT_req(char *at_buf, char **prsp_cmd)
 			return AT_END;
 		}
 
-		if(strlen(aucUserName) != 0 || strlen(aucPassword) != 0)
+		if(strlen((const char *)aucUserName) != 0 || strlen((const char *)aucPassword) != 0)
 		{
-			if (strlen(aucUserName) == 0 && strlen(aucPassword) != 0)
+			if (strlen((const char *)aucUserName) == 0 && strlen((const char *)aucPassword) != 0)
 			{
 				sprintf(at_QCGDEFCONT, "AT+CGAUTH=0,2,\"%s\"\r\n",aucPassword);
 			}
-			else if (strlen(aucUserName) != 0 && strlen(aucPassword) == 0)
+			else if (strlen((const char *)aucUserName) != 0 && strlen((const char *)aucPassword) == 0)
 			{
 				sprintf(at_QCGDEFCONT, "AT+CGAUTH=0,2,\"%s\"\r\n",aucUserName);
 			}
-			else if (strlen(aucUserName) != 0 && strlen(aucPassword) != 0)
+			else if (strlen((const char *)aucUserName) != 0 && strlen((const char *)aucPassword) != 0)
 			{
 				sprintf(at_QCGDEFCONT, "AT+CGAUTH=0,2,\"%s\",\"%s\"\r\n", aucUserName,aucPassword);
 			}
@@ -2110,7 +2110,7 @@ int at_QCGDEFCONT_req(char *at_buf, char **prsp_cmd)
 			return AT_END;
 		}
 		
-		if(strlen(CGAUTH_R_info->stCgauth[0].aucUserName) == 0 && strlen(CGAUTH_R_info->stCgauth[0].aucPassword) == 0)
+		if(strlen((const char *)CGAUTH_R_info->stCgauth[0].aucUserName) == 0 && strlen((const char *)CGAUTH_R_info->stCgauth[0].aucPassword) == 0)
 		{
 #if VER_QUCTL260 //MG 20221116 add by LGF			
 			ATC_MSG_CGCONTRDP_CNF_STRU Disguiser = { 0 };
@@ -2121,17 +2121,17 @@ int at_QCGDEFCONT_req(char *at_buf, char **prsp_cmd)
 #endif
 
 		}
-		else if(strlen(CGAUTH_R_info->stCgauth[0].aucUserName) == 0 && strlen(CGAUTH_R_info->stCgauth[0].aucPassword) != 0)
+		else if(strlen((const char *)CGAUTH_R_info->stCgauth[0].aucUserName) == 0 && strlen((const char *)CGAUTH_R_info->stCgauth[0].aucPassword) != 0)
 		{
 			snprintf(*prsp_cmd, 200, "\r\n+QCGDEFCONT:\"%s\",\"%s\",\"%s\"\r\n\r\nOK\r\n",aucPdpType[CGDCONT_R_info->stPdpContext[0].ucPdpType],CGDCONT_R_info->stPdpContext[0].aucApnValue,
 																							CGAUTH_R_info->stCgauth[0].aucPassword);
 		}
-		else if(strlen(CGAUTH_R_info->stCgauth[0].aucUserName) != 0 && strlen(CGAUTH_R_info->stCgauth[0].aucPassword) == 0)
+		else if(strlen((const char *)CGAUTH_R_info->stCgauth[0].aucUserName) != 0 && strlen((const char *)CGAUTH_R_info->stCgauth[0].aucPassword) == 0)
 		{
 			snprintf(*prsp_cmd, 200, "\r\n+QCGDEFCONT:\"%s\",\"%s\",\"%s\"\r\n\r\nOK\r\n",aucPdpType[CGDCONT_R_info->stPdpContext[0].ucPdpType],CGDCONT_R_info->stPdpContext[0].aucApnValue,
 																							CGAUTH_R_info->stCgauth[0].aucUserName);
 		}
-		else if(strlen(CGAUTH_R_info->stCgauth[0].aucUserName) != 0 && strlen(CGAUTH_R_info->stCgauth[0].aucPassword) != 0)
+		else if(strlen((const char *)CGAUTH_R_info->stCgauth[0].aucUserName) != 0 && strlen((const char *)CGAUTH_R_info->stCgauth[0].aucPassword) != 0)
 		{
 			snprintf(*prsp_cmd, 200, "\r\n+QCGDEFCONT:\"%s\",\"%s\",\"%s\",\"%s\"\r\n\r\nOK\r\n",aucPdpType[CGDCONT_R_info->stPdpContext[0].ucPdpType],CGDCONT_R_info->stPdpContext[0].aucApnValue,
 																							CGAUTH_R_info->stCgauth[0].aucUserName,CGAUTH_R_info->stCgauth[0].aucPassword);
@@ -2159,7 +2159,7 @@ uint8_t* getNewBuildInfo(void)
     {
         "Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"
      };
-     const uint8_t *cp_date = __DATE__;   // get origin format :month date year
+     const uint8_t *cp_date =(uint8_t *) __DATE__;   // get origin format :month date year
      for (i = 0; i < 4; i++) 
      {
          date_origin_format_buf[i] = *(cp_date + 7 + i);
