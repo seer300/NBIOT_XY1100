@@ -150,8 +150,6 @@ int at_NMGS_req(char *at_buf, char **prsp_cmd)
     char *src_data = xy_zalloc(strlen(at_buf));
     char *tans_data = NULL;
 
-	g_send_resume_flag = 1;
-
     if(g_req_type != AT_CMD_REQ)
     {
         *prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);

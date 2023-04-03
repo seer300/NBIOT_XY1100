@@ -623,9 +623,10 @@ int cdp_downbuffered_resume()
 
 void cdp_downbuffered_save()
 {
-	
+	/*
 	if(g_phandle->lwm2m_context->state != STATE_READY)
 		return;
+	*/
 	
 	buffer_list_t* node = NULL;
 	int buffered_num = 0;
@@ -1087,8 +1088,6 @@ void cdp_netif_event_callback(PsNetifStateChangeEvent event)
     }
 }
 
-//20230310 MG
-extern uint8_t g_send_resume_flag;
 int cdp_init()
 {
 	cdp_clear();
@@ -1144,8 +1143,6 @@ int cdp_init()
 //20230220 MG cancle the cdp downbuffered resume, +NMGS will resume former data
 //and look like not read out the total data
 #if VER_QUCTL260
-if(g_send_resume_flag != 1)
-{
 	//当需要恢复的时候需要把缓存链表恢复，再此基础上继续挂链表
 	if(NET_NEED_RECOVERY(CDP_TASK))
 	{
@@ -1156,13 +1153,8 @@ if(g_send_resume_flag != 1)
 		osMutexRelease(g_downstream_mutex);
 	}
 
-	g_send_resume_flag = 0;
-}
 #endif
 
-if(g_send_resume_flag == 1)
-	g_send_resume_flag = 0;
-	
     return 0;
 
 failed:

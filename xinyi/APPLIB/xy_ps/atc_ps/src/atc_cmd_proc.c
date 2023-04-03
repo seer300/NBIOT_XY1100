@@ -145,7 +145,7 @@ unsigned char AtcAp_CFUN_T_LNB_Process(unsigned char *pEventBuffer)
 
 	//20230311 MG add
 	g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)g_AtcApInfo.stAtRspInfo.aucAtcRspBuf,
-		(const unsigned char *)"\r\n+CFUN: (0,1,4),(0,1)\r\n");
+		(const unsigned char *)"\r\n+CFUN: (0,1,4),(0)\r\n");
 	// add end
     AtcAp_SendDataInd();
     AtcAp_SendOkRsp();
