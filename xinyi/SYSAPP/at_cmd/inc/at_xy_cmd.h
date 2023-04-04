@@ -29,8 +29,8 @@
 #if  MODULE_130
 
 #define MODULE 		"SLM130X"
-#define TVERSION 	"T08"
-#define SDATE		"S0320"
+#define TVERSION 	"T09"
+#define SDATE		"S0404"
 #define SDKVERSION	"0.2.3.C21"  /*20230224 patch03*/
 #define MVERSION	"M003"
 #define SI_NUM		HAL_GPIO_PIN_NUM_13
@@ -38,8 +38,8 @@
 #else
 
 #define MODULE 		"SLM160X"
-#define TVERSION 	"T08"
-#define SDATE		"S0320"
+#define TVERSION 	"T09"
+#define SDATE		"S0404"
 #define SDKVERSION	"0.2.3.C21"
 #define MVERSION	"M003"
 #define SI_NUM		HAL_GPIO_PIN_NUM_11
@@ -75,6 +75,7 @@ int at_QVERTIME_req(char *at_buf,char **prsp_cmd);
 int at_SGSW_req(char *at_buf,char **prsp_cmd);
 int at_QATWAKEUP_req(char *at_buf, char **prsp_cmd);
 int at_QCGDEFCONT_req(char *at_buf,char **prsp_cmd);
+int at_MGEDRXRPT_rep(char *at_buf,char **prsp_cmd);
 
 
 

@@ -688,12 +688,26 @@ void sys_up_urc()
 	//g_RTC_wakeup_type 0,NULL;1,wakeup by PS;2,wakeup by other UTC
 	//printf("\r\n[EXIT]ps_deepsleep_state=%d, g_RTC_wakeup_type=%d\r\n", g_softap_var_nv->ps_deepsleep_state, g_RTC_wakeup_type);
 	//if(/*get_sys_up_stat() == UTC_WAKEUP ||*/ get_sys_up_stat() == EXTPIN_WAKEUP)
-	if((get_sys_up_stat() == UTC_WAKEUP && g_softap_var_nv->ps_deepsleep_state != 2) || get_sys_up_stat() == EXTPIN_WAKEUP 
-		|| (g_softap_var_nv->ps_deepsleep_state == 2 && g_RTC_wakeup_type == 2))
+	if ((g_softap_fac_nv->mgedrxrpt_ind == 1) && (get_sys_up_stat() == UTC_WAKEUP || get_sys_up_stat() == EXTPIN_WAKEUP))
 	{
 		if(g_softap_fac_nv->deepsleep_urc == 1 && g_softap_var_nv->sleep_mode == 1)
 		{
-			sprintf(at_str,"\r\n+QNBIOTEVENT: \"EXIT DEEPSLEEP\"\r\n");			
+			sprintf(at_str,"\r\n+QNBIOTEVENT: \"EXIT DEEPSLEEP\"\r\n");
+
+			if(g_user_nv->atWakeup==1)
+			{
+				strcat(at_str,"\r\n+QATWAKEUP\r\n");
+			}
+		}
+	}
+
+	//when edrx mode, do not report "ENTER/EXIT DEEPSLEEP" 
+	else if((g_softap_fac_nv->mgedrxrpt_ind == 0) && ((get_sys_up_stat() == UTC_WAKEUP && g_softap_var_nv->ps_deepsleep_state != 2) || get_sys_up_stat() == EXTPIN_WAKEUP 
+		|| (g_softap_var_nv->ps_deepsleep_state == 2 && g_RTC_wakeup_type == 2)))
+	{
+		if(g_softap_fac_nv->deepsleep_urc == 1 && g_softap_var_nv->sleep_mode == 1)
+		{
+			sprintf(at_str,"\r\n+QNBIOTEVENT: \"EXIT DEEPSLEEP\"\r\n");
 
 			if(g_user_nv->atWakeup==1)
 			{

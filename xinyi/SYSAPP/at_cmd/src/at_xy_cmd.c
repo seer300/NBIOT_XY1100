@@ -27,8 +27,6 @@
 #include "at_global_def.h"
 #include "at_uart.h"
 #include "cloud_utils.h"
-
-
 #include "xy_atc_interface.h" //kt
 
 /*******************************************************************************
@@ -2225,4 +2223,45 @@ int at_QATWAKEUP_req(char *at_buf, char **prsp_cmd)
 
 	return AT_END;
 }
+
+//20230404 MG add for control EDRX mode "ENTER/EXIT DEEPSLEEP" URC
+int at_MGEDRXRPT_rep(char *at_buf, char **prsp_cmd)
+{
+    if(AT_CMD_TEST == g_req_type)
+    {
+		*prsp_cmd = xy_zalloc(32);
+		
+		sprintf(*prsp_cmd, "\r\n+MGEDRXRPT: (0,1)\r\n\r\nOK\r\n");
+    }
+	
+    else if(AT_CMD_QUERY == g_req_type)
+    {
+		*prsp_cmd = xy_zalloc(32);
+		sprintf(*prsp_cmd, "\r\n+MGEDRXRPT: %d\r\n\r\nOK\r\n", g_softap_fac_nv->mgedrxrpt_ind);
+    }
+
+	
+    else if(AT_CMD_REQ == g_req_type)
+    {
+        int8_t mgedrxrpt_mode = -1;
+		
+		if (at_parse_param("%1d(0-1)", at_buf, &mgedrxrpt_mode) != AT_OK)
+		{
+			*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
+			return AT_END;
+		}
+
+		if(mgedrxrpt_mode != g_softap_fac_nv->mgedrxrpt_ind)
+		{
+			g_softap_fac_nv->mgedrxrpt_ind = mgedrxrpt_mode;
+			SAVE_FAC_PARAM(mgedrxrpt_ind);
+		}
+    }
+
+	else
+		*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
+
+	return AT_END;
+}
+//add end
 

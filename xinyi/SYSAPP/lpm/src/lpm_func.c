@@ -478,7 +478,10 @@ void get_powerdown_urc(char *at_str)
 	//20230319 MG
 	//factoryNV parameter ucEdrxEnableFlag set 0(now edrx defalut closed) to reduce ps/edrx rtc timer effect
 	//under psm, the normal urc and platform lifetime update urc, under edrx, also consider platform lt update urc
-	if(g_softap_var_nv->ps_deepsleep_state != 2 || get_sys_up_stat() != UTC_WAKEUP || (g_softap_var_nv->ps_deepsleep_state == 2 && g_RTC_wakeup_type == 2))
+	if(g_softap_fac_nv->mgedrxrpt_ind == 1 && g_softap_fac_nv->deepsleep_urc == 1 && g_softap_var_nv->sleep_mode == 1)
+		sprintf(at_str,"\r\n+QNBIOTEVENT: \"ENTER DEEPSLEEP\"\r\n");
+	
+	else if((g_softap_fac_nv->mgedrxrpt_ind == 0) && (g_softap_var_nv->ps_deepsleep_state != 2 || get_sys_up_stat() != UTC_WAKEUP || (g_softap_var_nv->ps_deepsleep_state == 2 && g_RTC_wakeup_type == 2)))
 	{
 	    if(g_softap_fac_nv->deepsleep_urc == 1 && g_softap_var_nv->sleep_mode == 1)
 	    {
