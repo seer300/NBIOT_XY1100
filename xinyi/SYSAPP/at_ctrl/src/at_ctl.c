@@ -666,6 +666,8 @@ int at_rsp_info_broadcast(void *buf, int size)
 extern user_nv_data_t *g_user_nv;
 extern void read_user_nv_demo();
 extern void init_user_flash();
+
+extern void cdp_downbuffered_resume();
 #if VER_QUCTL260 //MG 20221121 add by LGF
 extern char* cis_cfg_tool(char* ip,unsigned int port,char is_bs,char* authcode,char is_dtls,char* psk,int *cfg_out_len);
 #endif
@@ -743,6 +745,9 @@ void sys_up_urc()
 		at_rsp_info_broadcast(power_str, strlen(power_str));
 		xy_free(power_str);
 	}
+
+    //20230412 MG add
+	cdp_downbuffered_resume();
 }
 
 void send_at_err_to_periperal(int err_no, at_context_t* ctx, char *file, int line)

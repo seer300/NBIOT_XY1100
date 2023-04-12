@@ -924,7 +924,8 @@ int at_QMTPUB_req(char *at_buf, char **prsp_cmd)
 		memset(topic, 0, strlen(at_buf));
 		memset(message, 0, strlen(at_buf));
 		
-		if (!ps_netif_is_ok()) {
+		if (!ps_netif_is_ok()) 
+		{
         	*prsp_cmd = BC26_AT_ERR_BUILD();
        		 goto exit;
         }

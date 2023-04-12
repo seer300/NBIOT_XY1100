@@ -499,6 +499,9 @@ char *get_message_via_lwm2m(int *data_len)
 	}
 	else if(downstream_info != NULL)
 	{
+		if(g_downstream_mutex == NULL)
+    		cloud_mutex_create(&g_downstream_mutex);
+		
 		osMutexAcquire(g_downstream_mutex, portMAX_DELAY);
 	    if (downstream_info->buffered_num > 0)
 	    {
@@ -563,6 +566,16 @@ int cdp_downbuffered_num_resume()
 		memset(downstream_info, 0, sizeof(downstream_info_t));
 	}
 	xy_flash_read(FOTA_BACKUP_BASE, &downstream_info->buffered_num, 4*sizeof(int));
+	
+	if(downstream_info->buffered_num < 0)
+		downstream_info->buffered_num = 0;
+
+	if(downstream_info->received_num < 0)
+		downstream_info->received_num = 0;
+
+	if(downstream_info->dropped_num < 0)
+		downstream_info->dropped_num = 0;
+	
 	if(downstream_info->buffered_num > DATALIST_MAX_LEN)//防止数据读取异常
 	{
 		xy_printf("downstream read flash error num = %d",downstream_info->buffered_num);
@@ -570,9 +583,12 @@ int cdp_downbuffered_num_resume()
 	}
 	return XY_OK;
 }
+uint8_t g_cdp_resume_flag = 0;
 
 int cdp_downbuffered_resume()
 {
+if(g_cdp_resume_flag != 1){
+	g_cdp_resume_flag = 1;
 	int len = 0;
 	int buffer_num = 0;
 	buffer_list_t *node = NULL;
@@ -617,7 +633,10 @@ int cdp_downbuffered_resume()
         }
 	}
 	xy_free(down_stream_info_read);
-	return XY_OK;
+}
+
+return XY_OK;
+
 }
 
 
@@ -869,7 +888,7 @@ int get_downstream_message_buffered_num()
 	int buffered_num = 0;
 #if VER_QUCTL260
 	if(!CDP_NEED_RECOVERY(g_softap_var_nv->cdp_lwm2m_event_status))
-		return buffered_num;
+		return (buffered_num >= 0 ? buffered_num : 0);
 	
 	if(downstream_info == NULL)
 	{
@@ -885,7 +904,7 @@ int get_downstream_message_buffered_num()
 #endif
 		buffered_num = downstream_info->buffered_num;
 
-    return buffered_num;
+    return (buffered_num >= 0 ? buffered_num : 0);
 }
 
 int get_downstream_message_received_num()
@@ -1223,7 +1242,8 @@ void cdp_clear()
 #endif
 	}   
 
-#if !VER_QUECTEL
+//20230412 MG !VER_QUECTEL->VER_QUECTEL, do not clear downstream info
+#if VER_QUECTEL
     if (downstream_info != NULL)
 	{
 		cdp_downstream_clear(&g_downstream_mutex, (void*)downstream_info);
@@ -1231,6 +1251,7 @@ void cdp_clear()
 		downstream_info = NULL;
 	}
 #endif
+//add end
         
     if (g_upstream_mutex != NULL)
     {

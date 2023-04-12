@@ -34,6 +34,10 @@ int at_NCDPOPEN_req(char *at_buf, char **prsp_cmd)
         char* psk_temp  = xy_zalloc(strlen(at_buf));
 		int port = 5683;
 
+		//20230412 MG clear download data
+		xy_flash_erase(FOTA_BACKUP_BASE, DOWNSTREAM_LEN_MAX*8);
+		//add end
+
 		if (!ps_netif_is_ok()) 
 		{
 			*prsp_cmd = AT_ERR_BUILD(ATERR_NOT_NET_CONNECT);
@@ -126,6 +130,10 @@ free_out:
 int at_NCDPCLOSE_req(char *at_buf, char **prsp_cmd)
 {
 	(void) at_buf;
+
+	//20230412 MG clear download data
+	xy_flash_erase(FOTA_BACKUP_BASE, DOWNSTREAM_LEN_MAX*8);
+	//add end
 
 	if(g_req_type != AT_CMD_ACTIVE)
 	{

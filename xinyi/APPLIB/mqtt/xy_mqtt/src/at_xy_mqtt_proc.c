@@ -1591,7 +1591,8 @@ int mqtt_client_publish(int tcpconnectID, int msgId, int qos, int retained, char
 
 	mqttCurContext = mqttFindContextBytcpid(tcpconnectID);
 
-	if (mqttCurContext->data_format.send_data_format == HEX_ASCII_STRING) {
+	if (mqttCurContext->data_format.send_data_format == HEX_ASCII_STRING) 
+	{
 	    if (strlen(mqttMessage) != message_len * 2) {
             return XY_ERR;
         }
@@ -1603,7 +1604,8 @@ int mqtt_client_publish(int tcpconnectID, int msgId, int qos, int retained, char
             return XY_ERR;
         }
     }
-    else {
+    else 
+	{
 			if (strlen(mqttMessage) != message_len) {
             	return XY_ERR;
         	}
