@@ -245,5 +245,53 @@ int at_NFWUPD_req(char *at_buf, char **prsp_cmd)
     return AT_END;
 }
 
+
+//20230413 MG FOTA AT command
+//输入完整url，解析得到host/port/path，三项均不能缺少，否则解析失败
+//如AT+QFOTADL="http://iotsvr.meigsmart.com:9090/download/xyDelta"得到
+//host:iotsvr.meigsmart.com port:9090 path:/download/xyDelta
+//处理从AT口输入的命令，需要特别注意结尾处的'\r'字符
+#include "fota_by_http.h"
+
+char *g_http_host = NULL;
+char *g_http_path = NULL;
+short unsigned int g_http_port = 0;
+
+int at_QFOTADL_req(char *at_buf, char **prsp_cmd)
+{
+    if(AT_CMD_TEST == g_req_type)
+    {
+		*prsp_cmd = xy_zalloc(48);
+		sprintf(*prsp_cmd, "\r\n+QFOTADL=<http url>\r\n\r\nOK\r\n");
+    }
+
+	else if(AT_CMD_REQ == g_req_type)
+	{
+	    char *http_addr = NULL;
+		http_addr = xy_zalloc(256);
+		
+		if (at_parse_param("%256s", at_buf, http_addr) != AT_OK)
+		{
+			*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
+			return AT_END;
+		}
+
+		if(httpurl_parse(at_buf, &g_http_host, &g_http_port, &g_http_path) != XY_OK)
+		{
+			*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
+			return AT_END;
+		}
+		
+		fota_by_http();
+		
+		xy_free(http_addr);
+	}
+
+	else
+		*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
+
+	return AT_END;	
+}
+//add end
 #endif
 

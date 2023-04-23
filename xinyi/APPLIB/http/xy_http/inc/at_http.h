@@ -3,6 +3,8 @@
 #include "xy_utils.h"
 #include "httpclient.h"
 
+#define HTTP_CONTEXT_REF_NUM   1
+
 typedef enum {
 	ESCAPE_MECHANISM = 0, 	// 字符串输入输出
 	HEX_CHARACTER = 1	  	// 16进制输入输出

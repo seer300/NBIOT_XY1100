@@ -76,7 +76,5 @@ int at_SGSW_req(char *at_buf,char **prsp_cmd);
 int at_QATWAKEUP_req(char *at_buf, char **prsp_cmd);
 int at_QCGDEFCONT_req(char *at_buf,char **prsp_cmd);
 int at_MGEDRXRPT_rep(char *at_buf,char **prsp_cmd);
-
-
-
+int at_QFOTADL_req(char *at_buf,char **prsp_cmd);
 
