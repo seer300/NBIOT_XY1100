@@ -146,6 +146,26 @@ void cdp_fota_info_set(upgrade_state_e state)
 	//此处写flash的目的是为了防止升级完成后用户不重新注册，然后走了重启，这样平台升级状态无法改变
     xy_flash_write(FOTA_STATEINFO_FLASH_BASE, g_fota_info, sizeof(cdp_fota_info_t));
 }
+
+//MG 20230508
+void cdp_fota_info_get(upgrade_state_e *state)
+{
+	if(g_fota_info == NULL)
+		g_fota_info = (cdp_fota_info_t*)xy_malloc(sizeof(cdp_fota_info_t));
+
+    //Check fota info flag
+    if(*(unsigned int*)FOTA_STATEINFO_FLASH_BASE == 0xAA)
+        xy_flash_read(FOTA_STATEINFO_FLASH_BASE, g_fota_info, sizeof(cdp_fota_info_t));
+    else
+	{
+    	memset(g_fota_info, 0x00, sizeof(cdp_fota_info_t));
+		return;
+	}
+
+	*state = g_fota_info->fota_upgrade_info.upgrade_state;
+
+}
+//MG END
 #endif
 #endif
 

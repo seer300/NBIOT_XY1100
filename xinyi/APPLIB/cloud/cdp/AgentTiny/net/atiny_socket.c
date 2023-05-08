@@ -599,6 +599,8 @@ void *atiny_net_connect(const char *host, const char *port, int proto)
             }
         }
 
+//MG 20230508
+#if 0
         //绑定本地port
         if(g_cdp_localPort != 0 && (!strcmp(port,"5683") || !strcmp(port,"5684")))
         {
@@ -625,7 +627,9 @@ void *atiny_net_connect(const char *host, const char *port, int proto)
                 continue;
             }
         }
-       
+
+#endif
+//MG END
         if (connect(ctx->fd, cur->ai_addr, cur->ai_addrlen) == 0)
         {
             break;

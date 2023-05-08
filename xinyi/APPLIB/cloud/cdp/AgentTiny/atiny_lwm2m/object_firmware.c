@@ -76,6 +76,7 @@
 
 #ifdef CONFIG_FEATURE_FOTA
 #include "atiny_fota_manager.h"
+#include "upgrade_flag.h"
 
 
 // ---- private object "Firmware" specific defines ----
@@ -90,6 +91,8 @@
 #define RES_O_PKG_VERSION               7
 #define RES_O_FIRMWARE_UPDATE_DELIVER_METHOD               8
 
+//MG 20230508
+extern void cdp_fota_info_get(upgrade_state_e *state);
 
 static uint8_t prv_firmware_read(uint16_t instanceId,
                                  int *numDataP,
@@ -167,8 +170,19 @@ static uint8_t prv_firmware_read(uint16_t instanceId,
 
         case RES_M_UPDATE_RESULT:
         {
-#ifdef CONFIG_FEATURE_FOTA    
-            int updateresult = atiny_fota_manager_get_update_result(atiny_fota_manager_get_instance());
+#ifdef CONFIG_FEATURE_FOTA 
+			//MG 20230508
+			upgrade_state_e tmp_state = OTA_IDLE;
+			int updateresult = ATINY_FIRMWARE_UPDATE_NULL;
+			cdp_fota_info_get(&tmp_state);
+			//printf("get upgrade result %d\r\n", tmp_state);
+			if(tmp_state == OTA_SUCCEED)
+				updateresult = ATINY_FIRMWARE_UPDATE_SUCCESS;
+			//MG END
+            else
+            	updateresult = atiny_fota_manager_get_update_result(atiny_fota_manager_get_instance());
+			
+			//printf("[%s %d]update result %d\r\n", __FUNCTION__, __LINE__, updateresult);
             lwm2m_data_encode_int(updateresult, *dataArrayP + i);
             result = COAP_205_CONTENT;
             if(updateresult > ATINY_FIRMWARE_UPDATE_SUCCESS && updateresult < ATINY_FIRMWARE_UPDATE_FAIL)
