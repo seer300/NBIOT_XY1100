@@ -1695,6 +1695,15 @@ out:
 	g_softap_var_nv->g_send_status = NOT_SENT;
 #endif
 	cdp_clear();
+    //MG 20230512
+    if (downstream_info != NULL)
+	{
+		cdp_downstream_clear(&g_downstream_mutex, (void*)downstream_info);
+		xy_free(downstream_info);
+		downstream_info = NULL;
+		//printf("[%s %d]downstream info clear\r\n", __FUNCTION__, __LINE__);
+	}
+	//MG END
 	atiny_deinit(g_phandle);
 	g_phandle = NULL;
 

@@ -197,6 +197,7 @@ static void prv_handleRegistrationReply(st_transaction_t * transacP,
         }else
         {
             core_callbackEvent(context,CIS_EVENT_REG_TIMEOUT,NULL);
+			core_updatePumpState(context, PUMP_STATE_UNREGISTER);
 
             targetP->status = STATE_REG_FAILED;
             LOGE("ERROR:Registration timeout");

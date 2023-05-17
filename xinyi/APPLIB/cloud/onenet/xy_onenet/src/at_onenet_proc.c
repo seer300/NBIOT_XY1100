@@ -2502,13 +2502,20 @@ int at_proc_miplopen_req(char *at_buf, char **rsp_cmd)
 
 
 #if VER_QUCTL260
+		//non bs timeout
         if(timeout == -1)
 			onenet_context_refs[0].onenet_user_config.reg_timeout = 0x1E;
 		else if (timeout >= 1 && timeout <= 0xFFFF)
             onenet_context_refs[0].onenet_user_config.reg_timeout = timeout;
 		else
 			goto param_error;
-		onenet_context_refs[0].onenet_user_config.bs_timeout = 0x1E; //30s  //cjh add 20230215 for bc260y
+		//bs timeout
+		if(timeout == -1)
+			onenet_context_refs[0].onenet_user_config.bs_timeout = 0x1E; //30s  //cjh add 20230215 for bc260y
+		else if (timeout >= 1 && timeout <= 0xFFFF)
+            onenet_context_refs[0].onenet_user_config.bs_timeout = timeout; //MG 20230516
+		else
+			goto param_error;
 #endif
 
         if (!is_onenet_task_running(ref)) {

@@ -14,6 +14,8 @@
 
 extern int deregister_lwm2m_task();
 extern int cdp_lifetime;
+extern downstream_info_t *downstream_info;
+extern osMutexId_t g_downstream_mutex;
 
 /*****************************************************************************
  Function    : +NCDPOPEN=<ip_addr>[,<port>]
@@ -34,8 +36,15 @@ int at_NCDPOPEN_req(char *at_buf, char **prsp_cmd)
         char* psk_temp  = xy_zalloc(strlen(at_buf));
 		int port = 5683;
 
-		//20230412 MG clear download data
+		//20230412 MG clear download data stored in flash 
 		xy_flash_erase(FOTA_BACKUP_BASE, DOWNSTREAM_LEN_MAX*8);
+		//20230512 MG clear downstream data stored in global variable
+		if (downstream_info != NULL)
+		{
+			cdp_downstream_clear(&g_downstream_mutex, (void*)downstream_info);
+			xy_free(downstream_info);
+			downstream_info = NULL;
+		}
 		//add end
 
 		if (!ps_netif_is_ok()) 
@@ -133,6 +142,13 @@ int at_NCDPCLOSE_req(char *at_buf, char **prsp_cmd)
 
 	//20230412 MG clear download data
 	xy_flash_erase(FOTA_BACKUP_BASE, DOWNSTREAM_LEN_MAX*8);
+	//20230512 MG clear downstream data stored in global variable
+	if (downstream_info != NULL)
+	{
+		cdp_downstream_clear(&g_downstream_mutex, (void*)downstream_info);
+		xy_free(downstream_info);
+		downstream_info = NULL;
+	}
 	//add end
 
 	if(g_req_type != AT_CMD_ACTIVE)
