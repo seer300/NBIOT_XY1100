@@ -320,6 +320,16 @@ int _ping_ipv4(char *host_ip, uint16_t data_len, uint8_t timeout, uint32_t ping_
     softap_printf(USER_LOG, WARN_LOG, "start send ping\n");
 	softap_printf(USER_LOG, WARN_LOG, "\nping ipv4 datalen:%d, timeout:%d, interval_time:%d\n", data_len, timeout, interval_time);
 
+    //MG 20230517
+    rsp_cmd = (char*)xy_zalloc(128);
+	//memset(rsp_cmd,0,128);
+    snprintf(rsp_cmd, 128, "\r\n+NPING: start send ping\r\n");
+    send_rsp_str_to_ext(rsp_cmd);
+	memset(rsp_cmd,0,128);
+    snprintf(rsp_cmd, 128, "\r\nping dst addr: %s, datalen: %d, timeout: %d, interval_time: %d\r\n", host_ip, data_len, timeout, interval_time);
+    send_rsp_str_to_ext(rsp_cmd);
+	//MG END
+
     now_in_ping = 1;
 
     while (!g_ping_stop && ping_num--)
@@ -395,12 +405,20 @@ int _ping_ipv4(char *host_ip, uint16_t data_len, uint8_t timeout, uint32_t ping_
                     total_rtt += rtt;
                     ping_info.time_average = total_rtt / ping_info.ping_reply_num;
                     softap_printf(USER_LOG, WARN_LOG, "reply from %s, %d bytes %d ms %d ttl\n", host_ip, data_len, rtt, reply_ttl);
+					//MG 20230517
+					memset(rsp_cmd,0,128);
+					snprintf(rsp_cmd, 128, "\r\nreply from %s, %d bytes %d ms %d ttl\r\n", host_ip, data_len, rtt, reply_ttl);
+					send_rsp_str_to_ext(rsp_cmd);
                     break;
                 }
             }
 			else if (recv_len == -1)
             {
                 softap_printf(USER_LOG, WARN_LOG, "ping timeout and break");
+				//MG 20230517
+				memset(rsp_cmd,0,128);
+				snprintf(rsp_cmd, 128, "\r\nping timeout\r\n");
+				send_rsp_str_to_ext(rsp_cmd);
 				is_timedout = 1;
                 break;
             }
@@ -430,7 +448,8 @@ int _ping_ipv4(char *host_ip, uint16_t data_len, uint8_t timeout, uint32_t ping_
         seqno++;
     }
 out:    
-	rsp_cmd = (char*)xy_zalloc(128);
+	//rsp_cmd = (char*)xy_zalloc(128);
+	memset(rsp_cmd,0,128);//MG 20230517
 #if VER_QUECTEL
 	sprintf(rsp_cmd, "\r\n+NPING:statistics: ping num:%d, reply:%d, longest_rtt:%dms, shortest_rtt:%dms, average_time:%dms\r\n", 
 			ping_info.ping_send_num, ping_info.ping_reply_num, ping_info.longest_rtt, ping_info.shortest_rtt, ping_info.time_average);
