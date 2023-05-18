@@ -892,7 +892,14 @@ int MessageExtract(char *fmt_parm, char *at_str, int ascii_len, char *param_data
 	if(!str_len)
 		return 0;	
 	if(mqttContext[tcpconnectID].data_format.send_data_format)
+	{
+		if(ascii_len*2 != str_len)
+			return 8001;
 		ascii_len+=ascii_len;
+	}
+	else if(ascii_len != str_len)
+		return 8001;
+	
 	memcpy(param_data, at_str, ascii_len);
 	*(param_data + ascii_len) = '\0';	
 	return AT_OK;
@@ -929,6 +936,7 @@ int at_QMTPUB_req(char *at_buf, char **prsp_cmd)
         	*prsp_cmd = BC26_AT_ERR_BUILD();
        		 goto exit;
         }
+		
 #if VER_QUCTL260
 		if(at_strnchr(at_buf, ',', 6) != NULL)
 		{
@@ -937,13 +945,14 @@ int at_QMTPUB_req(char *at_buf, char **prsp_cmd)
 					*prsp_cmd = BC26_AT_ERR_BUILD();
 					goto exit;
 				}
+				//for support json
 				if(MessageExtract(",,,,,,%s", at_buf, message_len, message, tcpconnectID) > 0)
 				{
 					*prsp_cmd = BC26_AT_ERR_BUILD();
 					goto exit;
 				}
 		}
-
+		else 
 #endif
 		if (at_parse_param("%d,%d,%d,%d,%s,%d,%s", at_buf, &tcpconnectID, &msgID, &qos, &retain, topic, &message_len, message) != AT_OK) {
 			*prsp_cmd = BC26_AT_ERR_BUILD();
