@@ -137,6 +137,10 @@ endif
 ifeq ($(LWM2M_COMMON_SUPPORT),y)
 	DEFINES += -DLWM2M_COMMON_VER=1
 endif
+
+ifeq ($(MG_DFOTA_SUPPORT),y)
+	DEFINES += -DMG_DFOTA=1  #130G的DFOTA功能，编译130G软件请打开MG_DFOTA_SUPPORT
+endif
 ####################################################################################################
 # export variable to use sub makefile
 ####################################################################################################

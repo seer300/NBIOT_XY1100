@@ -245,7 +245,7 @@ int at_NFWUPD_req(char *at_buf, char **prsp_cmd)
     return AT_END;
 }
 
-
+#if MG_DFOTA
 //20230413 MG FOTA AT command
 //输入完整url，解析得到host/port/path，三项均不能缺少，否则解析失败
 //如AT+QFOTADL="http://iotsvr.meigsmart.com:9090/download/xyDelta"得到
@@ -293,5 +293,7 @@ int at_QFOTADL_req(char *at_buf, char **prsp_cmd)
 	return AT_END;	
 }
 //add end
+#endif
+
 #endif
 

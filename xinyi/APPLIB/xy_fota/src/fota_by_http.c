@@ -1,4 +1,4 @@
-#if  HTTP
+#if MG_DFOTA
 
 #if XY_FOTA
 #include "xy_fota.h"
