@@ -147,6 +147,7 @@ void cdp_fota_info_set(upgrade_state_e state)
     xy_flash_write(FOTA_STATEINFO_FLASH_BASE, g_fota_info, sizeof(cdp_fota_info_t));
 }
 
+#if MG_DFOTA
 //MG 20230508
 void cdp_fota_info_get(upgrade_state_e *state)
 {
@@ -166,6 +167,7 @@ void cdp_fota_info_get(upgrade_state_e *state)
 
 }
 //MG END
+#endif
 #endif
 #endif
 

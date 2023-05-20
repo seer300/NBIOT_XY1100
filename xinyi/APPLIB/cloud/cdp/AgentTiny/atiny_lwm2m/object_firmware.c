@@ -171,6 +171,7 @@ static uint8_t prv_firmware_read(uint16_t instanceId,
         case RES_M_UPDATE_RESULT:
         {
 #ifdef CONFIG_FEATURE_FOTA 
+#if MG_DFOTA
 			//MG 20230508
 			upgrade_state_e tmp_state = OTA_IDLE;
 			int updateresult = ATINY_FIRMWARE_UPDATE_NULL;
@@ -178,10 +179,11 @@ static uint8_t prv_firmware_read(uint16_t instanceId,
 			//printf("get upgrade result %d\r\n", tmp_state);
 			if(tmp_state == OTA_SUCCEED)
 				updateresult = ATINY_FIRMWARE_UPDATE_SUCCESS;
-			//MG END
             else
             	updateresult = atiny_fota_manager_get_update_result(atiny_fota_manager_get_instance());
-			
+#else
+            int updateresult = atiny_fota_manager_get_update_result(atiny_fota_manager_get_instance());
+#endif
 			//printf("[%s %d]update result %d\r\n", __FUNCTION__, __LINE__, updateresult);
             lwm2m_data_encode_int(updateresult, *dataArrayP + i);
             result = COAP_205_CONTENT;
