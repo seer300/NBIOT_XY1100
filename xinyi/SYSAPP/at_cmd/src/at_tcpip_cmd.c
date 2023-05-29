@@ -164,9 +164,29 @@ static void query_dns_task(void *dnsquery)
 	struct addrinfo hint = {0};
 	struct addrinfo *result = NULL;
 	struct addrinfo *tmp = NULL;
-	hint.ai_family = AF_UNSPEC;
 	hint.ai_socktype = SOCK_DGRAM;
     int ret = 0;
+	uint8_t inetv6_need = 0;
+	uint8_t do_again = 0;
+
+//MG 20230527
+	if(g_netifIp_type == IPADDR_TYPE_V6)
+		hint.ai_family = AF_INET6;
+	else if(g_netifIp_type == IPADDR_TYPE_V4)
+		hint.ai_family = AF_INET;
+	else if(g_netifIp_type == IPADDR_TYPE_ANY){
+		hint.ai_family = AF_INET;
+	    inetv6_need = 1;
+	}
+	else
+		hint.ai_family = AF_UNSPEC;
+
+again:
+    if(do_again){
+		do_again = 0;
+		hint.ai_family = AF_INET6;
+	}
+//MG END
 
     if ((ret = getaddrinfo(dns_query->domain_name, NULL, &hint, &result)) != 0)
 	{
@@ -182,6 +202,8 @@ static void query_dns_task(void *dnsquery)
 		else if (dns_query->query_type == BC26DNS)
 		{
             snprintf(rsp_cmd, 32, "\r\n+QIDNSGIP: %d\r\n", get_bc26_tcpip_errcode(ret));
+			strcpy(rsp_cmd + strlen(rsp_cmd) - 1, "\r\n");
+			send_rsp_str_to_ext(rsp_cmd);
         }
             
 		goto END;
@@ -227,7 +249,17 @@ static void query_dns_task(void *dnsquery)
 			snprintf(rsp_cmd + strlen(rsp_cmd), 42, "%s,", inet_ntop(AF_INET6, &addr6->sin6_addr, ip6_addr, 40));
 		}
 	}
+
 	strcpy(rsp_cmd + strlen(rsp_cmd) - 1, "\r\n");
+	send_rsp_str_to_ext(rsp_cmd);
+
+//MG 20230527
+	if(inetv6_need){
+		inetv6_need = 0;
+		do_again = 1;
+		goto again;
+	}
+//MG END
 	if (dns_query->disable_cache == 1)
 	{
 		//QDNS=2,<hostname> 不保留缓存
@@ -235,7 +267,6 @@ static void query_dns_task(void *dnsquery)
 	}
 	freeaddrinfo(result);
 END:
-	send_rsp_str_to_ext(rsp_cmd);
 	softap_printf(USER_LOG, WARN_LOG, "query_dns_task %d exit", dns_query->query_type);
 
 	if (rsp_cmd != NULL)
