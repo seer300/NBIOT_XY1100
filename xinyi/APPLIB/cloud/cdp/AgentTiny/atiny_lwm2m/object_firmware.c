@@ -171,7 +171,8 @@ static uint8_t prv_firmware_read(uint16_t instanceId,
         case RES_M_UPDATE_RESULT:
         {
 #ifdef CONFIG_FEATURE_FOTA 
-#if MG_DFOTA
+//#if MG_DFOTA
+#if 0
 			//MG 20230508
 			upgrade_state_e tmp_state = OTA_IDLE;
 			int updateresult = ATINY_FIRMWARE_UPDATE_NULL;

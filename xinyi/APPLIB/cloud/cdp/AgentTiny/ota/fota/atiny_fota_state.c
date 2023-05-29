@@ -79,7 +79,11 @@ static int atiny_fota_idle_state_recv_notify_ack(atiny_fota_state_s *thi, data_s
     atiny_fota_state_e rpt_state;
 
     result = atiny_fota_manager_get_update_result(thi->manager);
+#if MG_DFOTA
+    if(SENT_SUCCESS != status && SENT_GET_RST != status)
+#else
     if(SENT_SUCCESS != status)
+#endif
     {
         ATINY_LOG(LOG_ERR, "idle state notify fail %d", status);
         
