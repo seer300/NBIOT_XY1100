@@ -53,26 +53,36 @@ unsigned short g_onenet_remotePort = 0;
  ******************************************************************************/
 static int create_cisnet_sock(cisnet_t ctx)
 {
-    struct sockaddr_in sock_addr = {0};
-    struct sockaddr_in local_addr= {0};
-    socklen_t n = sizeof(struct sockaddr_in);
+    char port[6];
+    int ret;
     struct addrinfo hints;
     struct addrinfo *addr_list;
     struct addrinfo *cur;
+
+	//ip4
+    struct sockaddr_in sock_addr = {0};
+    struct sockaddr_in local_addr= {0};
+    socklen_t n = sizeof(struct sockaddr_in);
     struct sockaddr_in *addr;
-    //struct addrinfo *cur;
-    char   port[6];
-    int ret;
+
+	//ip6
+	struct sockaddr_in6 sock_addr6 = {0};
+    struct sockaddr_in6 local_addr6= {0};
+	socklen_t n6 = sizeof(struct sockaddr_in6);
+	struct sockaddr_in6 *addr6;
+	
     if (ctx == NULL)
-    {
         return -1;
-    }
 
     /* Do name resolution with both IPv6 and IPv4 */
     memset(&hints, 0, sizeof(hints));
-    hints.ai_family = AF_UNSPEC;
-    hints.ai_socktype = SOCK_DGRAM;
-    hints.ai_protocol = IPPROTO_UDP;
+	hints.ai_socktype = SOCK_DGRAM;
+	hints.ai_protocol = IPPROTO_UDP;
+	
+	if(g_softap_fac_nv->onenet_ip_type == AF_INET6)
+		hints.ai_family = AF_INET6;
+	else
+    	hints.ai_family = AF_INET;
 
     sprintf(port, "%d", ctx->port);
     if ((ret = getaddrinfo(ctx->host, port, &hints, &addr_list)) != 0)
@@ -89,10 +99,22 @@ static int create_cisnet_sock(cisnet_t ctx)
             memset(ctx->host,0x0,sizeof(ctx->host));
             inet_ntop(AF_INET, &addr->sin_addr, ctx->host, 16);
         }
+		//MG 20230530
+		if(cur->ai_family == AF_INET6)
+		{
+			addr6 = (struct sockaddr_in6*)cur->ai_addr;
+            memset(ctx->host,0x0,sizeof(ctx->host));
+            inet_ntop(AF_INET6, &addr6->sin6_addr, ctx->host, 40);
+		}
     }
 
     /*Only support for ipv4 now*/
-    ctx->sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    //MG 20230520 ip6 support
+    if(g_softap_fac_nv->onenet_ip_type == AF_INET6)
+		ctx->sock = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
+	else
+    	ctx->sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	
     if (ctx->sock < 0)
     {
         freeaddrinfo(addr_list);
@@ -110,14 +132,30 @@ static int create_cisnet_sock(cisnet_t ctx)
 #endif
 			if(g_onenet_localPort != 0)
 			{
-				sock_addr.sin_family = AF_INET;
-			    sock_addr.sin_port = lwip_htons(g_onenet_localPort);
-			    if (bind(ctx->sock, (struct sockaddr*)&sock_addr, sizeof(struct sockaddr)))
-			    {
-			    	freeaddrinfo(addr_list);
-					close(ctx->sock);
-			        return -1;
+			    if(g_softap_fac_nv->onenet_ip_type == AF_INET6){
+					sock_addr6.sin6_family = AF_INET6;
+				    sock_addr6.sin6_port = lwip_htons(g_onenet_localPort);
+				
+					if (bind(ctx->sock, (struct sockaddr*)&sock_addr6, sizeof(struct sockaddr)))
+					{
+						freeaddrinfo(addr_list);
+						close(ctx->sock);
+						printf("1bind fail\r\n");
+						return -1;
+					}
 			    }
+				else{
+					sock_addr.sin_family = AF_INET;
+			    	sock_addr.sin_port = lwip_htons(g_onenet_localPort);
+				
+					if (bind(ctx->sock, (struct sockaddr*)&sock_addr, sizeof(struct sockaddr)))
+					{
+						freeaddrinfo(addr_list);
+						close(ctx->sock);
+						printf("2bind fail\r\n");
+						return -1;
+					}
+				}
 			}
 
             if (connect(ctx->sock, addr_list->ai_addr, addr_list->ai_addrlen) != 0)
@@ -129,9 +167,16 @@ static int create_cisnet_sock(cisnet_t ctx)
             
             if(g_onenet_localPort == 0)
             {
-                getsockname(ctx->sock, (struct sockaddr*)&local_addr, &n);
-                g_onenet_remotePort = ctx->port;
-                g_onenet_localPort = ntohs(local_addr.sin_port);
+            	if(g_softap_fac_nv->onenet_ip_type == AF_INET6){
+					getsockname(ctx->sock, (struct sockaddr*)&local_addr6, &n6);
+					g_onenet_remotePort = ctx->port;
+					g_onenet_localPort = ntohs(local_addr6.sin6_port);
+				}
+				else{
+	                getsockname(ctx->sock, (struct sockaddr*)&local_addr, &n);
+	                g_onenet_remotePort = ctx->port;
+	                g_onenet_localPort = ntohs(local_addr.sin_port);
+				}
             }
 
 #if 0			
@@ -367,21 +412,32 @@ cis_ret_t cisnet_disconnect(cisnet_t netctx)
 cis_ret_t cisnet_write(cisnet_t netctx,const uint8_t* buffer,uint32_t length, uint8_t raiflag)
 {
     int nbSent;
-    size_t addrlen;
     size_t offset;
     uint8_t type_offset = 2;
+
+	//ip4
+    size_t addrlen;
     struct sockaddr_in saddr;
     saddr.sin_family = AF_INET;
     saddr.sin_port = htons(netctx->port);
     saddr.sin_addr.s_addr = inet_addr(netctx->host);
-    
     addrlen = sizeof(saddr);
+
+	//ipv6
+    size_t addrlen6;
+    struct sockaddr_in6 saddr6;
+    saddr6.sin6_family = AF_INET6;
+    saddr6.sin6_port = htons(netctx->port);
+	ip6addr_aton(netctx->host, saddr6.sin6_addr.un.u32_addr);
+    addrlen6 = sizeof(saddr6);
+    
     offset = 0;
     while (offset != length)
     {
-        //nbSent = sendto(netctx->sock, (const char*)buffer + offset, length - offset, 0, (struct sockaddr *)&saddr, addrlen);
-
-        nbSent = sendto2(netctx->sock, (const char*)buffer + offset, length - offset, 0, (struct sockaddr *)&saddr, addrlen, 0, raiflag);
+		if(g_softap_fac_nv->onenet_ip_type == AF_INET6)/* ip6 */
+        	nbSent = sendto2(netctx->sock, (const char*)buffer + offset, length - offset, 0, (struct sockaddr *)&saddr6, addrlen6, 0, raiflag);
+		else/* ip4 */
+			nbSent = sendto2(netctx->sock, (const char*)buffer + offset, length - offset, 0, (struct sockaddr *)&saddr, addrlen, 0, raiflag);
 
         if (nbSent == -1){
             softap_printf(USER_LOG, WARN_LOG, "socket sendto [%s:%d] failed.\n", netctx->host, ntohs(saddr.sin_port));

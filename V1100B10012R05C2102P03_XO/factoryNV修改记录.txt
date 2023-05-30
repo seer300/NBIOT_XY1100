@@ -31,3 +31,6 @@ date：20230213
 
 date：20230404
 1）[130x/160x/130G]增加nv参数mgedrxrpt_ind，默认值为1。作用是控制EDRX下寻呼周期中"ENTER/EXIT DEEPSLEEP"的上报，1--上报on，0--上报off
+
+date 20230530
+1）增加nv参数onenet_ip_type，记录并保存登录onenet的ip类型。默认值为0，所以其实并没有更改。2--ip4，10--ip6。

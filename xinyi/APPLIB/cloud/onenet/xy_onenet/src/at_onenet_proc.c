@@ -1735,6 +1735,25 @@ bool isPureNumAndAlpha(char *buf)
     return true;
 }
 
+//MG 20230530 检测ip类型与合法性
+int  ipvalid(const char *ip)
+{
+	if(ip == NULL)
+		return 0;
+		
+	struct in_addr addr;
+	struct in6_addr addr6;
+	
+	if(inet_pton(AF_INET, ip, (void *)&addr) == 1)
+		return AF_INET;//ip4
+	else if(inet_pton(AF_INET6, ip, (void *)&addr6) == 1)
+		return AF_INET6;//ip6
+	else
+		return 0;
+}
+
+extern int8_t g_netifIp_type;
+
 /*****************************************************************************
  Function    : at_proc_miplconf_req
  Description : config onenet
@@ -1752,7 +1771,8 @@ int at_proc_miplconfig_req(char *at_buf, char **rsp_cmd)
 	uint8_t recv_data_format = -1;
 	uint8_t auto_update = 1;
 	uint16_t port = 5683;
-	uint8_t ip_addr[16] = {'1','8','3','.','2','3','0','.','4','0','.','3','9','\0'};
+	//uint8_t ip_addr[16] = {'1','8','3','.','2','3','0','.','4','0','.','3','9','\0'};
+	uint8_t ip_addr[40] = {0};
 
 	char *cis_user_config = NULL;
 	uint32_t cfg_len = 0;
@@ -1785,8 +1805,20 @@ int at_proc_miplconfig_req(char *at_buf, char **rsp_cmd)
 		}
 		else
 		{
-			if(xy_ipaddr_check(ip_addr,IPV4_TYPE) == XY_ERR)
+			if(xy_ipaddr_check(ip_addr,IPV4_TYPE) == XY_ERR && xy_ipaddr_check(ip_addr,IPV6_TYPE))
 				goto param_error;
+			//invalid: local ip4 but set ip6 addr, or local ip6 but set ip4 
+			else if((ipvalid(ip_addr) == AF_INET && g_netifIp_type == IPADDR_TYPE_V6) || (ipvalid(ip_addr) == AF_INET6 && g_netifIp_type == IPADDR_TYPE_V4))
+				goto param_error;
+			//bsmode 1 mean enable bootstrap, onenet not support bs&ip6, while support ip6 & non bs
+			else if(bs_mode == 1 && ipvalid(ip_addr) == AF_INET6)
+				goto param_error;
+			else
+			{
+				if(ipvalid(ip_addr) != 0 && ipvalid(ip_addr) != g_softap_fac_nv->onenet_ip_type)
+					g_softap_fac_nv->onenet_ip_type = ipvalid(ip_addr);
+					SAVE_FAC_PARAM(onenet_ip_type);
+			}
 		}
 
 		g_softap_fac_nv->keep_cloud_alive = auto_update;

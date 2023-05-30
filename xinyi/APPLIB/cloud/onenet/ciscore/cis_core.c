@@ -604,7 +604,9 @@ cis_ret_t cis_init_handle(void **context, void *configPtr, uint16_t configLen, v
 
 	//set bootstrap flag to context;
 	contextP->bootstrapEanbled = netConfig.bsEanbled != 0 ? true : false;
-	char config_host[16] = { 0 };
+	//char config_host[16] = { 0 };
+	//MG 20230530 for ip6
+	char config_host[60] = { 0 };
 	char config_port[5] = { 0 };
 	if(strlen((const char *)configRet.data.cfg_net->host.data) <= 5)
  	{
@@ -615,7 +617,8 @@ cis_ret_t cis_init_handle(void **context, void *configPtr, uint16_t configLen, v
 
     int len = 0;
     uint8_t *tmp_ptr = NULL;
-    tmp_ptr = strchr(configRet.data.cfg_net->host.data, ':');
+	//MG 20230530 both parse ip4 and ip6
+    tmp_ptr = strrchr(configRet.data.cfg_net->host.data, ':');
     if(tmp_ptr != NULL)
     {
         len = tmp_ptr - configRet.data.cfg_net->host.data;

@@ -475,7 +475,8 @@ char* cis_cfg_tool(char* ip,unsigned int port,char is_bs,char* authcode,char is_
 	char *APN= "CMIOT";
 	char *Username = NULL;
 	char *Password = NULL;
-	char Host[32] = {0};	
+	//char Host[32] = {0};
+	char Host[60] = {0};
 	sprintf(Host, "%s:%d", ip, port);
 	//char *Host = "183.230.40.39:5684";
 	char Userdata2[50] = {0}; 
