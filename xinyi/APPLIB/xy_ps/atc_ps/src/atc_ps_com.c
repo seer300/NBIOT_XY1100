@@ -1359,6 +1359,254 @@ void AtcAp_OutputAddr(unsigned char ucDataLen, unsigned char *pData, unsigned ch
   FUNCTION  : 
   NOTE      :
   HISTORY   :
+      1. MG 20230531 create only for ip6 report
+*******************************************************************************/
+static void AtcAp_OutputAddr_IPv6_NO_QUOTATION(unsigned char ucDataLen, unsigned char *pData, unsigned char *pucAtcRspBuf)
+{
+    int     i = 0,j = 0;
+    unsigned char    MaskCidr;
+    unsigned char    result;
+    unsigned char    start = 8, end = 0, start1 =16, end1 = 8;
+    unsigned char    ucZeroFlag = 0,ucZeroFlag1 = 0;
+    unsigned short    pusIpv6Addr[16] = {0};
+    
+    for(i = 0; i < (ucDataLen / 2); i++)
+    {
+        pusIpv6Addr[j++] = pData[2*i] << 8 | pData[2*i+1];
+    }
+
+    if(g_factory_nv->tNvData.tNasNv.ucIpv6CompressZeros == 1)
+    {
+        for(i = 0; i < 8; i++)
+        {
+            if(pusIpv6Addr[i] == 0)
+            {
+                ucZeroFlag++;
+                if(start == 8)
+                {
+                    start = i;
+                }
+            }
+            else
+            {
+                if(ucZeroFlag == 1)
+                {
+                    ucZeroFlag--;
+                    start = 8;
+                }
+                else if(ucZeroFlag > 1)
+                {
+                    end = i - 1;
+                    break;
+                }
+            }
+        }
+        if(ucZeroFlag > 1 && end == 0)
+        {
+            end = i - 1;
+        }
+        
+        if(ucDataLen == 32 )
+        {
+            for(i = 8; i < 16; i++)
+            {
+                if(pusIpv6Addr[i] == 0)
+                {
+                    ucZeroFlag1++;
+                    if(start1 == 16)
+                    {
+                        start1 = i;
+                    }
+                }
+                else
+                {
+                    if(ucZeroFlag1 == 1)
+                    {
+                        ucZeroFlag1--;
+                        start1 = 16;
+                    }
+                    else if(ucZeroFlag1 > 1)
+                    {
+                        end1 = i - 1;
+                        break;
+                    }
+                }
+            }
+            if(ucZeroFlag1 > 1 && end1 == 8)
+            {
+                end1 = i - 1;
+            }
+        }
+    }
+    
+    if(ucDataLen == 32 && g_factory_nv->tNvData.tNasNv.ucIpv6SubnetNotation ==1)
+    {
+        result = 1;
+        MaskCidr = 0;
+        for(i = 16; i < 32; i++)
+        {
+            for(j = 0; j < 8; j++)
+            {
+                if(pData[i] & (0x80 >>j))
+                {
+                    MaskCidr++;
+                }
+                else
+                {
+                    result = 0;
+                    break;
+                }
+            }
+            if(result == 0)
+            {
+                break;
+            }
+        }
+    }
+#if 0
+#if VER_QUECTEL
+    g_AtcApInfo.stAtRspInfo.usRspLen += sprintf((char *)(pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen),
+            (const char *)",");
+#else
+    g_AtcApInfo.stAtRspInfo.usRspLen += sprintf((char *)(pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen),
+            (const char *)",%c", D_ATC_N_QUOTATION);
+#endif
+#endif
+    if(g_factory_nv->tNvData.tNasNv.ucIpv6LeadingZeros == 0)
+    {
+        for(i = 0; i < 8; i++)
+        {
+            if((i < start) || (i > end)) 
+            {
+                if(i == 0)
+                {
+                    g_AtcApInfo.stAtRspInfo.usRspLen += sprintf((char*)pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen, (const char *)"%X", pusIpv6Addr[i]);
+                }
+                else
+                {
+                    g_AtcApInfo.stAtRspInfo.usRspLen += sprintf((char*)pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen, (const char *)":%X",pusIpv6Addr[i]);
+                }
+            }
+            else if(i == start )
+            {
+                g_AtcApInfo.stAtRspInfo.usRspLen += sprintf((char*)pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen, (const char *)":");
+                i = end;
+                if(i == 7)
+                {
+                    g_AtcApInfo.stAtRspInfo.usRspLen += sprintf((char*)pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen, (const char *)":");
+                }
+            }
+        }
+
+        if(ucDataLen == 32 && g_factory_nv->tNvData.tNasNv.ucIpv6SubnetNotation ==1)
+        {
+            g_AtcApInfo.stAtRspInfo.usRspLen += sprintf((char *)(pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen),
+            (const char *)"/%d",MaskCidr);
+        }
+        else if(ucDataLen == 32 && g_factory_nv->tNvData.tNasNv.ucIpv6SubnetNotation == 0)
+        {
+            g_AtcApInfo.stAtRspInfo.usRspLen += sprintf((char *)(pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen),
+            (const char *)" ");
+            for(i = 8; i < 16; i++)
+            {
+                if((i < start1) || (i > end1))
+                {
+                    if(i == 8)
+                    {
+                        g_AtcApInfo.stAtRspInfo.usRspLen += sprintf((char*)pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen, (const char *)"%X", pusIpv6Addr[i]);
+                    }
+                    else
+                    {
+                        g_AtcApInfo.stAtRspInfo.usRspLen += sprintf((char*)pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen, (const char *)":%X", pusIpv6Addr[i]);
+                    }
+                }
+                else if(i == start1 )
+                {
+                    g_AtcApInfo.stAtRspInfo.usRspLen += sprintf((char*)pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen, (const char *)":");
+                    i = end1;
+                    if(i == 15)
+                    {
+                        g_AtcApInfo.stAtRspInfo.usRspLen += sprintf((char*)pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen, (const char *)":");
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        for(i = 0; i < 8; i++)
+        {
+            if((i < start) || (i > end))
+            {
+                if(i == 0)
+                {
+                    g_AtcApInfo.stAtRspInfo.usRspLen += sprintf((char*)pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen, (const char *)"%04X", pusIpv6Addr[i]);
+                }
+                else
+                {
+                    g_AtcApInfo.stAtRspInfo.usRspLen += sprintf((char*)pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen, (const char *)":%04X", pusIpv6Addr[i]);
+                }
+            }
+            else if(i == start )
+            {
+                g_AtcApInfo.stAtRspInfo.usRspLen += sprintf((char*)pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen, (const char *)":");
+                i = end;
+                if(i == 7)
+                {
+                    g_AtcApInfo.stAtRspInfo.usRspLen += sprintf((char*)pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen, (const char *)":");
+                }
+            }
+        }
+
+        if(ucDataLen == 32 && g_factory_nv->tNvData.tNasNv.ucIpv6SubnetNotation ==1)
+        {
+            g_AtcApInfo.stAtRspInfo.usRspLen += sprintf((char *)(pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen),
+            (const char *)"/%d",MaskCidr);
+        }
+        else if(ucDataLen == 32 && g_factory_nv->tNvData.tNasNv.ucIpv6SubnetNotation == 0)
+        {
+            g_AtcApInfo.stAtRspInfo.usRspLen += sprintf((char *)(pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen),
+            (const char *)" ");
+            for(i = 8; i < 16; i++)
+            {
+                if((i < start1) || (i > end1))
+                {
+                    if(i == 8)
+                    {
+                        g_AtcApInfo.stAtRspInfo.usRspLen += sprintf((char*)pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen, (const char *)"%04X", pusIpv6Addr[i]);
+                    }
+                    else
+                    {
+                        g_AtcApInfo.stAtRspInfo.usRspLen += sprintf((char*)pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen, (const char *)":%04X", pusIpv6Addr[i]);
+                    }
+                }
+                else if(i == start1 )
+                {
+                    g_AtcApInfo.stAtRspInfo.usRspLen += sprintf((char*)pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen, (const char *)":");
+                    i = end1;
+                    if(i == 15)
+                    {
+                        g_AtcApInfo.stAtRspInfo.usRspLen += sprintf((char*)pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen, (const char *)":");
+                    }
+                }
+            }
+        }
+    }
+#if 0
+#if VER_QUECTEL
+#else
+    g_AtcApInfo.stAtRspInfo.usRspLen += sprintf((char *)(pucAtcRspBuf + g_AtcApInfo.stAtRspInfo.usRspLen),
+            (const char *)"%c", D_ATC_N_QUOTATION);
+#endif
+#endif
+    return;
+}
+
+/*******************************************************************************
+  MODULE    : AtcAp_OutputAddr
+  FUNCTION  : 
+  NOTE      :
+  HISTORY   :
       1. MG 20230310 create
 *******************************************************************************/
 void AtcAp_OutputAddr_NO_QUOTATION(unsigned char ucDataLen, unsigned char *pData, unsigned char *pucAtcRspBuf)
@@ -1398,7 +1646,7 @@ void AtcAp_OutputAddr_NO_QUOTATION(unsigned char ucDataLen, unsigned char *pData
     }
     else if(ucDataLen >=16 && g_factory_nv->tNvData.tNasNv.ucIpv6AddressFormat == 1)
     {
-        AtcAp_OutputAddr_IPv6(ucDataLen, pData, pucAtcRspBuf);
+        AtcAp_OutputAddr_IPv6_NO_QUOTATION(ucDataLen, pData, pucAtcRspBuf);
     }
     else
     {

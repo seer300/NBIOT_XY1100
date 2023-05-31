@@ -34,3 +34,8 @@ date：20230404
 
 date 20230530
 1）增加nv参数onenet_ip_type，记录并保存登录onenet的ip类型。默认值为0，所以其实并没有更改。2--ip4，10--ip6。
+
+date 20230531
+1）<130X/160X/130G> 都做相同修改
+ucIpv6AddressFormat由0改成1；ucIpv6LeadingZeros由0改成1
+目的：控制ip6地址上报格式，尽量与bc260y保持相同
