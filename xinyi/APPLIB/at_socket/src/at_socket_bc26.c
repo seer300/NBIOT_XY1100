@@ -501,7 +501,10 @@ int at_QICLOSE_req(char *at_buf, char **prsp_cmd)
 
         if ((sock_ctx_id = find_sock_ctx_id_by_sock_id(sockId)) == -1)
         {
-            *prsp_cmd = BC26_AT_ERR_BUILD();
+			//MG 20230601
+			*prsp_cmd = xy_zalloc(32);
+			sniprintf(*prsp_cmd, 32, "\r\nOK\r\n\r\nCLOSE OK\r\n");
+            //*prsp_cmd = BC26_AT_ERR_BUILD();
             return AT_END;
         }
 

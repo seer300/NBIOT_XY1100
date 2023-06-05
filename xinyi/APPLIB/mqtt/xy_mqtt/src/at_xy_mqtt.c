@@ -890,7 +890,29 @@ int MessageExtract(char *fmt_parm, char *at_str, int ascii_len, char *param_data
 	end_temp = strchr(at_str, '\r');
 	str_len = end_temp - at_str;	
 	if(!str_len)
-		return 0;	
+		return 0;
+
+	//MG 20230605
+	/* for
+	** AT+QMTPUB=0,1,1,0,"www",10,0123456789 -- ok
+	** AT+QMTPUB=0,1,1,0,"www",10,"0123456789" -- ok data:0123456789
+	** AT+QMTPUB=0,1,1,0,"www",10,"0123456789 --error
+	** and etc.
+	*/
+	if((at_str[0] == '"' && at_str[str_len-1] != '"') || (at_str[0] != '"' && at_str[str_len-1] == '"') )
+	{
+		//printf("[QMTPUB]\" head and tail not match\r\n");
+		return 8001;
+	}
+
+	if(at_str[0] == '"' && at_str[str_len-1] == '"')
+	{
+		at_str++;
+		str_len -= 2;
+		//printf("at buf %s buf len %d\r\n", at_str, str_len);
+	}
+	//MG END
+
 	if(mqttContext[tcpconnectID].data_format.send_data_format)
 	{
 		if(ascii_len*2 != str_len)
