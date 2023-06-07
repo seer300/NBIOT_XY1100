@@ -473,7 +473,13 @@ int xy_transaction_send(lwm2m_context_t *contextP,
                 timeout = COAP_RESPONSE_TIMEOUT << (4 - 1);
         }
 
-        if (COAP_MAX_RETRANSMIT + 1 >= transacP->retrans_counter)
+         /* MG 20230606
+		 ** brief change toatl timeout to 60s
+		 ** past: 4 8 16 32 32 =92s
+		 ** now:  4 8 16 32    =60s
+		 */
+        //if (COAP_MAX_RETRANSMIT + 1 >= transacP->retrans_counter)
+		if (COAP_MAX_RETRANSMIT >= transacP->retrans_counter)
         {
             ret = lwm2m_buffer_send(transacP->peerH, transacP->buffer, transacP->buffer_len, contextP->userData,((coap_packet_t *)(transacP->message))->raiflag,((coap_packet_t *)(transacP->message))->seq_num);
             output_buffer(stderr, (uint8_t *)(transacP->buffer), transacP->buffer_len, 0);

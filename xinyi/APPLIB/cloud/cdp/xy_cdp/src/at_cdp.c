@@ -1060,8 +1060,10 @@ int at_NMSTATUS_req(char *at_buf, char **prsp_cmd)
 	   snprintf(*prsp_cmd, 96, "\r\n+NMSTATUS: REGISTERED\r\n\r\nOK\r\n");
 	else if(g_softap_var_nv->cdp_lwm2m_event_status == ATINY_DEREG)
 	   snprintf(*prsp_cmd, 96, "\r\n+NMSTATUS: DEREGISTERED\r\n\r\nOK\r\n");
-	else if(g_softap_var_nv->cdp_lwm2m_event_status == ATINY_REG_FAIL || g_softap_var_nv->cdp_lwm2m_event_status == 255)
+	else if(g_softap_var_nv->cdp_lwm2m_event_status == 255)
 	   snprintf(*prsp_cmd, 96, "\r\n+NMSTATUS: UNINITIALISED\r\n\r\nOK\r\n");
+	else if(g_softap_var_nv->cdp_lwm2m_event_status == ATINY_REG_FAIL)
+        snprintf(*prsp_cmd, 96, "\r\n+NMSTATUS: TIMEOUT\r\n\r\nOK\r\n");
 	else if(g_softap_var_nv->cdp_lwm2m_event_status == 10) //服务器拒绝
 	   snprintf(*prsp_cmd, 96, "\r\n+NMSTATUS: REJECTED_BY_SERVER\r\n\r\nOK\r\n");
 	else

@@ -503,6 +503,7 @@ static uint8_t prv_register(lwm2m_context_t *contextP,
     return COAP_NO_ERROR;
 }
 
+extern int cdp_register_fail_flag;
 static void prv_handleRegistrationUpdateReply(lwm2m_transaction_t *transacP,
         void *message)
 {
@@ -531,6 +532,12 @@ static void prv_handleRegistrationUpdateReply(lwm2m_transaction_t *transacP,
         else
         {
             targetP->status = XY_STATE_REG_FAILED;
+			//MG 20230607
+			/* force to set flag and quit thread
+			** if not, reg update fail then reg. double tiemout
+			*/
+			cdp_register_fail_flag = 1;
+			//MG END
             LOG("Registration update failed");
         }
     }
