@@ -168,8 +168,17 @@ static u16_t tcp_port = 0;
 
 /* Incremented every coarse grained timer shot (typically every 500 ms). */
 u32_t tcp_ticks;
+//static const u8_t tcp_backoff[13] =
+//{ 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7};
+//20230609 MG
+/* brief reduce total timeout
+** psat 20 40 80 160 ... actual 150s
+** now  48-66 second
+*/
 static const u8_t tcp_backoff[13] =
-{ 1, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7};
+{ 0, 1, 1, 2, 3, 4, 5, 6, 6, 6, 6, 6, 6};
+//MG END
+
 /* Times per slowtmr hits */
 static const u8_t tcp_persist_backoff[7] = { 3, 6, 12, 24, 48, 96, 120 };
 

@@ -813,7 +813,7 @@ char *at_err_build(int err_no)
 
     xy_assert(err_no != 0);
     at_str = xy_malloc(50);
-    snprintf(at_str, 50, "\r\n+CME ERROR:%d\r\n", err_no);
+    snprintf(at_str, 50, "\r\n+CME ERROR: %d\r\n", err_no);
 
     return at_str;
 }
@@ -830,12 +830,12 @@ char *at_err_build_info(int err_no, char *file, int line)
 		sprintf(at_str, "\r\nERROR\r\n");
 	else if (g_softap_fac_nv->cmee_mode == 1)
 #if VER_QUCTL260
-		sprintf(at_str, "\r\n+CME ERROR:%d\r\n", get_at_err_num(err_no));
+		sprintf(at_str, "\r\n+CME ERROR: %d\r\n", get_at_err_num(err_no));
 #else
 		sprintf(at_str, "\r\n+CME ERROR:%d\r\n", err_no);
 #endif
 	else
-		sprintf(at_str, "\r\n+CME ERROR:%s\r\n", get_at_err_string(err_no));
+		sprintf(at_str, "\r\n+CME ERROR: %s\r\n", get_at_err_string(err_no));
 
 	if (g_softap_fac_nv->off_debug == 0)
 	{

@@ -554,7 +554,8 @@ typedef struct {
     uint32_t ref_pridns4;   //##1920103026("114.114.114.114"字节形式)## ipv4默认主dns服务器地址。以字节形式保存
     uint32_t ref_secdns4;   //##134744072("8.8.8.8"字节形式)## ipv4默认辅dns服务器地址。以字节形式保存
     
-    uint8_t   reserved[125];		//##0 128-2## 
+    uint8_t   reserved[124];		//##0 128-2## 
+	uint8_t   mgsleep_enable;//MG 20230609 default #0# 0-enable,1-disable
     uint8_t   onenet_ip_type;//MG 20230530 2:ip4 10:ip6
     uint8_t   mgedrxrpt_ind; //20230404 MG add for control EDRX mode "ENTER/EXIT DEEPSLEEP" URC
     uint8_t   epco_ind;    //20230217 MG add for:AT+QCFG="epco",0/1

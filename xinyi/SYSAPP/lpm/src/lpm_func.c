@@ -1349,7 +1349,7 @@ int xy_StandbyStateCheck()
 
 unsigned int LPM_Deepsleep_Allow()
 {
-	if(g_softap_fac_nv->deepsleep_enable == 1 && HAVE_FREE_LOCK == 1 && g_softap_var_nv->sleep_mode != 0 && (DSP_IS_NOT_LOADED() || g_deepsleep_dsp_ready) && user_allow_deepsleep_hook()==XY_OK)
+	if(g_softap_fac_nv->deepsleep_enable == 1 && HAVE_FREE_LOCK == 1 &&  g_softap_fac_nv->mgsleep_enable == 0 && g_softap_var_nv->sleep_mode != 0 && (DSP_IS_NOT_LOADED() || g_deepsleep_dsp_ready) && user_allow_deepsleep_hook()==XY_OK)
 	{
 		return 1;
 	}	
@@ -1362,7 +1362,7 @@ unsigned int LPM_Deepsleep_Allow()
 
 unsigned int LPM_Deepsleep_Allow_Critical()
 {
-	if( !(g_softap_fac_nv->deepsleep_enable == 1 && HAVE_FREE_LOCK == 1 && g_softap_var_nv->sleep_mode != 0 && (DSP_IS_NOT_LOADED() || g_deepsleep_dsp_ready) && at_deepsleep_Check() && user_allow_deepsleep_hook()==XY_OK) \
+	if( !(g_softap_fac_nv->deepsleep_enable == 1 && HAVE_FREE_LOCK == 1 && g_softap_fac_nv->mgsleep_enable == 0 && g_softap_var_nv->sleep_mode != 0 && (DSP_IS_NOT_LOADED() || g_deepsleep_dsp_ready) && at_deepsleep_Check() && user_allow_deepsleep_hook()==XY_OK) \
 		|| icm_buf_check())
 	{
 		return 0;

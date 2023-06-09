@@ -779,16 +779,16 @@ int at_MGSLEEP_req(char *at_buf,char **prsp_cmd)
 		}
 
 		if(strcmp("enable", mode) == 0 && strlen(mode) == strlen("enable")){
-			if(1 != g_softap_fac_nv->deepsleep_enable){
-			    g_softap_fac_nv->deepsleep_enable = 1;
-			    SAVE_FAC_PARAM(deepsleep_enable); 
+			if(0 != g_softap_fac_nv->mgsleep_enable){
+			    g_softap_fac_nv->mgsleep_enable = 0;
+			    SAVE_FAC_PARAM(mgsleep_enable); 
 			}
 		}
 		 
 		else if(strcmp("disable", mode) == 0 && strlen(mode) == strlen("disable")){
-			if(0 != g_softap_fac_nv->deepsleep_enable){
-			    g_softap_fac_nv->deepsleep_enable = 0;
-			    SAVE_FAC_PARAM(deepsleep_enable); 
+			if(1 != g_softap_fac_nv->mgsleep_enable){
+			    g_softap_fac_nv->mgsleep_enable = 1;
+			    SAVE_FAC_PARAM(mgsleep_enable); 
 			}
 		}
 	}
@@ -796,7 +796,7 @@ int at_MGSLEEP_req(char *at_buf,char **prsp_cmd)
 	else if(AT_CMD_QUERY == g_req_type){
 	    *prsp_cmd = xy_zalloc(32);
 
-		if(g_softap_fac_nv->deepsleep_enable == 1)
+		if(g_softap_fac_nv->mgsleep_enable == 0)
 			sprintf(*prsp_cmd, "\r\n+MGSLEEP: enable\r\n\r\nOK\r\n");
 		else
 			sprintf(*prsp_cmd, "\r\n+MGSLEEP: disable\r\n\r\nOK\r\n");
