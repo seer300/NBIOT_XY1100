@@ -24,12 +24,12 @@
 ** [2]MODEM模块，优化调整，R16后向兼容处理优化
 */
 
-#define MODULE_130  0
+#define MODULE_130  1
 
 #if  MODULE_130
 
-#define MODULE 		"SLM130X"
-#define TVERSION 	"T12"
+#define MODULE 		"SLM130G"
+#define TVERSION 	"T13"
 #define SDATE		"S0609"
 #define SDKVERSION	"0.2.3.C21"  /*20230224 patch03*/
 #define MVERSION	"M003"

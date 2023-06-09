@@ -663,8 +663,10 @@ void atiny_event_notify(atiny_event_e event, const char* arg, int len)
 				if(update_result == ATINY_FIRMWARE_UPDATE_SUCCESS || update_result == ATINY_FIRMWARE_UPDATE_FAIL)
                 {                
 					snprintf(rsp_cmd, buf_len, "\r\nFIRMWARE UPDATE OVER\r\n");
-                    if(update_result == ATINY_FIRMWARE_UPDATE_FAIL)
+                    if(update_result == ATINY_FIRMWARE_UPDATE_FAIL){
+						snprintf(rsp_cmd, buf_len, "\r\nFIRMWARE UPDATE FAIL\r\n");
                         xy_fota_state_hook(5);
+					}
                 }
 				else if(update_result > ATINY_FIRMWARE_UPDATE_SUCCESS && update_result < ATINY_FIRMWARE_UPDATE_FAIL)
 				{

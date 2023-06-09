@@ -2001,7 +2001,7 @@ int at_SGSW_req(char *at_buf, char **prsp_cmd)
 		*prsp_cmd = xy_zalloc(128);
        // snprintf(*prsp_cmd,128,"MeiG\r\n%s\r\n%s_%s%s",MODULE,MODULE,TVERSION,SDATE);
        //sprintf(*prsp_cmd, "\r\n%s.%s%sS%c%c%c%c_%s_XY1100\r\n\r\nOK\r\n",MODULE,SDKVERSION,TVERSION,compTime[4],compTime[5],compTime[6],compTime[7],MVERSION);
-		sprintf(*prsp_cmd, "\r\n%s.%s%s%s_%s_XY1100\r\n\r\nOK\r\n",MODULE,SDKVERSION,TVERSION,SDATE,MVERSION);
+		sprintf(*prsp_cmd, "\r\n%s.%s%s%s_%s_XY1100_FOTA\r\n\r\nOK\r\n",MODULE,SDKVERSION,TVERSION,SDATE,MVERSION);
 	}
 	else
 	{
