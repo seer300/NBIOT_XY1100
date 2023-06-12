@@ -1850,7 +1850,12 @@ int at_proc_miplconfig_req(char *at_buf, char **rsp_cmd)
 		{
 			if(cis_config_init(&cfg_tmp, g_softap_fac_nv->onenet_config_hex, g_softap_fac_nv->onenet_config_len) == 0)
 			{
-				tmp_ptr = strchr(cfg_tmp->cfgNet.host.data, ':');
+				/*MG 20230612
+				* support host parse, ip6 need find ‘:’ at the end
+				* ip4 183.230.40.40:5683/5684
+				* ip6 2409:8060:8ea:601::1864:5683
+				*/
+				tmp_ptr = strrchr(cfg_tmp->cfgNet.host.data, ':');
 				if(tmp_ptr != NULL)
 				{
 					len = tmp_ptr - cfg_tmp->cfgNet.host.data;
