@@ -654,13 +654,13 @@ int at_QISTATE_req(char *at_buf, char **prsp_cmd)
             { 
                 if (sock_ctx[sock_ctx_id]->net_type == 0)
                 {
-                    snprintf(*prsp_cmd + strlen(*prsp_cmd), 320, "\r\n+QISTATE: %d,\"TCP\",\"%s\"\r\n,%d,%d,%d,%d,%d",
+                    snprintf(*prsp_cmd + strlen(*prsp_cmd), 320, "\r\n+QISTATE: %d,\"TCP\",\"%s\",%d,%d,%d,%d,%d\r\n",
                              socket_id, sock_ctx[sock_ctx_id]->remote_ip, sock_ctx[sock_ctx_id]->remote_port, sock_ctx[sock_ctx_id]->local_port_ori,
                              sock_ctx[sock_ctx_id]->sock_state, sock_ctx[sock_ctx_id]->cid, sock_ctx[sock_ctx_id]->accessmode);
                 }
                 else
                 {
-                    snprintf(*prsp_cmd + strlen(*prsp_cmd), 320, "\r\n+QISTATE: %d,\"UDP\",\"%s\"\r\n,%d,%d,%d,%d,%d",
+                    snprintf(*prsp_cmd + strlen(*prsp_cmd), 320, "\r\n+QISTATE: %d,\"UDP\",\"%s\",%d,%d,%d,%d,%d\r\n",
                              socket_id, sock_ctx[sock_ctx_id]->remote_ip, sock_ctx[sock_ctx_id]->remote_port, sock_ctx[sock_ctx_id]->local_port_ori,
                              sock_ctx[sock_ctx_id]->sock_state, sock_ctx[sock_ctx_id]->cid, sock_ctx[sock_ctx_id]->accessmode);
                 }
