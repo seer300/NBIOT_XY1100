@@ -1291,7 +1291,8 @@ uint32_t    cis_pump(void* context)
                     core_updatePumpState(ctx, PUMP_STATE_UNREGISTER);
                 }
                 //max retransmit timeout, if COAP_RESPONSE_TIMEOUT=4,COAP_MAX_RETRANSMIT=4, then timeout=124
-				if(ctx->lasttime == 0 || tv_sec - ctx->lasttime > 122)
+				//now COAP_RESPONSE_TIMEOUT=2,COAP_MAX_RETRANSMIT=4 timeout=62
+				if(ctx->lasttime == 0 || tv_sec - ctx->lasttime > 61)
                 {
                     core_callbackEvent(context,CIS_EVENT_BOOTSTRAP_FAILED,NULL);
                     core_updatePumpState(ctx, PUMP_STATE_UNREGISTER);

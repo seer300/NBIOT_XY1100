@@ -33,7 +33,7 @@
 onenet_context_config_t onenet_context_configs[CIS_REF_MAX_NUM] = {0};
 onenet_context_reference_t onenet_context_refs[CIS_REF_MAX_NUM] = {0};
 
-uint8_t g_ONENET_ACK_TIMEOUT = 4;
+uint8_t g_ONENET_ACK_TIMEOUT = 2;//MG 20230619
 uint8_t g_notify_raiflag = 0;  
 
 //static int onenet_out_fd;
@@ -2550,7 +2550,7 @@ int at_proc_miplopen_req(char *at_buf, char **rsp_cmd)
 		if(timeout == -1)
 			onenet_context_refs[0].onenet_user_config.bs_timeout = 0x1E; //30s  //cjh add 20230215 for bc260y
 		else if (timeout >= 1 && timeout <= 0xFFFF)
-            onenet_context_refs[0].onenet_user_config.bs_timeout = timeout; //MG 20230516
+            onenet_context_refs[0].onenet_user_config.bs_timeout = timeout>60? 60 : timeout; //MG 20230516
 		else
 			goto param_error;
 #endif
