@@ -1166,6 +1166,7 @@ void registration_deregister(st_context_t * contextP)
         transaction->callback = prv_handleDeregistrationReply;
         transaction->userData = (void *) contextP;
         transaction->server = serverP;
+		transaction->trans_business = TRANS_DEREG;//20230626 MG
         contextP->transactionList = (st_transaction_t *)CIS_LIST_ADD(contextP->transactionList, transaction);
         if (transaction_send(contextP, transaction, PS_SOCK_RAI_NO_INFO) == TRUE)
         {

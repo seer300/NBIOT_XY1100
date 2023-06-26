@@ -555,6 +555,15 @@ struct st_firmware_serialize
     uint8_t  reserved2[8];
 };
 
+//20230626 MG
+typedef enum{
+	TRANS_REG,
+	TRANS_UPDATE,
+	TRANS_SEND,
+	TRANS_RECV,
+	TRANS_DEREG,
+}trans_business_t;
+//MG END
 
 struct st_transaction
 {
@@ -574,6 +583,7 @@ struct st_transaction
     uint8_t *           buffer;
     cis_transaction_callback_t callback;
     void *              userData;
+	trans_business_t    trans_business;//reg 0 | update 1 | send data 2 | recv response 3 | dereg 4
 };
 #if CIS_ENABLE_UPDATE
 //response struct
