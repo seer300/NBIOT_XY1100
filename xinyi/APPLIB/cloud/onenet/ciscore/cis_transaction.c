@@ -109,7 +109,6 @@ Contains code snippets which are:
 #include "xy_utils.h"
 #include "cis_internals.h"
 #include "cis_log.h"
-#include "at_onenet.h"//20230626 MG
 
 static int prv_checkFinished(st_transaction_t * transacP,
                              coap_packet_t * receivedMessage)
@@ -311,8 +310,6 @@ void transaction_removeAll(st_context_t* contextP)
     contextP->transactionList = NULL;
 }
 
-extern onenet_context_reference_t onenet_context_refs[CIS_REF_MAX_NUM];
-
 bool transaction_handleResponse(st_context_t * contextP,
                                  coap_packet_t * message,
                                  coap_packet_t * response)
@@ -336,15 +333,6 @@ bool transaction_handleResponse(st_context_t * contextP,
                     transacP->ackReceived = true;
                     reset = (COAP_TYPE_RST == message->type ? true : false);
                     LOGD("trans resp id:%d,reset:%d",message->mid,reset);
-					
-					//20230626 MG
-					if(transacP->trans_business == TRANS_DEREG){
-						if(COAP_TYPE_ACK == message->type)
-							core_updatePumpState((&onenet_context_refs[0])->onenet_context, PUMP_STATE_UNREGISTER);
-						//else
-							//handle rst error;
-					}
-					
                 }else
                 {
                     LOGD("trans resp mid with (%d vs %d)",transacP->mID,message->mid);
@@ -569,16 +557,6 @@ bool transaction_send(st_context_t * contextP,
 		if (transacP->callback)
 		{
 			transacP->callback(transacP, NULL);
-			
-			//20230626 MG
-			if(transacP->trans_business == TRANS_DEREG)
-			{
-				//dereg timeout urc, 16=DEREG TIMEOUT
-				//send_urc_to_ext("+MIPLEVENT: DEREG TIMEOUT\r\n");
-				send_urc_to_ext("\r\n+MIPLEVENT: 0,16\r\n");
-			}
-			//MG END
-
 		}
 		transaction_remove(contextP, transacP);
 		return false;

@@ -1038,12 +1038,7 @@ cis_ret_t    cis_unregister(void* context)
 		return CIS_RET_PARAMETER_ERR;
 	}
 	LOGD("api cis_unregister");
-	
-	//20230626 MG: only send delete request
-	//core_updatePumpState(ctx, PUMP_STATE_UNREGISTER);
-    registration_deregister(ctx);
-	//MG END
-	
+	core_updatePumpState(ctx, PUMP_STATE_UNREGISTER);
 	//[XY]Add for onenet loop
 	if(cis_poll_sem != NULL)
 		osSemaphoreRelease(cis_poll_sem);
@@ -1565,8 +1560,7 @@ uint32_t    cis_pump(void* context)
 
 	case PUMP_STATE_UNREGISTER:
 	{
-		//20230626 MG: the state only for clearing resource
-		//registration_deregister(ctx);
+		registration_deregister(ctx);
 #if CIS_ENABLE_UPDATE 
 
 		if (ctx->device_inst != NULL)

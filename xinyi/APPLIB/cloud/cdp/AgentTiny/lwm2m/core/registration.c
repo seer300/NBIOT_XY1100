@@ -781,12 +781,7 @@ static void prv_handleDeregistrationReply(lwm2m_transaction_t *transacP,
                 LOG("Deregistration Success!");
             }
             else
-            {
                 LOG("Deregistration failed!");
-                //send_urc_to_ext("+QLWEVTIND: DEREG TIMEOUT\r\n");
-				//20230626 MG: <ctwing> dereg timeout urc 
-                send_urc_to_ext("\r\n+QLWEVTIND: 11\r\n");
-            }
 
             cdp_deregister_flag = 1;
             //delete_lwm2m_task();
