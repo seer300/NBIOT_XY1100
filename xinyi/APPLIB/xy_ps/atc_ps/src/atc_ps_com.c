@@ -2386,7 +2386,7 @@ void AtcAp_OutputLocalTime(LNB_NAS_LOCAL_TIME_STRU* pLocalTime)
 
         AtcAp_ConvertTimeZone(aucUtAndLtz, ucDayLightTime);
 
-        AtcAp_StrPrintf_AtcRspBuf((const char *)"20%d%d/%d%d/%d%d,%d%d:%d%d:%d%d",
+        AtcAp_StrPrintf_AtcRspBuf((const char *)"\"20%d%d/%d%d/%d%d,%d%d:%d%d:%d%d\"",//MG 20230706 add""
             aucUtAndLtz[0] / 10,aucUtAndLtz[0] % 10,
             aucUtAndLtz[1] / 10,aucUtAndLtz[1] % 10,
             aucUtAndLtz[2] / 10,aucUtAndLtz[2] % 10,
