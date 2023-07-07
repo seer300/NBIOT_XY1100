@@ -168,6 +168,7 @@ static void query_dns_task(void *dnsquery)
     int ret = 0;
 	uint8_t inetv6_need = 0;
 	uint8_t do_again = 0;
+	uint8_t	ipv4v6_ip4_err = 0;
 
 //MG 20230527
 	if(g_netifIp_type == IPADDR_TYPE_V6)
@@ -201,9 +202,31 @@ again:
 			strcpy(rsp_cmd, "\r\n+QDNS:QUERY_DNS_FAILED\r\n");
 		else if (dns_query->query_type == BC26DNS)
 		{
-            snprintf(rsp_cmd, 32, "\r\n+QIDNSGIP: %d\r\n", get_bc26_tcpip_errcode(ret));
-			strcpy(rsp_cmd + strlen(rsp_cmd) - 1, "\r\n");
-			send_rsp_str_to_ext(rsp_cmd);
+		    if(g_netifIp_type == IPADDR_TYPE_ANY){
+				//ip4 fail and try ip6.domain only with ip6 is not familiar
+				if(hint.ai_family == AF_INET){
+					do_again = 1;
+					ipv4v6_ip4_err = 1;
+					inetv6_need = 0;
+			    	goto again;
+				}
+				else if(hint.ai_family == AF_INET6){
+					if(ipv4v6_ip4_err){
+						//ip4&ip6 domain parse fail and reporturc
+						snprintf(rsp_cmd, 32, "\r\n+QIDNSGIP: %d\r\n", get_bc26_tcpip_errcode(ret));
+						send_rsp_str_to_ext(rsp_cmd);
+						ipv4v6_ip4_err = 0;
+						goto END;
+					}	
+					else
+						goto END;//only ip6 fail and no urc
+				}
+			}
+			else{
+	            snprintf(rsp_cmd, 32, "\r\n+QIDNSGIP: %d\r\n", get_bc26_tcpip_errcode(ret));
+				strcpy(rsp_cmd + strlen(rsp_cmd) - 1, "\r\n");
+				send_rsp_str_to_ext(rsp_cmd);
+			}
         }
             
 		goto END;
