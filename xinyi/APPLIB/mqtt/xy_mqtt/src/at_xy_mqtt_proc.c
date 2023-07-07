@@ -82,6 +82,7 @@ mqtt_context_t *mqttCreateContext(int tcpconnectID, char *mqttUri, int mqttPort,
 	mqttContext[idx].timeout_data.pkt_timeout = MQTT_PKT_TIMEOUT_DEFAULT;
 	mqttContext[idx].timeout_data.retry_times = MQTT_RETRY_TIMES_DEFAULT;
 	mqttContext[idx].timeout_data.timeout_notice = MQTT_TIMEOUT_NOTICE_DEFAULT;
+	mqttContext[idx].echo_mode = MQTT_ECHOMODE_DEFAULT;//MG 20230707
 		
 	return &mqttContext[idx];
 }
