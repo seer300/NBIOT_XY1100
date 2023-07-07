@@ -679,7 +679,7 @@ void atiny_event_notify(atiny_event_e event, const char* arg, int len)
                 if(cdp_wait_sem == NULL)
                     cdp_wait_sem = osSemaphoreNew(0xFFFF, 0, NULL);
                 osSemaphoreRelease(cdp_wait_sem); 
-				snprintf(rsp_cmd, buf_len, "\r\nFIRMWARE DOWNLOADING\r\n");
+				snprintf(rsp_cmd, buf_len, "\r\n+QLWEVTIND: 8\r\n\r\nFIRMWARE DOWNLOADING\r\n");
 
 
                 xy_fota_state_hook(0);

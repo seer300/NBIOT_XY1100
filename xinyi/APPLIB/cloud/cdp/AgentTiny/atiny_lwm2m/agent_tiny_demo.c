@@ -1059,7 +1059,8 @@ void cdp_netif_event_callback(PsNetifStateChangeEvent event)
 
 
     //20230310 MG
-	if((/*get_sys_up_stat() == UTC_WAKEUP ||*/ get_sys_up_stat() == EXTPIN_WAKEUP) && CDP_NEED_RECOVERY(g_softap_var_nv->cdp_lwm2m_event_status))
+	//MG 20230707 revert
+	if((get_sys_up_stat() == UTC_WAKEUP || get_sys_up_stat() == EXTPIN_WAKEUP) && CDP_NEED_RECOVERY(g_softap_var_nv->cdp_lwm2m_event_status))
 	{
 		static uint8_t register_notify = 0;
 		if(!register_notify)
