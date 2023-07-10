@@ -1,0 +1,6 @@
+date 20230710
+1）编译130X 160X或130G相应版本时，务必把allbin文件中factoryNV文件替换。
+例如，编译130G，需要把130G_factoryNV下面的文件替换到allbin文件中
+2）feature.mk文件中宏MG_DFOTA_SUPPORT默认关闭，为n。
+编译130X与160X时无须改动，编译130G需要改成y。
+MG_DFOTA_SUPPORT是控制DFOTA功能的宏，而DFOTA是为130G增加的功能，130X与160X目前不需要。
