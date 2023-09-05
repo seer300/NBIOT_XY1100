@@ -292,12 +292,13 @@ int set_cdp_server_ip_addr_str(char *ip_addr_str)
 			return XY_ERR;
     	}
 	}
+#if 0 // bugID(2658) 2000062257.nb.ctwing.cn	
 	else
 	{
 		if(domain_check(ip_addr_str) == XY_ERR)
 			return XY_ERR;
 	}
-	
+#endif
 	if(strcmp(g_softap_fac_nv->cloud_server_ip,ip_addr_str))
 	{	
 		memset(g_softap_fac_nv->cloud_server_ip, 0x00, sizeof(g_softap_fac_nv->cloud_server_ip));
