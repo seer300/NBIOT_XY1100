@@ -24,22 +24,22 @@
 ** [2]MODEM模块，优化调整，R16后向兼容处理优化
 */
 
-#define MODULE_130  1
+#define MODULE_130  0
 
 #if  MODULE_130
 
 #define MODULE 		"SLM130G"
-#define TVERSION 	"T17"
-#define SDATE		"S0905"
+#define TVERSION 	"T16"
+#define SDATE		"S0707"
 #define SDKVERSION	"0.2.3.C21"  /*20230224 patch03*/
 #define MVERSION	"M003"
 #define SI_NUM		HAL_GPIO_PIN_NUM_13
 
 #else
 
-#define MODULE 		"SLM160X"
-#define TVERSION 	"T15"
-#define SDATE		"S0707"
+#define MODULE 		"SLM130X"
+#define TVERSION 	"T16"
+#define SDATE		"S0905"
 #define SDKVERSION	"0.2.3.C21"
 #define MVERSION	"M003"
 #define SI_NUM		HAL_GPIO_PIN_NUM_11
