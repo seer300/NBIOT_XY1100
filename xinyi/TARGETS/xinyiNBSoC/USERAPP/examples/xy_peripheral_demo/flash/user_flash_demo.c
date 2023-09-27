@@ -8,7 +8,7 @@
 * @par			目前芯翼的flash寿命为10万次，当写频率小于一小时，必须考虑磨损机制，否则无法达到10年使用期限。
 */
 
-#if 1//DEMO_TEST
+#if DEMO_TEST
 
 #include "xy_api.h"
 #include "at_xy_cmd.h"

@@ -24,13 +24,13 @@
 ** [2]MODEM模块，优化调整，R16后向兼容处理优化
 */
 
-#define MODULE_130  0
+#define MODULE_130  1
 
 #if  MODULE_130
 
 #define MODULE 		"SLM130G"
-#define TVERSION 	"T16"
-#define SDATE		"S0707"
+#define TVERSION 	"T17"
+#define SDATE		"S0927"
 #define SDKVERSION	"0.2.3.C21"  /*20230224 patch03*/
 #define MVERSION	"M003"
 #define SI_NUM		HAL_GPIO_PIN_NUM_13
@@ -77,4 +77,5 @@ int at_QATWAKEUP_req(char *at_buf, char **prsp_cmd);
 int at_QCGDEFCONT_req(char *at_buf,char **prsp_cmd);
 int at_MGEDRXRPT_rep(char *at_buf,char **prsp_cmd);
 int at_QFOTADL_req(char *at_buf,char **prsp_cmd);
+int at_130G_NIDD_req(char *at_buf, char **prsp_cmd);
 

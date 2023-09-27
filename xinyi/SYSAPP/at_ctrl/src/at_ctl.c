@@ -683,8 +683,8 @@ void sys_up_urc()
 	
 	at_str = xy_zalloc(64);
 	
-	init_user_flash();
-	read_user_nv_demo();
+	//init_user_flash();
+	//read_user_nv_demo();
 
 	//20230309 MG add
 	//g_RTC_wakeup_type 0,NULL;1,wakeup by PS;2,wakeup by other UTC

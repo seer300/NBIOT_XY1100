@@ -4120,6 +4120,7 @@ void AtcAp_MsgProc_QNIDD_Cnf(unsigned char* pRecvMsg)
     AtcAp_SendDataInd();
 }
 
+extern void NIDD_buffer_write(char *nidd_data, int data_len);
 void AtcAp_MsgProc_QNIDD_Ind(unsigned char* pRecvMsg)
 {
     unsigned char           index    = 0;
@@ -4130,7 +4131,7 @@ void AtcAp_MsgProc_QNIDD_Ind(unsigned char* pRecvMsg)
 
     AtcAp_MemCpy((unsigned char*)&tQnidd, pRecvMsg, offsetof(ATC_MSG_QNIDD_IND_STRU, pucData));
     tQnidd.pucData = pRecvMsg + offsetof(ATC_MSG_QNIDD_IND_STRU, pucData);
-
+#if 0
     pInd = (unsigned char *)AtcAp_Malloc(D_ATC_QNIDD_IND_LENGTH + 512 * 2 + 1);
     while(offset < tQnidd.usDataLen)
     {
@@ -4147,5 +4148,9 @@ void AtcAp_MsgProc_QNIDD_Ind(unsigned char* pRecvMsg)
     }
     
     AtcAp_Free(pInd);
+#else
+	NIDD_buffer_write(tQnidd.pucData,tQnidd.usDataLen);
+#endif
+	 
 }
 
