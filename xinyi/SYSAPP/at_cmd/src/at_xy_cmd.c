@@ -2265,3 +2265,100 @@ int at_MGEDRXRPT_rep(char *at_buf, char **prsp_cmd)
 }
 //add end
 
+int NIDD_BUFFER_ED = 0 ;
+char *NIDD_STORAGE = NULL;
+#define MAX_NIDD_BUFFER 1000*100
+
+void NIDD_buffer_write(char *nidd_data, int data_len)
+{
+	xy_printf("[%s][%d]data_len[%d]", __func__, __LINE__, data_len);
+	if(data_len + NIDD_BUFFER_ED > MAX_NIDD_BUFFER)
+	{
+		// tbc : send to UART
+		char *var1 = xy_zalloc(data_len * 2 + 1);
+		char *var2 = xy_zalloc(data_len * 2 + 40);
+		bytes2hexstr(nidd_data,data_len,var1,data_len * 2 + 1);
+		sprintf(var2,"\r\n+QNIDD:4,0,%d,0,%s\r\n", data_len,var1);
+		send_urc_to_ext(var2);
+		xy_free(var1);
+		var1=NULL;
+		xy_free(var2);
+		var2=NULL;
+	}
+	else
+	{
+		// tbc : downlink URC notification
+		char *con_mid = xy_zalloc(40);
+		sprintf(con_mid,"\r\n+QNIDD:4,0,%d\r\n", data_len);
+		send_urc_to_ext(con_mid);
+		xy_free(con_mid);
+		con_mid=NULL;
+
+		if((NIDD_STORAGE == NULL) && (NIDD_BUFFER_ED == 0))
+		{
+			NIDD_STORAGE = xy_zalloc(MAX_NIDD_BUFFER);
+			memcpy(NIDD_STORAGE,nidd_data,data_len);
+			NIDD_BUFFER_ED += data_len;
+		}
+		else
+		{
+			memcpy(NIDD_STORAGE + NIDD_BUFFER_ED, nidd_data, data_len);
+			NIDD_BUFFER_ED += data_len;
+		}
+	}
+}
+
+void NIDD_buffer_read(int data_read, char **prsp)
+{
+	xy_printf("[%s][%d]data_read[%d]bufferd[%d]", __func__, __LINE__, data_read, NIDD_BUFFER_ED);
+	if(NIDD_BUFFER_ED == 0)
+	{
+		return;
+	}
+	data_read = (data_read > NIDD_BUFFER_ED) ? NIDD_BUFFER_ED : data_read ;
+	char *var1 = xy_zalloc(data_read * 2 + 1); 
+	*prsp = xy_zalloc(data_read * 2 + 40); 
+	bytes2hexstr(NIDD_STORAGE,data_read,var1,data_read * 2 + 1);
+	sprintf(*prsp,"\r\n+QNIDD:%d,%s\r\n\r\nOK\r\n", data_read,var1);
+	xy_free(var1);
+	var1 = NULL;
+	NIDD_BUFFER_ED -= data_read;
+	memmove(NIDD_STORAGE, NIDD_STORAGE + data_read, NIDD_BUFFER_ED);
+}
+int at_130G_NIDD_req(char *at_buf, char **prsp_cmd)
+{
+	if( g_req_type == AT_CMD_REQ)
+	{
+		int var1;
+		if (at_parse_param("%d", at_buf, &var1) != AT_OK)
+		{
+			*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
+			return AT_END;
+		}
+		switch (var1)
+		{
+			case 5:
+			{
+				int var2 = 0;
+				if (at_parse_param(",%d", at_buf, &var2) != AT_OK)
+				{
+					*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
+					return AT_END;
+				}
+				NIDD_buffer_read(var2,prsp_cmd);
+				break;
+			}
+			case 6:
+			{
+				*prsp_cmd = xy_zalloc(40);
+				sprintf(*prsp_cmd, "\r\n+QNIDD:%d\r\n\r\nOK\r\n",NIDD_BUFFER_ED);
+				break;
+			}
+			default:
+				return AT_FORWARD;	
+		}
+		return AT_END;
+	}
+	return AT_FORWARD;
+}
+
