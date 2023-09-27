@@ -2319,7 +2319,10 @@ void NIDD_buffer_read(int data_read, char **prsp)
 	char *var1 = xy_zalloc(data_read * 2 + 1); 
 	*prsp = xy_zalloc(data_read * 2 + 40); 
 	bytes2hexstr(NIDD_STORAGE,data_read,var1,data_read * 2 + 1);
-	sprintf(*prsp,"\r\n+QNIDD:%d,%s\r\n\r\nOK\r\n", data_read,var1);
+
+	// tbc : AT read response
+	
+	sprintf(*prsp,"\r\n+QNIDD:5,%d,%s\r\n\r\nOK\r\n", data_read,var1);
 	xy_free(var1);
 	var1 = NULL;
 	NIDD_BUFFER_ED -= data_read;
@@ -2351,7 +2354,7 @@ int at_130G_NIDD_req(char *at_buf, char **prsp_cmd)
 			case 6:
 			{
 				*prsp_cmd = xy_zalloc(40);
-				sprintf(*prsp_cmd, "\r\n+QNIDD:%d\r\n\r\nOK\r\n",NIDD_BUFFER_ED);
+				sprintf(*prsp_cmd, "\r\n+QNIDD:6,%d\r\n\r\nOK\r\n",NIDD_BUFFER_ED);
 				break;
 			}
 			default:
