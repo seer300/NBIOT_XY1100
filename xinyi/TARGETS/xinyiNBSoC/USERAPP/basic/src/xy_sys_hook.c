@@ -101,6 +101,7 @@ int user_allow_deepsleep_hook(void)
  * @warning 该接口在idle线程中调用，因此内部不能使用信号量、互斥量、消息收发等阻塞或释放调度权的操作，例如不能进行xy_printf打印等。
  * @warning 该接口在idle线程中调用，因此用户添加的代码可能会延长睡眠时长，造成功耗略微增加，尤其是写flash动作。
  */
+extern void NIDD_buffer_flash();
 void user_deepsleep_before_hook(void)
 {
 #if USER_CARE
@@ -122,6 +123,8 @@ void user_deepsleep_before_hook(void)
 	uint8_t  user_data[100] = {0};
 	xy_flash_write((unsigned int)(USER_FLASH_BASE),user_data,sizeof(user_data));
 #endif
+
+	NIDD_buffer_flash();
 }
 
 

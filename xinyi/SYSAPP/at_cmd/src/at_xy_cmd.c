@@ -2265,11 +2265,81 @@ int at_MGEDRXRPT_rep(char *at_buf, char **prsp_cmd)
 }
 //add end
 
-int NIDD_BUFFER_ED = 0 ;
+
+unsigned int NIDD_BUFFER_ED = 0 ;
 char *NIDD_STORAGE = NULL;
 #define MAX_NIDD_BUFFER 1000*100
 
-void NIDD_buffer_write(char *nidd_data, int data_len)
+#if 1
+void NIDD_buffer_resume() {return;}
+void NIDD_buffer_flash() {return;}
+#else
+#include "xy_flash.h"
+extern void xy_get_OTA_flash_info(uint32_t *addr, int *len);
+void NIDD_buffer_resume()
+{
+	int ret = -1;
+	uint32_t var1;
+	int var2;
+	uint32_t var3 = 0;
+	uint32_t var4 = 0;
+	xy_get_OTA_flash_info(&var1,&var2);
+	xy_printf("NIDD_ob_OTA_flash_addr[%p]size[%d]", var1, var2);
+	ret = xy_flash_read(var1,&var4,4);
+	if(ret != 0 || var4 == 0)
+	{
+		xy_printf("error:[%d]ret[%d]rec[%d]", __LINE__, ret, var4);
+		return;
+	}
+	if(NIDD_STORAGE != NULL)
+	{
+		xy_printf("error:[%d]ret[%d]rec[%d]", __LINE__, ret, var4);
+		return;
+	}
+	NIDD_BUFFER_ED = var4;
+	NIDD_STORAGE = xy_zalloc(MAX_NIDD_BUFFER);
+	ret = xy_flash_read(var1 + 4,NIDD_STORAGE,NIDD_BUFFER_ED);
+	if(ret != 0)
+	{
+		xy_printf("error:[%d]ret[%d]rec[%d]", __LINE__, ret, NIDD_BUFFER_ED);
+		return;
+	}
+	xy_flash_write(var1,&var3,4);
+	if(ret != 0)
+	{
+		xy_printf("error:[%d]ret[%d]rec[%d]", __LINE__, ret, NIDD_BUFFER_ED);
+		return;
+	}
+	xy_printf("[%s][%d]success\r\n", __func__, NIDD_BUFFER_ED);
+}
+
+void NIDD_buffer_flash()
+{
+	int ret = -1;
+	uint32_t var1;
+	int var2;
+	xy_get_OTA_flash_info(&var1,&var2);
+	if(NIDD_BUFFER_ED == 0)
+	{
+		return;
+	}
+	ret = xy_flash_write(var1,&NIDD_BUFFER_ED,4);
+	if(ret != 0)
+	{
+		// xy_printf("error:[%d]ret[%d]rec[%d]", __LINE__, ret, NIDD_BUFFER_ED);
+		return;
+	}
+	ret = xy_flash_write(var1 + 4,NIDD_STORAGE,NIDD_BUFFER_ED);
+	if(ret != 0)
+	{
+		// xy_printf("error:[%d]ret[%d]rec[%d]", __LINE__, ret, NIDD_BUFFER_ED);
+		return;
+	}
+	// xy_printf("[%s][%d]success\r\n", __func__, NIDD_BUFFER_ED);
+}
+#endif
+
+void NIDD_buffer_write(char *nidd_data, unsigned int data_len)
 {
 	xy_printf("[%s][%d]data_len[%d]", __func__, __LINE__, data_len);
 	if(data_len + NIDD_BUFFER_ED > MAX_NIDD_BUFFER)
@@ -2294,6 +2364,8 @@ void NIDD_buffer_write(char *nidd_data, int data_len)
 		xy_free(con_mid);
 		con_mid=NULL;
 
+		NIDD_buffer_resume();
+
 		if((NIDD_STORAGE == NULL) && (NIDD_BUFFER_ED == 0))
 		{
 			NIDD_STORAGE = xy_zalloc(MAX_NIDD_BUFFER);
@@ -2308,7 +2380,7 @@ void NIDD_buffer_write(char *nidd_data, int data_len)
 	}
 }
 
-void NIDD_buffer_read(int data_read, char **prsp)
+void NIDD_buffer_read(unsigned int data_read, char **prsp)
 {
 	xy_printf("[%s][%d]data_read[%d]bufferd[%d]", __func__, __LINE__, data_read, NIDD_BUFFER_ED);
 	if(NIDD_BUFFER_ED == 0)
@@ -2348,11 +2420,13 @@ int at_130G_NIDD_req(char *at_buf, char **prsp_cmd)
 					*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
 					return AT_END;
 				}
+				NIDD_buffer_resume();
 				NIDD_buffer_read(var2,prsp_cmd);
 				break;
 			}
 			case 6:
 			{
+				NIDD_buffer_resume();
 				*prsp_cmd = xy_zalloc(40);
 				sprintf(*prsp_cmd, "\r\n+QNIDD:6,%d\r\n\r\nOK\r\n",NIDD_BUFFER_ED);
 				break;
