@@ -75,6 +75,10 @@ ifeq ($(XY_ASYNC_SOCKET_SUPPORT),y)
 -include $(APPLIB_SRC_DIR)/xy_async_socket/xy_async_socket.mk
 endif
 
+ifeq ($(XY_FS_SUPPORT),y)
+-include $(APPLIB_SRC_DIR)/fs/fs.mk
+endif
+
 ####################################################################################################
 # APPLIB_EXCLUDE_LIB   SRCS_APPLIB_FILE   DEPS_PATH_APPLIB
 # these variable is defined and assignment in include makefile
