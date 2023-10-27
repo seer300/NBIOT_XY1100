@@ -1121,7 +1121,7 @@ void mqttTaskSendProcess(void* argument)
 				mqttCurContext->state &= ~MQTT_STATE_SUBSCRIBE;
 				if (res != SUCCESS) {
 					//mqttDeleteContext(mqttCurContext);
-					mqttCurContext->is_used = MQTT_CONTEXT_CONFIGED;//20230706
+					//mqttCurContext->is_used = MQTT_CONTEXT_CONFIGED;//20230706
 					char* rsp = xy_malloc(48);
 					snprintf(rsp, 48, "\r\n+QMTSUB: %d,%d,%d\r\n", msg->tcpconnectID, msg->msg_id, 2);
 					send_urc_to_ext(rsp);
@@ -1163,7 +1163,7 @@ void mqttTaskSendProcess(void* argument)
 				mqttCurContext->state &= ~MQTT_STATE_UNSUBSCRIBE;
 				if (res != SUCCESS) {
 					//mqttDeleteContext(mqttCurContext);
-					mqttCurContext->is_used = MQTT_CONTEXT_CONFIGED;//20230706
+					//mqttCurContext->is_used = MQTT_CONTEXT_CONFIGED;//20230706
 					char *rsp = xy_malloc(48);
 					snprintf(rsp, 48, "\r\n+QMTUNS: %d,%d,%d\r\n", msg->tcpconnectID, msg->msg_id, 2);
 					send_urc_to_ext(rsp);
@@ -1194,7 +1194,7 @@ void mqttTaskSendProcess(void* argument)
 				mqttCurContext->state &= ~MQTT_STATE_PUBLISH;
 				if (res != SUCCESS) {
 					//mqttDeleteContext(mqttCurContext);
-					mqttCurContext->is_used = MQTT_CONTEXT_CONFIGED;//20230706
+					//mqttCurContext->is_used = MQTT_CONTEXT_CONFIGED;//20230706
 					char *rsp = xy_malloc(48);
 					snprintf(rsp, 48, "\r\n+QMTPUB: %d,%d,%d\r\n", msg->tcpconnectID, msg->msg_id, 2);
 					send_urc_to_ext(rsp);	
@@ -1232,6 +1232,11 @@ void mqttTaskSendProcess(void* argument)
 						if (errno == ECONNABORTED || errno == ECONNRESET || errno == ENOTCONN || errno == EBADE) {
 							mqttCloseClient(mqttCurContext);
 							//mqttDeleteContext(mqttCurContext);MG20230706
+							if (mqttCurContext->addrinfo_data.host != NULL)  // added by LGF 20231027
+							{
+						  		xy_free(mqttCurContext->addrinfo_data.host);
+						  		mqttCurContext->addrinfo_data.host = NULL;
+							}
 							mqttCurContext->is_used = MQTT_CONTEXT_CONFIGED;
 							char* rsp = xy_malloc(48);
 							snprintf(rsp, 48, "\r\n+QMTSTAT: %d,%d\r\n", msg->tcpconnectID, 1);
@@ -1254,6 +1259,11 @@ void mqttTaskSendProcess(void* argument)
 				else {
 						mqttCloseClient(mqttCurContext);
 						//mqttDeleteContext(mqttCurContext);//20230706
+						if (mqttCurContext->addrinfo_data.host != NULL)  // added by LGF 20231027
+						{
+					  		xy_free(mqttCurContext->addrinfo_data.host);
+					  		mqttCurContext->addrinfo_data.host = NULL;
+						}
 						mqttCurContext->is_used = MQTT_CONTEXT_CONFIGED;
 						char *rsp = xy_malloc(48);
 						snprintf(rsp, 48, "\r\n+QMTSTAT: %d,%d\r\n", msg->tcpconnectID, 2);
@@ -1265,6 +1275,11 @@ void mqttTaskSendProcess(void* argument)
 			case MQTT_TCP_DISCONN_UNEXPECTED_REQ: {
 				mqttCloseClient(mqttCurContext);
 				//mqttDeleteContext(mqttCurContext);//MG 20230706
+				if (mqttCurContext->addrinfo_data.host != NULL)  // added by LGF 20231027
+				{
+			  		xy_free(mqttCurContext->addrinfo_data.host);
+			  		mqttCurContext->addrinfo_data.host = NULL;
+				}
 				mqttCurContext->is_used = MQTT_CONTEXT_CONFIGED;
 				char *rsp = xy_malloc(48);
 				snprintf(rsp, 48, "\r\n+QMTSTAT: %d,%d\r\n", msg->tcpconnectID, 1);
