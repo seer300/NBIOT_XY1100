@@ -181,6 +181,11 @@ int bc26_socket_send_data(char *data, uint32_t len, int rai_flag, socket_context
     return XY_OK;
 }
 
+#if 1  // added by LGF 20231028
+extern osTimerId_t passthr_timer;
+extern passthr_timeout_callback(uint16_t *timer);
+#endif
+
 void passthr_socket_send_proc(void* param)
 {
     UNUSED_ARG(param);
@@ -208,6 +213,15 @@ void passthrough_socket_init()
         thread_attr.stack_size = 0x800;
         passthr_sock_send_thd = osThreadNew((osThreadFunc_t)passthr_socket_send_proc, NULL, &thread_attr);
     }
+#if 1   // added by LGF 20231028 
+	if (passthr_timer == NULL)
+	{
+		osTimerAttr_t timer_attr = {0};
+		timer_attr.name = "skt_ptr_timer";
+    	passthr_timer = osTimerNew((osTimerFunc_t)(passthr_timeout_callback), osTimerOnce, NULL, &timer_attr);
+		osTimerStart(passthr_timer, 60*1000);
+	}
+#endif	
 }
 
 static void bc26_socket_open_task(void* param)
@@ -582,13 +596,13 @@ int at_QISTATE_req(char *at_buf, char **prsp_cmd)
 #else
 					if (sock_ctx[sock_ctx_id]->net_type == 0)
                     {
-                        snprintf(*prsp_cmd + strlen(*prsp_cmd), 320, "\r\n+QISTATE:%d,\"TCP\",\"%s\",%d,%d,%d,%d",
+                        snprintf(*prsp_cmd + strlen(*prsp_cmd), 320, "\r\n+QISTATE: %d,\"TCP\",\"%s\",%d,%d,%d,%d",
                                  socket_id, sock_ctx[sock_ctx_id]->remote_ip, sock_ctx[sock_ctx_id]->remote_port, 
                                  sock_ctx[sock_ctx_id]->sock_state, sock_ctx[sock_ctx_id]->cid, sock_ctx[sock_ctx_id]->accessmode);
                     }
                     else
                     {
-                        snprintf(*prsp_cmd + strlen(*prsp_cmd), 320, "\r\n+QISTATE:%d,\"UDP\",\"%s\",%d,%d,%d,%d",
+                        snprintf(*prsp_cmd + strlen(*prsp_cmd), 320, "\r\n+QISTATE: %d,\"UDP\",\"%s\",%d,%d,%d,%d",
                                  socket_id, sock_ctx[sock_ctx_id]->remote_ip, sock_ctx[sock_ctx_id]->remote_port, 
                                  sock_ctx[sock_ctx_id]->sock_state, sock_ctx[sock_ctx_id]->cid, sock_ctx[sock_ctx_id]->accessmode);
                     }
