@@ -225,7 +225,7 @@ int at_NCFG_req(char *at_buf, char **prsp_cmd)
 	else if(g_req_type == AT_CMD_TEST)
 	{
 		*prsp_cmd = xy_zalloc(60);
-		snprintf(*prsp_cmd, 60, "\r\n+NCFG: 0[,(0-2592000)]\r\n+NCFG: 1[,(0-1)]\r\n\r\nOK\r\n");
+		snprintf(*prsp_cmd, 60, "\r\n+NCFG: 0[,(0-2592000)]\r\n\r\nOK\r\n");
 	}
 	else
 		*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
