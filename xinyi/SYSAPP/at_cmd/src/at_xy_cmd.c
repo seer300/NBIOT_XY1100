@@ -2121,17 +2121,17 @@ int at_QCGDEFCONT_req(char *at_buf, char **prsp_cmd)
 		}
 		else if(strlen((const char *)CGAUTH_R_info->stCgauth[0].aucUserName) == 0 && strlen((const char *)CGAUTH_R_info->stCgauth[0].aucPassword) != 0)
 		{
-			snprintf(*prsp_cmd, 200, "\r\n+QCGDEFCONT:\"%s\",\"%s\",\"%s\"\r\n\r\nOK\r\n",aucPdpType[CGDCONT_R_info->stPdpContext[0].ucPdpType],CGDCONT_R_info->stPdpContext[0].aucApnValue,
+			snprintf(*prsp_cmd, 200, "\r\n+QCGDEFCONT: \"%s\",\"%s\",\"%s\"\r\n\r\nOK\r\n",aucPdpType[CGDCONT_R_info->stPdpContext[0].ucPdpType],CGDCONT_R_info->stPdpContext[0].aucApnValue,
 																							CGAUTH_R_info->stCgauth[0].aucPassword);
 		}
 		else if(strlen((const char *)CGAUTH_R_info->stCgauth[0].aucUserName) != 0 && strlen((const char *)CGAUTH_R_info->stCgauth[0].aucPassword) == 0)
 		{
-			snprintf(*prsp_cmd, 200, "\r\n+QCGDEFCONT:\"%s\",\"%s\",\"%s\"\r\n\r\nOK\r\n",aucPdpType[CGDCONT_R_info->stPdpContext[0].ucPdpType],CGDCONT_R_info->stPdpContext[0].aucApnValue,
+			snprintf(*prsp_cmd, 200, "\r\n+QCGDEFCONT: \"%s\",\"%s\",\"%s\"\r\n\r\nOK\r\n",aucPdpType[CGDCONT_R_info->stPdpContext[0].ucPdpType],CGDCONT_R_info->stPdpContext[0].aucApnValue,
 																							CGAUTH_R_info->stCgauth[0].aucUserName);
 		}
 		else if(strlen((const char *)CGAUTH_R_info->stCgauth[0].aucUserName) != 0 && strlen((const char *)CGAUTH_R_info->stCgauth[0].aucPassword) != 0)
 		{
-			snprintf(*prsp_cmd, 200, "\r\n+QCGDEFCONT:\"%s\",\"%s\",\"%s\",\"%s\"\r\n\r\nOK\r\n",aucPdpType[CGDCONT_R_info->stPdpContext[0].ucPdpType],CGDCONT_R_info->stPdpContext[0].aucApnValue,
+			snprintf(*prsp_cmd, 200, "\r\n+QCGDEFCONT: \"%s\",\"%s\",\"%s\",\"%s\"\r\n\r\nOK\r\n",aucPdpType[CGDCONT_R_info->stPdpContext[0].ucPdpType],CGDCONT_R_info->stPdpContext[0].aucApnValue,
 																							CGAUTH_R_info->stCgauth[0].aucUserName,CGAUTH_R_info->stCgauth[0].aucPassword);
 		}
 
