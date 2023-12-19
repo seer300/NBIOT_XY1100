@@ -396,10 +396,11 @@ struct at_serv_proc_e at_basic_req[] = {
 	//{"AT+QATWAKEUP", at_QATWAKEUP_req},     
 	{"AT+QCGDEFCONT", at_QCGDEFCONT_req},
 	{"AT+MGEDRXRPT", at_MGEDRXRPT_rep}, //MG add 20230404
-	{"AT+QNIDD", at_130G_NIDD_req},
 	
 #if MG_DFOTA
 	{"AT+QFOTADL", at_QFOTADL_req}, //MG add 20230404
+	{"AT+QNIDD", at_130G_NIDD_req},
+	{"AT+NIDDCTL", at_NIDD_urc_req},
 #endif
 	
 	{0, 0} //can not delete!!!

@@ -2270,14 +2270,14 @@ unsigned int NIDD_BUFFER_ED = 0 ;
 char *NIDD_STORAGE = NULL;
 #define MAX_NIDD_BUFFER 1000*100
 
-#if 1
-void NIDD_buffer_resume() {return;}
-void NIDD_buffer_flash() {return;}
-#else
 #include "xy_flash.h"
 extern void xy_get_OTA_flash_info(uint32_t *addr, int *len);
 void NIDD_buffer_resume()
 {
+	if(g_softap_fac_nv->nidd_rpt_mode != 2)
+	{
+		return;
+	}
 	int ret = -1;
 	uint32_t var1;
 	int var2;
@@ -2315,14 +2315,14 @@ void NIDD_buffer_resume()
 
 void NIDD_buffer_flash()
 {
+	if(g_softap_fac_nv->nidd_rpt_mode != 2 || NIDD_BUFFER_ED == 0)
+	{
+		return;
+	}
 	int ret = -1;
 	uint32_t var1;
 	int var2;
 	xy_get_OTA_flash_info(&var1,&var2);
-	if(NIDD_BUFFER_ED == 0)
-	{
-		return;
-	}
 	ret = xy_flash_write(var1,&NIDD_BUFFER_ED,4);
 	if(ret != 0)
 	{
@@ -2337,7 +2337,6 @@ void NIDD_buffer_flash()
 	}
 	// xy_printf("[%s][%d]success\r\n", __func__, NIDD_BUFFER_ED);
 }
-#endif
 
 void NIDD_buffer_write(char *nidd_data, unsigned int data_len)
 {
@@ -2438,4 +2437,43 @@ int at_130G_NIDD_req(char *at_buf, char **prsp_cmd)
 	}
 	return AT_FORWARD;
 }
+
+// AT+NIDDCTL
+int at_NIDD_urc_req(char *at_buf, char **prsp_cmd)
+{
+	switch(g_req_type)
+	{
+		case AT_CMD_QUERY:
+		{
+			*prsp_cmd = xy_zalloc(66);
+			sprintf(*prsp_cmd, "\r\n+NIDDCTL:%d\r\n\r\nOK\r\n", g_softap_fac_nv->nidd_rpt_mode);
+			break;
+		}
+		case AT_CMD_TEST:
+		{
+			*prsp_cmd = xy_zalloc(66);
+			sprintf(*prsp_cmd, "\r\n+NIDDCTL: (0-2)\r\n\r\nOK\r\n");
+			break;
+		}	
+		case AT_CMD_REQ:
+		{
+			int var1 = -1;
+			if(at_parse_param("%d(0-2)", at_buf, &var1) != AT_OK)
+			 {
+				*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
+				break;
+			 }
+			g_softap_fac_nv->nidd_rpt_mode = var1;
+			SAVE_FAC_PARAM(nidd_rpt_mode);
+			break;
+		}
+		default:
+		{
+			*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
+			break;
+		}
+	}
+	return AT_END;
+}
+
 

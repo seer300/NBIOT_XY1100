@@ -78,4 +78,5 @@ int at_QCGDEFCONT_req(char *at_buf,char **prsp_cmd);
 int at_MGEDRXRPT_rep(char *at_buf,char **prsp_cmd);
 int at_QFOTADL_req(char *at_buf,char **prsp_cmd);
 int at_130G_NIDD_req(char *at_buf, char **prsp_cmd);
+int at_NIDD_urc_req(char *at_buf, char **prsp_cmd);
 

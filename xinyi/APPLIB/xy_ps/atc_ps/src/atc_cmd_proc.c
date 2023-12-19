@@ -4131,26 +4131,30 @@ void AtcAp_MsgProc_QNIDD_Ind(unsigned char* pRecvMsg)
 
     AtcAp_MemCpy((unsigned char*)&tQnidd, pRecvMsg, offsetof(ATC_MSG_QNIDD_IND_STRU, pucData));
     tQnidd.pucData = pRecvMsg + offsetof(ATC_MSG_QNIDD_IND_STRU, pucData);
-#if 0
-    pInd = (unsigned char *)AtcAp_Malloc(D_ATC_QNIDD_IND_LENGTH + 512 * 2 + 1);
-    while(offset < tQnidd.usDataLen)
-    {
-        AtcAp_MemSet(pInd, 0, D_ATC_QNIDD_IND_LENGTH + 512 * 2 + 1);
-        
-        len = (tQnidd.usDataLen - offset > 512 ? 512 : tQnidd.usDataLen - offset);
-        g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)pInd, (const unsigned char *)"\r\n+QNIDD:4,%d,%d,%d,\"", tQnidd.ucNIDD_ID,len,index++);
-        AtcAp_HexToAsc(len, pInd + g_AtcApInfo.stAtRspInfo.usRspLen, tQnidd.pucData + offset);
-        g_AtcApInfo.stAtRspInfo.usRspLen += len * 2;            
-        g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)pInd + g_AtcApInfo.stAtRspInfo.usRspLen, (const unsigned char *)"\"\r\n");
-        AtcAp_SendLongDataInd(&pInd, D_ATC_CRTDCP_IND_LENGTH + len * 2);
-
-        offset += len;
-    }
     
-    AtcAp_Free(pInd);
-#else
-	NIDD_buffer_write(tQnidd.pucData,tQnidd.usDataLen);
-#endif
+	if(g_softap_fac_nv->nidd_rpt_mode == 0)
+	{
+	    pInd = (unsigned char *)AtcAp_Malloc(D_ATC_QNIDD_IND_LENGTH + 512 * 2 + 1);
+	    while(offset < tQnidd.usDataLen)
+	    {
+	        AtcAp_MemSet(pInd, 0, D_ATC_QNIDD_IND_LENGTH + 512 * 2 + 1);
+	        
+	        len = (tQnidd.usDataLen - offset > 512 ? 512 : tQnidd.usDataLen - offset);
+	        g_AtcApInfo.stAtRspInfo.usRspLen = AtcAp_StrPrintf((unsigned char *)pInd, (const unsigned char *)"\r\n+QNIDD:4,%d,%d,%d,\"", tQnidd.ucNIDD_ID,len,index++);
+	        AtcAp_HexToAsc(len, pInd + g_AtcApInfo.stAtRspInfo.usRspLen, tQnidd.pucData + offset);
+	        g_AtcApInfo.stAtRspInfo.usRspLen += len * 2;            
+	        g_AtcApInfo.stAtRspInfo.usRspLen += AtcAp_StrPrintf((unsigned char *)pInd + g_AtcApInfo.stAtRspInfo.usRspLen, (const unsigned char *)"\"\r\n");
+	        AtcAp_SendLongDataInd(&pInd, D_ATC_CRTDCP_IND_LENGTH + len * 2);
+
+	        offset += len;
+	    }
+	    
+	    AtcAp_Free(pInd);
+	} 
+	else
+	{
+		NIDD_buffer_write(tQnidd.pucData,tQnidd.usDataLen);
+	}
 	 
 }
 
