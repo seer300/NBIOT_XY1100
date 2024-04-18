@@ -2346,7 +2346,7 @@ void NIDD_buffer_write(char *nidd_data, unsigned int data_len)
 		// tbc : send to UART
 		char *var1 = xy_zalloc(data_len * 2 + 1);
 		char *var2 = xy_zalloc(data_len * 2 + 40);
-		bytes2hexstr(nidd_data,data_len,var1,data_len * 2 + 1);
+		bytes2hexstr((unsigned char *)nidd_data,data_len,var1,data_len * 2 + 1);
 		sprintf(var2,"\r\n+QNIDD:4,0,%d,0,%s\r\n", data_len,var1);
 		send_urc_to_ext(var2);
 		xy_free(var1);
@@ -2389,7 +2389,7 @@ void NIDD_buffer_read(unsigned int data_read, char **prsp)
 	data_read = (data_read > NIDD_BUFFER_ED) ? NIDD_BUFFER_ED : data_read ;
 	char *var1 = xy_zalloc(data_read * 2 + 1); 
 	*prsp = xy_zalloc(data_read * 2 + 40); 
-	bytes2hexstr(NIDD_STORAGE,data_read,var1,data_read * 2 + 1);
+	bytes2hexstr((unsigned char *)NIDD_STORAGE,data_read,var1,data_read * 2 + 1);
 
 	// tbc : AT read response
 	

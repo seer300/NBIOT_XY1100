@@ -28,7 +28,7 @@
 #endif
 
 
-//extern void user_led_demo_init(void);
+extern void user_led_demo_init(void);
 
 //extern void hal_gpio_out_work_task_init();
 
@@ -39,12 +39,12 @@
 */
 void user_peripheral_init()
 {
-
+	
 	if(*(uint32_t*)(BACKUP_MEM_RF_MODE) != 0)
 		return;
 	
-#if DEMO_TEST	
-	if((g_softap_fac_nv != NULL) && (!(g_softap_fac_nv->peri_remap_enable & 0x0100)) && (g_softap_fac_nv->led_pin <= HAL_GPIO_PIN_NUM_63))
+#if 1//DEMO_TEST	
+	//if((g_softap_fac_nv != NULL) && (!(g_softap_fac_nv->peri_remap_enable & 0x0100)) && (g_softap_fac_nv->led_pin <= HAL_GPIO_PIN_NUM_63))
 		user_led_demo_init();
 #endif
 	
