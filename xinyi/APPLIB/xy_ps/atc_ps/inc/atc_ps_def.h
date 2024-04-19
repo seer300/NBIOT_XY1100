@@ -47,7 +47,7 @@
 #define D_ATC_ESM_CAUSE_TBL_SIZE             40
 
 #define D_ATC_CMD_PROC_TBL_SIZE              71  //qedrxcfg70->71
-#define D_ATC_DATAIND_PROC_TBL_SIZE          116//QNIDD,114->116
+#define D_ATC_DATAIND_PROC_TBL_SIZE          117 //SimDataDownloadInd,116->117
 #define D_ATC_USER_REG_EVENT_TBL_SIZE        25
 
 #define D_ATC_FAC_NUM                        1//22

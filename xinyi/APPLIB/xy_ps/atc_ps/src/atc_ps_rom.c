@@ -224,6 +224,7 @@ const ST_ATC_AP_CMD_PROC_TABLE AtcAp_DataIndProcTable[D_ATC_DATAIND_PROC_TBL_SIZ
     { D_ATC_EVENT_QEDRXCFG_R,                   AtcAp_MsgProc_QEDRXCFG_R_Cnf    },
     { D_ATC_EVENT_QNIDD,                        AtcAp_MsgProc_QNIDD_Cnf         },
     { D_ATC_AP_QNIDD_IND,                       AtcAp_MsgProc_QNIDD_Ind         },
+    { D_ATC_AP_SIM_DATA_DOWNLOAD_IND,           AtcAp_MsgProc_SimDataDownload_Ind },
 };
 
 const ST_ATC_COMMAND_ANAL_TABLE ATC_Plus_CommandTable[] =

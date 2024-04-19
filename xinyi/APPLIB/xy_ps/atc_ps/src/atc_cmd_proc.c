@@ -4158,3 +4158,8 @@ void AtcAp_MsgProc_QNIDD_Ind(unsigned char* pRecvMsg)
 	 
 }
 
+void AtcAp_MsgProc_SimDataDownload_Ind(unsigned char* pRecvMsg)
+{
+    AtcAp_StrPrintf_AtcRspBuf((const char *)"\r\n+CMT:\"ESIM request\"\r\n");
+    AtcAp_SendDataInd();
+}

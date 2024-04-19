@@ -283,6 +283,7 @@ extern void AtcAp_MsgProc_ECURC_R_Cnf(unsigned char* pRecvMsg);
 extern void AtcAp_MsgProc_QENG_Cnf(unsigned char* pRecvMsg);
 extern void AtcAp_MsgProc_QNIDD_Cnf(unsigned char* pRecvMsg);
 extern void AtcAp_MsgProc_QNIDD_Ind(unsigned char* pRecvMsg);
+extern void AtcAp_MsgProc_SimDataDownload_Ind(unsigned char* pRecvMsg);
 
 /*************** atc_ap_cmd_proc.c  end *************************************/
 
