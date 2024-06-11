@@ -24,27 +24,50 @@
 ** [2]MODEM模块，优化调整，R16后向兼容处理优化
 */
 
-#define MODULE_130  1
+#define MODULE_130      0
+#define MODULE_130G     0
+#define MODULE_TNB100   1
 
 #if  MODULE_130
 
-//#define MODULE 		"SLM130X"
-#define MODULE 		"SLM130G"
-#define TVERSION 	"T22"
-#define SDATE		"S0419"
-#define SDKVERSION	"0.2.3.C21"  /*20230224 patch03*/
-#define MVERSION	"M003"
-#define SI_NUM			HAL_GPIO_PIN_NUM_13
-#define LED_NUM		HAL_GPIO_PIN_NUM_4
-#else
+    #define VENDER_NAME "MeiG"
+    #define MODULE 		"SLM130X"
+    #define TVERSION 	"T23"
+    #define SDATE		"S0419"
+    #define SDKVERSION	"0.2.3.C21"  /*20230224 patch03*/
+    #define MVERSION	"M003"
+    #define SI_NUM		HAL_GPIO_PIN_NUM_13
+    #define LED_NUM		HAL_GPIO_PIN_NUM_4
 
-#define MODULE 		"SLM160X"
-#define TVERSION 	"T18"
-#define SDATE		"S1030"
-#define SDKVERSION	"0.2.3.C21"
-#define MVERSION	"M003"
-#define SI_NUM		HAL_GPIO_PIN_NUM_11
-#define LED_NUM		HAL_GPIO_PIN_NUM_10
+#elif MODULE_130G
+    #define VENDER_NAME "MeiG"
+    #define MODULE 		"SLM130G"
+    #define TVERSION 	"T23"
+    #define SDATE		"S0419"
+    #define SDKVERSION	"0.2.3.C21"  /*20230224 patch03*/
+    #define MVERSION	"M003"
+    #define SI_NUM		HAL_GPIO_PIN_NUM_13
+    #define LED_NUM		HAL_GPIO_PIN_NUM_4
+
+#elif MODULE_TNB100
+    #define VENDER_NAME "TELADIN"
+    #define MODULE 		"TNB100"
+    #define TVERSION 	"T00"
+    #define SDATE		"S0611"
+    #define SDKVERSION	"0.2.3.C21"  /*20230224 patch03*/
+    #define MVERSION	"M003"
+    #define SI_NUM		HAL_GPIO_PIN_NUM_13
+    #define LED_NUM		HAL_GPIO_PIN_NUM_4
+
+#else
+    #define VENDER_NAME "MeiG"
+    #define MODULE 		"SLM160X"
+    #define TVERSION 	"T18"
+    #define SDATE		"S1030"
+    #define SDKVERSION	"0.2.3.C21"
+    #define MVERSION	"M003"
+    #define SI_NUM		HAL_GPIO_PIN_NUM_11
+    #define LED_NUM		HAL_GPIO_PIN_NUM_10
 
 #endif
 
