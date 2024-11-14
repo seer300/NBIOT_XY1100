@@ -573,7 +573,7 @@ WAIT_PROC:
         wait_sum += 8;
 		osDelay(8);
 	}
-	else if (g_current_baudrate == 4800)
+	else if (g_current_baudrate <= 9600)
 	{
         wait_sum += 4;
 		osDelay(4);
