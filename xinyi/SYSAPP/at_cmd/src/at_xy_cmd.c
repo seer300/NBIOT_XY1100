@@ -731,6 +731,37 @@ int  simple_get_val(char *param,char **prsp_cmd)
 	return  1;
 }
 
+void open_log(uint32_t val)
+{
+	extern osThreadId_t g_xylog_TskHandle;
+	extern int xy_log_init_resource(void);
+	if(val==1 && g_xylog_TskHandle == NULL)
+	{
+		osThreadAttr_t thread_attr = {0};
+		uint32_t* dsp_log_addr=NULL;
+		PRCM_Clock_Enable(PRCM_BASE, PRCM_CKG_CTL_CSP3_EN);
+		CSPUARTModeSet(CSP3_BASE, g_XY_PCLK, 921600, 8, 1);
+		CSPFIFOLevelSet(CSP3_BASE, (32-1)<<2, (1-1)<<2);
+		if(g_softap_fac_nv->log_size != 0)
+		{
+			dsp_log_addr =  xy_malloc_Align(g_softap_fac_nv->log_size * 1024);
+			*((uint32_t *)(DSP_EXT_POOL+8)) = get_Dsp_Addr_from_ARM((unsigned int)(dsp_log_addr));
+			*((uint32_t *)(DSP_EXT_POOL+12)) = g_softap_fac_nv->log_size * 1024;
+		}
+		else
+		{
+			dsp_log_addr =  xy_malloc_Align(20 * 1024);
+			*((uint32_t *)(DSP_EXT_POOL+8)) = get_Dsp_Addr_from_ARM((unsigned int)(dsp_log_addr));
+			*((uint32_t *)(DSP_EXT_POOL+12)) = 20480;
+		}
+		xy_log_init_resource();
+		thread_attr.name	   = "xy_log";
+		thread_attr.priority   = osPriorityBelowNormal;
+		thread_attr.stack_size = 0x180;
+		g_xylog_TskHandle = osThreadNew ((osThreadFunc_t)(xy_log_entry),NULL,&thread_attr);
+	}
+}
+
 int at_NV_req(char *at_buf, char **prsp_cmd)
 {
 	if (g_req_type == AT_CMD_REQ)
@@ -1140,10 +1171,10 @@ int at_NV_req(char *at_buf, char **prsp_cmd)
 				}
 				else if (!strcmp(param, "LOG"))
 				{
+					open_log(val);
+					get_req_to_dsp(at_buf);
 					g_softap_fac_nv->open_log = val;
 					SAVE_FAC_PARAM(open_log);
-					get_req_to_dsp(at_buf);
-					xy_log_task();
 				}
 				else if (!strcmp(param, "WFI"))
 				{
@@ -1945,7 +1976,7 @@ int at_ATI_req(char *at_buf, char **prsp_cmd)
 #if VER_QUECTEL || VER_QUCTL260
 	    //snprintf(*prsp_cmd, 128, "\r\nXY1100\r\n%s\r\nRevision:%s\r\n\r\nOK\r\n", MODULE_VER, PRODUCT_VER);
 		//snprintf(*prsp_cmd, 128, "\r\nMeiG \r\n"MODULE"\r\nRevision:"MODULE"_%sS%c%c%c%c\r\nOK\r\n", TVERSION, compTime[4],compTime[5],compTime[6],compTime[7]);
-		snprintf(*prsp_cmd, 128, "\r\n"VENDER_NAME" \r\n"MODULE"\r\nRevision: "MODULE"_%s%s [Mar 01 2025 11:30:00]\r\n\r\nOK\r\n", TVERSION, SDATE);		
+		snprintf(*prsp_cmd, 128, "\r\n"VENDER_NAME" \r\n"MODULE"\r\nRevision: "MODULE"_%s%s [Mar 01 2025 11:30:00]\r\n\r\nOK\r\n", TVERSION, SDATE);
 #else
 		snprintf(*prsp_cmd, 128, "XY1100\r\n%s\r\nRevision:%s\r\n\r\nOK\r\n", MODULE_VER, PRODUCT_VER);
 #endif //VER_QUECTEL
