@@ -1,4 +1,4 @@
-softVer:V1100B10012R05C2102P09
+softVer:V1100B10012R05C2102P10
 $I:1:S:DRV: tx open: freq = %d, cfo=%d
 $I:2:S:Crastal: ulCurRegVal:%d, sFreqErr: %d, ulFrequency: %d, sCalcPpm: %d, sResFreqErr:%d
 $I:3:S:BBPLL: ulCurRegVal:%d, ulSetRegVal:%d, slDetal: %d, sFreqErr: %d, ulFrequency: %d
