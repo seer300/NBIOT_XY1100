@@ -53,8 +53,8 @@
 #elif MODULE_TNB100
     #define VENDER_NAME "TELADIN"
     #define MODULE 		"TNB100"
-    #define TVERSION 	"T11"
-    #define SDATE		"S0401"
+    #define TVERSION 	"T12"
+    #define SDATE		"S0408"
     #define SDKVERSION	"0.2.3.C21"  /*20230224 patch03*/
     #define MVERSION	"M003"
     #define SI_NUM		HAL_GPIO_PIN_NUM_13
