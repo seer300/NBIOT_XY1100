@@ -23,12 +23,13 @@
 #if ABUP_FOTA
 #include "abup_fota.h"
 #endif
-#if DEMO_TEST
+#if 1
 #include "xy_demo.h"
 #endif
 
 
 extern void user_led_demo_init(void);
+extern void hal_uart_IT_demo_task_init(void);
 
 //extern void hal_gpio_out_work_task_init();
 
@@ -59,6 +60,7 @@ void user_task_init()
 		return;
 
 	//hal_gpio_out_work_task_init();
+	hal_uart_IT_demo_task_init();
 	
 #if DEMO_TEST
  	if(g_softap_fac_nv->demotest > 0)

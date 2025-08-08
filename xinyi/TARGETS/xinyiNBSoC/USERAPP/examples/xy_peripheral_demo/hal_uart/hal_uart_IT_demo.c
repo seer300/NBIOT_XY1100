@@ -9,7 +9,7 @@
 * @warning	用户使用外设时需注意：1.使用前关闭standby，使用完开启standby 2.确保没有在NV中配置外设所使用的GPIO，否则芯片进出standby时会根据NV重配GPIO，导致外设无法正常使用
 ***********************************************************************************/
 
-#if DEMO_TEST
+#if 1
 
 
 #include "xy_api.h"
@@ -28,7 +28,7 @@ HAL_UART_HandleTypeDef hal_uart_IT_demo_handle;
  * @brief 错误中断回调函数。注意：1.用户在使用时需将__weak 删除！！！2.用户需保证中断及中断里调用的函数都在ram上！！！
  */
 void HAL_UART_ErrorCallback(HAL_UART_HandleTypeDef* huart) __RAM_FUNC;
-__weak void HAL_UART_ErrorCallback(HAL_UART_HandleTypeDef* huart)
+void HAL_UART_ErrorCallback(HAL_UART_HandleTypeDef* huart)
 {
 	//用户根据实际需求添加错误处理代码
 
@@ -42,7 +42,7 @@ __weak void HAL_UART_ErrorCallback(HAL_UART_HandleTypeDef* huart)
  * @brief 中断回调函数。注意：1.用户在使用时需将__weak 删除！！！2.用户需保证中断及中断里调用的函数都在ram上！！！
  */
 void HAL_UART_RxCpltCallback(HAL_UART_HandleTypeDef *huart) __RAM_FUNC;
-__weak void HAL_UART_RxCpltCallback(HAL_UART_HandleTypeDef *huart)
+void HAL_UART_RxCpltCallback(HAL_UART_HandleTypeDef *huart)
 {
 	UNUSED_ARG(huart);
 	osSemaphoreRelease(g_hal_uart_IT_demo_sem);
@@ -52,7 +52,7 @@ __weak void HAL_UART_RxCpltCallback(HAL_UART_HandleTypeDef *huart)
  * @brief 中断服务函数。注意：1.用户在使用时需将__weak 删除！！！2.用户需保证中断及中断里调用的函数都在ram上！！！
  */
 void HAL_UART_IRQHandler(void) __RAM_FUNC;
-__weak void HAL_UART_IRQHandler(void)
+void HAL_UART_IRQHandler(void)
 {
 	UART_IRQHandler(&hal_uart_IT_demo_handle);
 }
@@ -116,7 +116,7 @@ void hal_uart_IT_demo_task(void)
 		if(hal_uart_IT_demo_handle.RxXferCount > 0)
 		{
 			//用户进行数据处理，此处demo仅将接收到的数据回写
-			HAL_UART_Transmit(&hal_uart_IT_demo_handle, data, hal_uart_IT_demo_handle.RxXferCount, 500);
+			HAL_UART_Transmit(&hal_uart_IT_demo_handle, "\r\n#1234#\r\n", sizeof("\r\n#1234#\r\n"), 500);
 			str_out = xy_zalloc(200);
 			snprintf(str_out, 200, "hal_uart_IT_demo_handle.RxXferCount: %d\n", hal_uart_IT_demo_handle.RxXferCount);
 			send_debug_str_to_at_uart(str_out);
