@@ -396,6 +396,7 @@ struct at_serv_proc_e at_basic_req[] = {
 	//{"AT+QATWAKEUP", at_QATWAKEUP_req},     
 	{"AT+QCGDEFCONT", at_QCGDEFCONT_req},
 	{"AT+MGEDRXRPT", at_MGEDRXRPT_rep}, //MG add 20230404
+	{"AT+TCPINIT", at_TCPINIT_rep},
 	
 #if MG_DFOTA
 	{"AT+QFOTADL", at_QFOTADL_req}, //MG add 20230404

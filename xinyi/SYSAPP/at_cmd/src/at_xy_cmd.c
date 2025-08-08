@@ -2476,4 +2476,24 @@ int at_NIDD_urc_req(char *at_buf, char **prsp_cmd)
 	return AT_END;
 }
 
+extern void init_tcp_server();
 
+int at_TCPINIT_rep(char *at_buf, char **prsp_cmd)
+{
+	(void)at_buf;
+	
+	if (g_req_type == AT_CMD_REQ || g_req_type == AT_CMD_ACTIVE)
+	{
+		*prsp_cmd = xy_zalloc(128);
+		xy_printf("[%s][%d] at_TCPINIT_rep run", __func__, __LINE__);
+		init_tcp_server();
+
+		snprintf(*prsp_cmd, 128, "\r\nOK\r\n");
+	}
+	else
+	{
+		*prsp_cmd = AT_ERR_BUILD(ATERR_PARAM_INVALID);
+	}
+
+	return AT_END;
+}
