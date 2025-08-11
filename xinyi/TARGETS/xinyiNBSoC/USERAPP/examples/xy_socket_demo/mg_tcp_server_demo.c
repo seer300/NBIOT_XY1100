@@ -3,86 +3,82 @@
  ******************************************************************************/
 #include "xy_api.h"
 #include "xy_utils.h"
-#include "lwip/tcp.h"
+#include "lwip/sockets.h"
 #include "lwip/netdb.h"
 #include "lwip/api.h"
 #include "lwip/err.h"
 
-/* TCP服务器数据处理服务器回调函数 */
-static err_t recv_callback(void *arg, struct tcp_pcb *pcb, struct pbuf *tcp_recv_pbuf, err_t err)
-{
-  struct pbuf *tcp_send_pbuf;
-  char echoString[]="This is the client content echo:\r\n";
-
-  if (tcp_recv_pbuf != NULL)
-  {
-    /* 更新接收窗口 */
-    tcp_recved(pcb, tcp_recv_pbuf->tot_len);
-
-    /* 将接收的数据拷贝给发送结构体 */
-    tcp_send_pbuf = tcp_recv_pbuf;
-    tcp_write(pcb,echoString, strlen(echoString), 1);
-    /* 将接收到的数据再转发出去 */
-    tcp_write(pcb, tcp_send_pbuf->payload, tcp_send_pbuf->len, 1);
-
-    pbuf_free(tcp_recv_pbuf);
-    tcp_close(pcb);
-  }
-  else if (err == ERR_OK)
-  {
-    return tcp_close(pcb);
-  }
-
-  return ERR_OK;
-}
-
-// 定义数据发送完成的回调函数
-static err_t sent_callback(void *arg, struct tcp_pcb *tpcb, u16_t len) {
-    LWIP_UNUSED_ARG(arg);
-    LWIP_UNUSED_ARG(len);
-
-    // 在这里可以添加额外的逻辑，比如发送更多数据
-
-    return ERR_OK;
-}
-
-// 定义错误处理的回调函数
-static void err_callback(void *arg, err_t err) {
-    LWIP_UNUSED_ARG(arg);
-
-    if (err != ERR_ABRT) {
-        // 错误处理逻辑
-    }
-}
-
-/* TCP服务器接收回调函数，当客户端建立连接后本函数被调用 */
-static err_t TCPServerAccept(void *arg, struct tcp_pcb *pcb, err_t err)
-{
-  /* 注册接收回调函数 */
-  tcp_recv(pcb, TCPServerCallback);
-
-  return ERR_OK;
-}
 
 // 初始化TCP服务器监听
 void init_tcp_server() {
-    
-
-    struct tcp_pcb *tcp_server_pcb;
-    ip4_addr_t ipaddr;
-    IP4_ADDR(&ipaddr, 0, 0, 0, 0);
-
-    /* 为tcp服务器分配一个tcp_pcb结构体 */
-    tcp_server_pcb = tcp_new();
-
-    /* 绑定本地端号和IP地址 */
-    tcp_bind(tcp_server_pcb, &ipaddr, 3300);
-
-    /* 监听之前创建的结构体tcp_server_pcb */
-    tcp_server_pcb = tcp_listen(tcp_server_pcb);
-
-    /* 初始化结构体接收回调函数 */
-    tcp_accept(tcp_server_pcb, TCPServerAccept);
+    int server_fd, client_fd;
+    struct sockaddr_in server_addr, client_addr;
+    socklen_t client_len = sizeof(client_addr);
+    char buffer[MAX_BUF];
+    int recv_len;
 
     xy_printf("PPP: init_tcp_server run");
+
+    // 1. 创建套接字
+    server_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_fd < 0) {
+        xy_printf("Failed to create socket\n");
+        return;
+    }
+
+    // 2. 配置服务器地址结构
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = INADDR_ANY;  // 监听所有网卡
+    server_addr.sin_port = htons(SERVER_PORT);
+
+    // 3. 绑定
+    if (bind(server_fd, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
+        xy_printf("Bind failed\n");
+        closesocket(server_fd);
+        return;
+    }
+
+    // 4. 监听
+    if (listen(server_fd, 5) < 0) {  // 最多5个等待连接
+        xy_printf("Listen failed\n");
+        closesocket(server_fd);
+        return;
+    }
+
+    xy_printf("TCP Server listening on port %d...\n", SERVER_PORT);
+
+    while (1) {
+        // 5. 接受客户端连接
+        client_fd = accept(server_fd, (struct sockaddr*)&client_addr, &client_len);
+        if (client_fd < 0) {
+            xy_printf("Accept failed\n");
+            continue;
+        }
+
+        xy_printf("Client connected: %s:%d\n",
+               inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_addr.s_addr));
+
+        // 6. 与客户端通信
+        while (1) {
+            recv_len = recv(client_fd, buffer, MAX_BUF - 1, 0);
+            if (recv_len > 0) {
+                buffer[recv_len] = '\0';
+                xy_printf("Received: %s", buffer);
+
+                // 回显数据
+                send(client_fd, buffer, recv_len, 0);
+            } else {
+                // 客户端断开或出错
+                xy_printf("Client disconnected\n");
+                break;
+            }
+        }
+
+        // 7. 关闭客户端套接字
+        closesocket(client_fd);
+    }
+
+    // 理论上不会执行到这里
+    closesocket(server_fd);
 }
