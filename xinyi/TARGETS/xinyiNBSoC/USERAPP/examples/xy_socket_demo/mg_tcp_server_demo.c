@@ -84,3 +84,18 @@ void init_tcp_server() {
     // 理论上不会执行到这里
     closesocket(server_fd);
 }
+
+
+/**
+ * @brief 任务创建
+ * 
+ */
+void init_tcp_server_task_init(void)
+{
+	osThreadAttr_t thread_attr = {0};
+		
+	thread_attr.name	   = "init_tcp_server_task";
+	thread_attr.priority   = osPriorityNormal;
+	thread_attr.stack_size = 1024;
+	hal_uart_IT_demo_TskHandle = osThreadNew((osThreadFunc_t)init_tcp_server, NULL, &thread_attr);
+}

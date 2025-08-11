@@ -2476,7 +2476,7 @@ int at_NIDD_urc_req(char *at_buf, char **prsp_cmd)
 	return AT_END;
 }
 
-extern void init_tcp_server();
+extern void init_tcp_server_task_init();
 
 int at_TCPINIT_rep(char *at_buf, char **prsp_cmd)
 {
@@ -2486,7 +2486,7 @@ int at_TCPINIT_rep(char *at_buf, char **prsp_cmd)
 	{
 		*prsp_cmd = xy_zalloc(128);
 		xy_printf("[%s][%d] at_TCPINIT_rep run", __func__, __LINE__);
-		init_tcp_server();
+		init_tcp_server_task_init();
 
 		snprintf(*prsp_cmd, 128, "\r\nOK\r\n");
 	}
