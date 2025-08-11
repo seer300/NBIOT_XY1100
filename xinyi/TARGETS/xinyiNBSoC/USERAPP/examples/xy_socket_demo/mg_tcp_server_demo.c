@@ -97,5 +97,5 @@ void init_tcp_server_task_init(void)
 	thread_attr.name	   = "init_tcp_server_task";
 	thread_attr.priority   = osPriorityNormal;
 	thread_attr.stack_size = 1024;
-	hal_uart_IT_demo_TskHandle = osThreadNew((osThreadFunc_t)init_tcp_server, NULL, &thread_attr);
+	osThreadNew((osThreadFunc_t)init_tcp_server, NULL, &thread_attr);
 }
