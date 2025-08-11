@@ -8,6 +8,8 @@
 #include "lwip/api.h"
 #include "lwip/err.h"
 
+#define SERVER_PORT 8080
+#define MAX_BUF     256
 
 // 初始化TCP服务器监听
 void init_tcp_server() {
