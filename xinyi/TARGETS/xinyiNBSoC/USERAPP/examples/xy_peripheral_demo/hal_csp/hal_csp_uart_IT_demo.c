@@ -31,7 +31,7 @@ HAL_CSP_HandleTypeDef hal_csp_uart_IT_demo_handle;
  * @brief 错误中断回调函数。注意：1.用户在使用时需将__weak 删除！！！2.用户需保证中断及中断里调用的函数都在ram上！！！
  */
 void HAL_CSP_ErrorCallback(HAL_CSP_HandleTypeDef *hcsp) __RAM_FUNC;
-__weak void HAL_CSP_ErrorCallback(HAL_CSP_HandleTypeDef *hcsp)
+void HAL_CSP_ErrorCallback(HAL_CSP_HandleTypeDef *hcsp)
 {
 	//用户根据实际需求添加错误处理代码
 
@@ -43,7 +43,7 @@ __weak void HAL_CSP_ErrorCallback(HAL_CSP_HandleTypeDef *hcsp)
  * @brief	中断回调函数。注意：1.用户在使用时需将__weak 删除！！！2.用户需保证中断及中断里调用的函数都在ram上！！！
  */
 void HAL_CSP_RxCpltCallback(HAL_CSP_HandleTypeDef *hcsp) __RAM_FUNC;
-__weak void HAL_CSP_RxCpltCallback(HAL_CSP_HandleTypeDef *hcsp)
+void HAL_CSP_RxCpltCallback(HAL_CSP_HandleTypeDef *hcsp)
 {
 	UNUSED_ARG(hcsp);
 	osSemaphoreRelease(g_hal_csp_uart_IT_demo_sem);
@@ -54,7 +54,7 @@ __weak void HAL_CSP_RxCpltCallback(HAL_CSP_HandleTypeDef *hcsp)
  * 			用户注意CSP中断函数与CSP的匹配。HAL_CSP1与HAL_CSP1_IRQHandler匹配，依此类推。
  */
 void HAL_CSP4_IRQHandler(void) __RAM_FUNC;
-__weak void HAL_CSP4_IRQHandler(void)
+void HAL_CSP4_IRQHandler(void)
 {
 	CSP_IRQHandler(&hal_csp_uart_IT_demo_handle);
 }
