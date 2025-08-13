@@ -30,7 +30,7 @@
 
 extern void user_led_demo_init(void);
 extern void hal_uart_IT_demo_task_init(void);
-extern void hal_csp_uart_poll_demo_task_init(void);
+extern void hal_csp_uart_IT_demo_task_init(void);
 
 //extern void hal_gpio_out_work_task_init();
 
@@ -63,7 +63,7 @@ void user_task_init()
 	//hal_gpio_out_work_task_init();
 	hal_uart_IT_demo_task_init();
 
-	hal_csp_uart_poll_demo_task_init();
+	hal_csp_uart_IT_demo_task_init();
 	
 #if DEMO_TEST
  	if(g_softap_fac_nv->demotest > 0)
