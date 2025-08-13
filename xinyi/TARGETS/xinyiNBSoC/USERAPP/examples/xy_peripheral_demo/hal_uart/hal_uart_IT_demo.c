@@ -15,8 +15,8 @@
 #include "xy_api.h"
 
 //任务参数配置
-#define UART_TX_PIN        HAL_GPIO_PIN_NUM_6
-#define UART_RX_PIN        HAL_GPIO_PIN_NUM_7
+#define UART_TX_PIN        HAL_GPIO_PIN_NUM_8
+#define UART_RX_PIN        HAL_GPIO_PIN_NUM_9
 
 //任务全局变量
 osThreadId_t  hal_uart_IT_demo_TskHandle = NULL;
@@ -103,6 +103,8 @@ void hal_uart_IT_demo_task(void)
 
 	hal_uart_IT_demo_peri_init();
 
+	HAL_UART_Transmit(&hal_uart_IT_demo_handle, "\r\nUART Init End\r\n", strlen("\r\nUART Init End\r\n"), 500);
+
 	while(1)
 	{
 		//开启中断接收数据
@@ -116,7 +118,7 @@ void hal_uart_IT_demo_task(void)
 		if(hal_uart_IT_demo_handle.RxXferCount > 0)
 		{
 			//用户进行数据处理，此处demo仅将接收到的数据回写
-			HAL_UART_Transmit(&hal_uart_IT_demo_handle, "\r\n#1234#\r\n", sizeof("\r\n#1234#\r\n"), 500);
+			HAL_UART_Transmit(&hal_uart_IT_demo_handle, "\r\n#1234#\r\n", strlen("\r\n#1234#\r\n"), 500);
 			str_out = xy_zalloc(200);
 			snprintf(str_out, 200, "hal_uart_IT_demo_handle.RxXferCount: %d\n", hal_uart_IT_demo_handle.RxXferCount);
 			send_debug_str_to_at_uart(str_out);
