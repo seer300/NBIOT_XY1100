@@ -181,11 +181,6 @@ int bc26_socket_send_data(char *data, uint32_t len, int rai_flag, socket_context
     return XY_OK;
 }
 
-#if 1  // added by LGF 20231028
-extern osTimerId_t passthr_timer;
-extern passthr_timeout_callback(uint16_t *timer);
-#endif
-
 void passthr_socket_send_proc(void* param)
 {
     UNUSED_ARG(param);
@@ -213,15 +208,6 @@ void passthrough_socket_init()
         thread_attr.stack_size = 0x800;
         passthr_sock_send_thd = osThreadNew((osThreadFunc_t)passthr_socket_send_proc, NULL, &thread_attr);
     }
-#if 1   // added by LGF 20231028 
-	if (passthr_timer == NULL)
-	{
-		osTimerAttr_t timer_attr = {0};
-		timer_attr.name = "skt_ptr_timer";
-    	passthr_timer = osTimerNew((osTimerFunc_t)(passthr_timeout_callback), osTimerOnce, NULL, &timer_attr);
-		osTimerStart(passthr_timer, 60*1000);
-	}
-#endif	
 }
 
 static void bc26_socket_open_task(void* param)
@@ -497,16 +483,6 @@ int at_QICLOSE_req(char *at_buf, char **prsp_cmd)
     {
         uint8_t sockId;
         int sock_ctx_id;
-
-	//20230228 MG add
-#if VER_QUCTL260
-	    if(NET_NEED_RECOVERY(SOCKET_TASK)){
-	        //printf("\r\n[QICLOSE]need recovery SOCKET_TASK\r\n");
-	        resume_net_app(SOCKET_TASK);
-	    }
-#endif
-    //add end
-
         if (at_parse_param("%1d(0-4)", at_buf, &sockId) != XY_OK)
         {
             *prsp_cmd = BC26_AT_ERR_BUILD();
@@ -515,10 +491,7 @@ int at_QICLOSE_req(char *at_buf, char **prsp_cmd)
 
         if ((sock_ctx_id = find_sock_ctx_id_by_sock_id(sockId)) == -1)
         {
-			//MG 20230601
-			*prsp_cmd = xy_zalloc(32);
-			sniprintf(*prsp_cmd, 32, "\r\nOK\r\n\r\nCLOSE OK\r\n");
-            //*prsp_cmd = BC26_AT_ERR_BUILD();
+            *prsp_cmd = BC26_AT_ERR_BUILD();
             return AT_END;
         }
 
@@ -550,16 +523,6 @@ int at_QISTATE_req(char *at_buf, char **prsp_cmd)
         uint8_t query_type = 0;
         int contextId = 0;
         int socketId = 0;
-
-	    //20230228 MG add
-#if VER_QUCTL260
-		if(NET_NEED_RECOVERY(SOCKET_TASK)){
-			//printf("\r\n[QISTATE]request recovery SOCKET_TASK\r\n");
-			resume_net_app(SOCKET_TASK);
-		}
-#endif
-        //add end
-        
         if (at_parse_param("%1d(0-1)", at_buf, &query_type) != XY_OK)
         {
             *prsp_cmd = BC26_AT_ERR_BUILD();
@@ -580,7 +543,6 @@ int at_QISTATE_req(char *at_buf, char **prsp_cmd)
             {
                 if ((sock_ctx_id = find_sock_ctx_id_by_sock_id(socket_id)) != -1)
                 {
-#if 0                
                     if (sock_ctx[sock_ctx_id]->net_type == 0)
                     {
                         snprintf(*prsp_cmd + strlen(*prsp_cmd), 320, "\r\n+QISTATE: %d,\"TCP\",\"%s\",%d,%d,%d,%d,%d",
@@ -593,21 +555,6 @@ int at_QISTATE_req(char *at_buf, char **prsp_cmd)
                                  socket_id, sock_ctx[sock_ctx_id]->remote_ip, sock_ctx[sock_ctx_id]->remote_port, sock_ctx[sock_ctx_id]->local_port_ori,
                                  sock_ctx[sock_ctx_id]->sock_state, sock_ctx[sock_ctx_id]->cid, sock_ctx[sock_ctx_id]->accessmode);
                     }
-#else
-					if (sock_ctx[sock_ctx_id]->net_type == 0)
-                    {
-                        snprintf(*prsp_cmd + strlen(*prsp_cmd), 320, "\r\n+QISTATE: %d,\"TCP\",\"%s\",%d,%d,%d,%d",
-                                 socket_id, sock_ctx[sock_ctx_id]->remote_ip, sock_ctx[sock_ctx_id]->remote_port, 
-                                 sock_ctx[sock_ctx_id]->sock_state, sock_ctx[sock_ctx_id]->cid, sock_ctx[sock_ctx_id]->accessmode);
-                    }
-                    else
-                    {
-                        snprintf(*prsp_cmd + strlen(*prsp_cmd), 320, "\r\n+QISTATE: %d,\"UDP\",\"%s\",%d,%d,%d,%d",
-                                 socket_id, sock_ctx[sock_ctx_id]->remote_ip, sock_ctx[sock_ctx_id]->remote_port, 
-                                 sock_ctx[sock_ctx_id]->sock_state, sock_ctx[sock_ctx_id]->cid, sock_ctx[sock_ctx_id]->accessmode);
-                    }
-
-#endif
                 }
             }
             snprintf(*prsp_cmd + strlen(*prsp_cmd), 320, "\r\n\r\nOK\r\n");
@@ -652,35 +599,25 @@ int at_QISTATE_req(char *at_buf, char **prsp_cmd)
         *prsp_cmd = xy_zalloc(320);
 		int socket_id = 0;
         int sock_ctx_id = 0;
-		
-	    //20230228 MG add
-#if VER_QUCTL260
-		if(NET_NEED_RECOVERY(SOCKET_TASK)){
-			//printf("\r\n[QISTATE]query recovery SOCKET_TASK\r\n");
-			resume_net_app(SOCKET_TASK);
-		}
-#endif
-        //add end
-
         for (socket_id = 0; socket_id < SOCK_NUM; socket_id++)
 		{
 			if ((sock_ctx_id = find_sock_ctx_id_by_sock_id(socket_id)) != -1)
             { 
                 if (sock_ctx[sock_ctx_id]->net_type == 0)
                 {
-                    snprintf(*prsp_cmd + strlen(*prsp_cmd), 320, "\r\n+QISTATE: %d,\"TCP\",\"%s\",%d,%d,%d,%d,%d\r\n",
+                    snprintf(*prsp_cmd + strlen(*prsp_cmd), 320, "\r\n+QISTATE: %d,\"TCP\",\"%s\",%d,%d,%d,%d,%d",
                              socket_id, sock_ctx[sock_ctx_id]->remote_ip, sock_ctx[sock_ctx_id]->remote_port, sock_ctx[sock_ctx_id]->local_port_ori,
                              sock_ctx[sock_ctx_id]->sock_state, sock_ctx[sock_ctx_id]->cid, sock_ctx[sock_ctx_id]->accessmode);
                 }
                 else
                 {
-                    snprintf(*prsp_cmd + strlen(*prsp_cmd), 320, "\r\n+QISTATE: %d,\"UDP\",\"%s\",%d,%d,%d,%d,%d\r\n",
+                    snprintf(*prsp_cmd + strlen(*prsp_cmd), 320, "\r\n+QISTATE: %d,\"UDP\",\"%s\",%d,%d,%d,%d,%d",
                              socket_id, sock_ctx[sock_ctx_id]->remote_ip, sock_ctx[sock_ctx_id]->remote_port, sock_ctx[sock_ctx_id]->local_port_ori,
                              sock_ctx[sock_ctx_id]->sock_state, sock_ctx[sock_ctx_id]->cid, sock_ctx[sock_ctx_id]->accessmode);
                 }
             }
         }
-        snprintf(*prsp_cmd + strlen(*prsp_cmd), 320, "\r\nOK\r\n");
+        snprintf(*prsp_cmd + strlen(*prsp_cmd), 320, "\r\n\r\nOK\r\n");
     }
     else
     {
@@ -694,7 +631,6 @@ int at_QISTATE_req(char *at_buf, char **prsp_cmd)
 //透传发送定长数据   AT+QISEND=<connectID>,<send_length>
 //透传发送不定长数据 AT+QISEND=<connectID>
 //查询已发送、已应答，以及已发送但未应 答数据的总长度 AT+QISEND=<connectID>,0
-bool transmission_flag = 0;
 int at_QISEND_req(char *at_buf, char **prsp_cmd)
 {
     if (g_req_type == AT_CMD_REQ)
@@ -703,18 +639,8 @@ int at_QISEND_req(char *at_buf, char **prsp_cmd)
         int data_len = -1;
         int socket_ctx_index = -1;
         int rai_flag = 0;
-		int mode = 0;
         char *data = xy_zalloc(strlen(at_buf));
         socket_context_t *socket_ctx = NULL;
-
-		//20230228 MG add
-#if VER_QUCTL260
-		if(NET_NEED_RECOVERY(SOCKET_TASK)){
-			//printf("\r\n[QISEND]need recovery SOCKET_TASK\r\n");
-			resume_net_app(SOCKET_TASK);
-		}
-#endif
-        //add end
 
         if (g_data_send_mode == ASCII_STRING)
         {
@@ -722,30 +648,23 @@ int at_QISEND_req(char *at_buf, char **prsp_cmd)
             {
                 *prsp_cmd = BC26_AT_ERR_BUILD();
                 goto END_PROC;
-            }			
-            if (data_len > 0 && at_strnchr(at_buf, ',', 2) != NULL)
-            {   
-            	transmission_flag = 1;
-                if ((mode = get_ascii_data(",,%s,", at_buf, data_len, data)) > AT_JSON)
-                {
-                    *prsp_cmd = BC26_AT_ERR_BUILD();	
-					transmission_flag = 0;
-                    goto END_PROC;
-                }
-//				#if 0	//Enable send_string with RAI[0-2] 20230208 add by LGF
-                if ((at_parse_param(",,,%d[0-2]", at_buf, &rai_flag) != AT_OK)&&(mode == 0))
-                {
-                    *prsp_cmd = BC26_AT_ERR_BUILD();						
-                    goto END_PROC;
-                }
-//				#else
-				xy_printf("wait send data=%s,datalen=%d\n",data,data_len);
-				//TCP/UDP数据采用透传模式
-				mode = AT_JSON;
-				transmission_flag = 0;
-//				#endif
             }
-        }		
+
+            if (data_len > 0 && at_strnchr(at_buf, ',', 2) != NULL)
+            {
+                if (get_ascii_data(",,%s,", at_buf, data_len, data) != AT_OK)
+                {
+                    *prsp_cmd = BC26_AT_ERR_BUILD();
+                    goto END_PROC;
+                }
+
+                if (at_parse_param(",,,%d[0-2]", at_buf, &rai_flag) != AT_OK)
+                {
+                    *prsp_cmd = BC26_AT_ERR_BUILD();
+                    goto END_PROC;
+                }
+            }
+        }
 
         if (g_data_send_mode == HEX_ASCII_STRING && at_parse_param("%d(0-4),%d[0-512],%s,%d[0-2]", at_buf, &socket_id, &data_len, data, &rai_flag) != AT_OK)
         {
@@ -811,22 +730,6 @@ int at_QISEND_req(char *at_buf, char **prsp_cmd)
                 xy_free(data);
                 return AT_ASYN;
             }
-			//TCP/UDP采用透传发送
-			else if((data_len > 0 ) && (mode == AT_JSON))
-			{
-				
-				if (bc26_socket_send_data(data, data_len, rai_flag, socket_ctx) == XY_ERR)
-                {
-                    *prsp_cmd = BC26_AT_ERR_BUILD();
-                    goto END_PROC;
-                }
-                else if (socket_ctx->zero_flag == 1)
-                {
-                    socket_ctx->zero_flag = 0;
-                    *prsp_cmd = xy_zalloc(32);
-                    snprintf(*prsp_cmd, 32, "\r\nOK\r\n\r\nSEND OK\r\n");
-                }
-			}
             /* 正常发送数据 */
             else
             {

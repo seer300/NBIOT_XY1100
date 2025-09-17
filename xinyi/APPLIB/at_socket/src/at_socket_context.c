@@ -127,50 +127,9 @@ int at_socket_create(struct sock_context *sock_param, int *fd)
 	int context = -1;
 	unsigned short local_port = sock_param->local_port;
 
-    //20230228 MG add
-#if VER_QUCTL260
-    struct addrinfo hint = {0};
-    struct addrinfo *result = NULL;
-	
-	if (sock_param->net_type == 1)
-    {
-        hint.ai_protocol = IPPROTO_UDP;
-        hint.ai_socktype = SOCK_DGRAM;
-    }
-    else
-    {
-        hint.ai_protocol = IPPROTO_TCP;
-        hint.ai_socktype = SOCK_STREAM;
-    }
-
-    hint.ai_family = AF_UNSPEC;
-    uint8_t strPort[7] = {0};
-    snprintf(strPort, sizeof(strPort) - 1, "%d", sock_param->remote_port);
-	//printf("\r\nstrPort=%s\r\n", strPort);
-	
-    if (getaddrinfo(sock_param->remote_ip, strPort, &hint, &result) != 0)
-    {
-        softap_printf(USER_LOG, WARN_LOG, "[at_socket_create] getaddrinfo err:%d", errno);
-        return ATERR_PARAM_INVALID;
-    }
-
-	 sock_param->af_type = (result->ai_family == AF_INET6) ? 1 : 0;
-#endif
-    //add end
-
-    /*创建socket*/
 	if (sock_param->net_type == 1 && sock_param->af_type == 0)
 	{
-#if VER_QUCTL260
-		if ((context = socket(result->ai_family, result->ai_socktype, result->ai_protocol)) == -1)
-        {
-            softap_printf(USER_LOG, WARN_LOG, "[at_socket_create] create err:%d", errno);
-            freeaddrinfo(result);
-            return NET_SOCK_CREATE_ERR;
-        }
-#else
-        context = socket(AF_INET /*srv.family*/, SOCK_DGRAM, IPPROTO_UDP);
-#endif
+		context = socket(AF_INET /*srv.family*/, SOCK_DGRAM, IPPROTO_UDP);
 	}
 	else if (sock_param->net_type == 1 && sock_param->af_type == 1)
 	{
@@ -190,10 +149,8 @@ int at_socket_create(struct sock_context *sock_param, int *fd)
 	{
 		return ATERR_PARAM_INVALID;
 	}
-	
 	*fd = context;
 
-    /*binding socket*/
 	if(sock_param->af_type == 1)
 		bind_addr.sin_family = AF_INET6;
 	else
@@ -201,30 +158,17 @@ int at_socket_create(struct sock_context *sock_param, int *fd)
 	bind_addr.sin_port = htons(local_port);
 	if (bind(*fd, (struct sockaddr *)&bind_addr, sizeof(bind_addr)) == -1)
 	{
-		softap_printf(USER_LOG, WARN_LOG, "[at_socket_create]sock bind errno:%d", errno);
+		softap_printf(USER_LOG, WARN_LOG, "sock bind errno:%d", errno);
         close(*fd);
 		return ATERR_NOT_NET_CONNECT;
 	}
 
-    /*set socket receive timeout*/
 	struct timeval tv;
     tv.tv_sec = SOCK_CREATE_TIMEOUT;
     tv.tv_usec = 0;
+
     setsockopt(*fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(struct timeval));
 
-    //20230228 MG add
-	/*use socket fd to connect host*/
-#if VER_QUCTL260
-    if (connect(*fd, result->ai_addr, result->ai_addrlen) == -1)
-    {
-        softap_printf(USER_LOG, WARN_LOG, "[at_socket_create]socket connect err:%d", errno);
-        freeaddrinfo(result);
-        close(*fd);
-        return NET_SOCK_CONNECT_ERR;
-    }
-#endif
-    //add end
-	
 	return AT_OK;
 }
 
@@ -254,15 +198,12 @@ int del_socket_ctx_by_index(int idx, bool report)
 		}
 		if (sock_ctx[idx]->remote_ip != NULL)
 			xy_free(sock_ctx[idx]->remote_ip);
-		
-        int actual_connectid = sock_ctx[idx]->sock_id;
+
 		del_allsnnode_by_socketid(sock_ctx[idx]->sock_id);
 		xy_free(sock_ctx[idx]);
         sock_ctx[idx] = NULL;
         if (report)
-            //at_report_socket_state(idx, net_type);
-            /*20221110 wjb add: tcp close URC id is <connectID>, aka sock_ctx[idx]->sock_id*/
-		    at_report_socket_state(actual_connectid, net_type);
+            at_report_socket_state(idx, net_type);
         osMutexRelease(g_socket_mux);
         return XY_OK;
     }
@@ -685,15 +626,9 @@ int save_udp_context_deepsleep(udp_context_t* udp_info)
 		
 		//memcpy(&(g_udp_context->udp_socket[i].local_ip),&(sock_ctx[i]->local_ip),sizeof(ip_addr_t));
 		g_udp_context->udp_socket[i].net_info.local_port = sock_ctx[i]->local_port;
-		/*downdata receive mode*/
 		g_udp_context->udp_socket[i].recv_ctl = sock_ctx[i]->recv_ctl;
 		g_udp_context->udp_socket[i].socket_idx = (char)(sock_ctx[i]->sock_id);
-		g_udp_context->udp_socket[i].af_type = sock_ctx[i]->af_type;
-		
-        //20230228 MG add
-        g_udp_context->udp_socket[i].net_info.remote_port = sock_ctx[i]->remote_port;
-		memcpy(g_udp_context->udp_socket[i].net_info.remote_ip, sock_ctx[i]->remote_ip, 40*sizeof(char));
-		//add end
+		g_udp_context->udp_socket[i].af_type = sock_ctx[i]->af_type;	
 	}
 	
 	g_udp_context->data_mode = (unsigned char)g_at_sck_report_mode;
@@ -745,8 +680,8 @@ void restore_udp_context_thread()
 		
 		if(sock_ctx[idx] != NULL || idx >= SOCK_NUM)
 		{
-		    softap_printf(USER_LOG, WARN_LOG,"sock_ctx[idx] not NULL,exit thread!!");
 			xy_assert(0);
+			softap_printf(USER_LOG, WARN_LOG,"sock_ctx[idx] not NULL,exit thread!!");
 			goto END;
 		}	
 
@@ -756,13 +691,8 @@ void restore_udp_context_thread()
 		sock_param[i]->net_type = 1;
 		sock_param[i]->af_type = g_udp_context->udp_socket[i].af_type;
 		sock_param[i]->recv_ctl = g_udp_context->udp_socket[i].recv_ctl;
-		
-		//20230228 MG add
-		sock_param[i]->remote_ip = xy_zalloc(sizeof(char)*50);
-		sock_param[i]->remote_port = g_udp_context->udp_socket[i].net_info.remote_port;
-		memcpy(sock_param[i]->remote_ip, g_udp_context->udp_socket[i].net_info.remote_ip, sizeof(char)*40);
-		//add end
 
+		sock_param[i]->recv_ctl = g_udp_context->udp_socket[i].recv_ctl ;
 		g_at_sck_report_mode = g_udp_context->data_mode;
 		
 	    if ((res = at_socket_create(sock_param[i], &fd)) != AT_OK) 
@@ -772,27 +702,13 @@ void restore_udp_context_thread()
 			softap_printf(USER_LOG, WARN_LOG,"udp_nack_err:%d",res);
 			xy_free(sock_param[i]);	
 			softap_printf(USER_LOG, WARN_LOG,"sock_ctx[%d] creat fail,exit thread!!",i);
-			//xy_free(sock_param[i]->remote_ip);
 			continue;
 		}
 		sock_param[i]->fd = fd;
-
 		nonblock(fd);
 		sock_ctx[idx] = sock_param[i];	
 		set_socket_sequence_default_state(sock_param[i]->sock_id);
-
-        //20230228 MG add
-		sock_ctx[idx]->accessmode = g_udp_context->udp_socket[i].recv_ctl;
-        #if 0
-		if(NULL != sock_param[i]->remote_ip){
-			xy_free(sock_param[i]->remote_ip);
-			sock_param[i]->remote_ip = NULL;
-		}
-		#endif
-		//add end
-		
 	}
-	
 	if(is_all_socket_exit())
 		goto END;
 

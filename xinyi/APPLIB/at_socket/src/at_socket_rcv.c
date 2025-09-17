@@ -33,7 +33,7 @@ void at_sock_recv_thread(void)
 			if (sock_ctx[i] != NULL && sock_ctx[i]->quit == 1 && sock_ctx[i]->fd >= 0)
 			{
                 del_socket_ctx_by_index(i, false);
-#if VER_QUCTL260
+#if 0
                 char *close_info = xy_zalloc(32);
                 sniprintf(close_info, 32, "\r\nCLOSE OK\r\n");
                 at_write_all_to_uart(close_info, strlen(close_info));
@@ -106,14 +106,16 @@ void at_sock_recv_thread(void)
 
 			ioctl(sock_ctx[i]->fd, FIONREAD, &len);  //get the size of received data
             softap_printf(USER_LOG, WARN_LOG, "socket[%d] fionread len:%d", i, len);
-#if !VER_QUCTL260
+#if 0
+            if (len == 0 && sock_ctx[i]->net_type == 0)
+#else
             if (len == 0)
+#endif /* VER_QUCTL260 */
             {
                 softap_printf(USER_LOG, WARN_LOG, "socket[%d] recv 0 BYTES,force to close socket", i);
                 del_socket_ctx_by_index(i, true);
 				continue;
             }
-#endif /* VER_QUCTL260 */
 
             buf = xy_zalloc(len+1);
 			remote_info = xy_zalloc(sizeof(struct sockaddr_in));
@@ -138,14 +140,21 @@ void at_sock_recv_thread(void)
             }
             else if (read_len == 0)
             {
-#if VER_QUCTL260
-                /* 美格版本收到0长度下行数据不删除socket */
-                softap_printf(USER_LOG, WARN_LOG, "socket[%d]read 0 BYTES", i);
+#if 0
+                if (sock_ctx[i]->net_type == 0)
+                {
+                    softap_printf(USER_LOG, WARN_LOG, "socket[%d] tcp read 0 BYTES,force to close socket", i);
+                    del_socket_ctx_by_index(i, true);
+                }
+                else
+                {
+                    softap_printf(USER_LOG, WARN_LOG, "socket[%d] udp read 0 BYTES", i);
+                }
 #else
-                softap_printf(USER_LOG, WARN_LOG, "socket[%d]read 0 BYTES,force to close socket", i);
+                softap_printf(USER_LOG, WARN_LOG, "socket[%d] tcp read 0 BYTES,force to close socket", i);
                 del_socket_ctx_by_index(i, true);
-#endif //VER_QUCTL260
-				xy_free(buf);
+#endif /* VER_QUCTL260 */
+                xy_free(buf);
 				xy_free(remote_info);
 				continue;
             }
@@ -172,7 +181,7 @@ void at_sock_recv_thread(void)
 			 	continue;
 			}
 
-#if VER_QUCTL260
+#if 0
             //+QIURC: "recv",<connectID>,<current_recv_length>,<data>
             //仅支持直吐模式
             if (sock_ctx[i]->accessmode == 1)
