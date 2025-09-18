@@ -860,4 +860,43 @@ END_PROC:
     return AT_END;
 }
 
+//AT+QISWTMD=<connectID>,<access_mode>
+/**
+ * <connectID>:整型。套接字服务索引。范围为0-4。
+ * <access_mode>:整型。套接字服务的数据访问模式。
+ *                  0 缓冲区访问模式
+ *                  1 直接推送模式
+ */
+int at_QISWTMD_req(char *at_buf, char **prsp_cmd)
+{
+    if (g_req_type == AT_CMD_REQ)
+    {
+        uint8_t connect_id = 0xFF;
+        uint8_t access_mode = 0xFF;
+        
+        if (at_parse_param("%1d[0-4],%1d[0-1]", at_buf, &connect_id, &access_mode) != XY_OK)
+        {
+            *prsp_cmd = BC26_AT_ERR_BUILD();
+            return AT_END;
+        }
+
+        // 如果提供了有效参数，则更新配置
+        if (access_mode != 0xFF && connect_id != 0xFF)
+        {
+            sock_ctx[connect_id]->accessmode = access_mode;
+        }
+    }
+    else if (g_req_type == AT_CMD_TEST)
+    {
+        *prsp_cmd = xy_zalloc(64);
+        sniprintf(*prsp_cmd, 64, "\r\n+QISWTMD: (0-4),(0,1)\r\n\r\nOK\r\n");
+    }
+    else
+    {
+        *prsp_cmd = BC26_AT_ERR_BUILD();
+    }
+
+    return AT_END;
+}
+
 #endif //AT_SOCKET

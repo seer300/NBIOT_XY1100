@@ -1,0 +1,18 @@
+{
+    "files.associations": {
+        "xy_api.h": "c",
+        "xy_demo.h": "c",
+        "api.h": "c",
+        "err.h": "c",
+        "softap_nv.h": "c",
+        "xy_log_send.h": "c",
+        "xy_passthrough.h": "c",
+        "at_socket_context.h": "c",
+        "xy_memmap.h": "c",
+        "osal.h": "c",
+        "*.txt": "c",
+        "at_ctl.h": "c",
+        "at_global_def.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
+}

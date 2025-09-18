@@ -195,6 +195,7 @@ struct at_serv_proc_e at_basic_req[] = {
     {"AT+QICLOSE", at_QICLOSE_req},
     {"AT+QISEND", at_QISEND_req},
     {"AT+QISTATE", at_QISTATE_req},
+    {"AT+QISWTMD", at_QISWTMD_req},
 #endif //VER_QUCTL260
 #if XY_PING
 	{"AT+NPING", at_NPING_req},
