@@ -109,6 +109,133 @@ void read_data_from_socket_buffer(int skt_index, int *pread_len, char **prsp_cmd
 	osMutexRelease(g_socket_mux);
 }
 
+void BC26_read_data_from_socket_buffer(int skt_index, int *pread_len, char **prsp_cmd)
+{
+	osMutexAcquire(g_socket_mux, osWaitForever);
+
+	recv_data_node_t *temp = sock_ctx[skt_index]->data_list;
+	char *rcv_data = NULL;
+	char *remote_ip = xy_zalloc(REMOTE_SERVER_LEN);
+
+	if (temp != NULL)
+	{
+		*prsp_cmd = xy_zalloc(120 + temp->len * 2);
+
+		// send_urc_to_ext("BC26_read_data_from_socket_buffer 1\r\n");
+
+		if (sock_ctx[skt_index]->af_type == 1)
+			inet_ntop(AF_INET6, &(temp->sockaddr_info->sin_addr), remote_ip, REMOTE_SERVER_LEN);
+		else
+			inet_ntop(AF_INET, &(temp->sockaddr_info->sin_addr), remote_ip, REMOTE_SERVER_LEN);
+
+		int old_i = ntohs(temp->sockaddr_info->sin_port);
+
+		if (temp->len <= *pread_len)
+		{
+			// 情况 1：本次收到数据小于或等于请求读取长度（temp->len <= *pread_len）
+			char *tmp_data = xy_zalloc(10 + temp->len * 2);
+			bytes2hexstr(temp->data, temp->len, tmp_data, temp->len * 2 + 1);
+
+			sock_ctx[skt_index]->data_list = temp->next;
+			if (temp->data)
+				xy_free(temp->data);
+			if (temp->sockaddr_info)
+				xy_free(temp->sockaddr_info);
+
+			// 获取剩余多少缓冲区数据
+			int remaining_bufflen = get_remaining_socket_buffer_size(skt_index);
+
+			// 组装上报URC
+			if (remaining_bufflen > 0)
+			{
+				// 后面缓冲区还有数据
+				sprintf(*prsp_cmd, "\r\n+QIRD:%d,%d\r\n%s\r\n", temp->len, remaining_bufflen, tmp_data);
+
+			}
+			else
+			{
+				// 后面缓冲区没有数据
+				sprintf(*prsp_cmd, "\r\n+QIRD:%d\r\n%s\r\n", temp->len, tmp_data);
+			}
+			sprintf(*prsp_cmd + strlen(*prsp_cmd), "\r\nOK\r\n");
+			xy_free(temp);
+
+			// 接着上报下一条抵达的数据
+			if (g_at_sck_report_mode == BUFFER_WITH_HINT && (sock_ctx[skt_index]->data_list != NULL))
+			{
+				sprintf(*prsp_cmd + strlen(*prsp_cmd), "\r\n+QIURC: \"recv\",%d,%d\r\n", skt_index, sock_ctx[skt_index]->data_list->len);
+			}
+			else if ((sock_ctx[skt_index]->data_list) == NULL)
+			{
+				sock_ctx[skt_index]->firt_recv = 0;
+			}
+			xy_free(tmp_data);
+		}
+		else
+		{
+			// rcv_data = xy_zalloc(temp->len - *pread_len + 1);
+
+			// memcpy(rcv_data, temp->data + *pread_len, temp->len - *pread_len);
+
+			// sprintf(*prsp_cmd, "\r\n+NSORF:%d,%s,%d,%d,", skt_index, remote_ip, old_i, *pread_len);
+			// bytes2hexstr(temp->data, *pread_len, *prsp_cmd + strlen(*prsp_cmd), *pread_len * 2 + 1);
+
+			// xy_free(temp->data);
+
+			// temp->data = rcv_data;
+			// temp->len = temp->len - *pread_len;
+
+			// sprintf(*prsp_cmd + strlen(*prsp_cmd), ",%d\r\n", get_remaining_socket_buffer_size(skt_index));
+
+			// // 后面缓冲区没有数据
+			// sprintf(*prsp_cmd, "\r\n+QIRD:%d\r\n%s\r\n", temp->len, tmp_data);
+			// sprintf(*prsp_cmd + strlen(*prsp_cmd), "\r\nOK\r\n");
+
+
+			// 情况 2：缓冲区数据长度 > 用户请求读取长度（temp->len > *pread_len）
+			// 只读取 *pread_len 长度，剩余数据保留在当前节点中
+
+			// Step 1: 分配临时缓冲区，用于存放 HEX 字符串（只转换前 *pread_len 字节）
+			char *tmp_data = xy_zalloc(*pread_len * 2 + 1);
+			if (tmp_data == NULL) {
+				xy_assert(0);
+			}
+			bytes2hexstr(temp->data, *pread_len, tmp_data, *pread_len * 2 + 1);
+
+			// Step 2: 为剩余未读数据分配新缓冲区
+			char *remaining_data = xy_zalloc(temp->len - *pread_len);
+			if (remaining_data == NULL) {
+				xy_assert(0);
+			}
+			memcpy(remaining_data, temp->data + *pread_len, temp->len - *pread_len);
+
+			// Step 3: 释放旧数据，更新当前节点为剩余数据
+			xy_free(temp->data);
+			temp->data = remaining_data;
+			temp->len = temp->len - *pread_len;  // 更新后，当前节点还剩这么多未读
+
+			// Step 4: 计算“当前连接的整个接收缓冲区”还剩多少数据（包括当前节点和后续节点）
+			int remaining_bufflen = get_remaining_socket_buffer_size(skt_index);
+
+			// Step 5: 组装上报命令 —— 只上报本次读取的部分，提示剩余总量
+			sprintf(*prsp_cmd, "\r\n+QIRD:%d,%d\r\n%s\r\n", *pread_len, remaining_bufflen, tmp_data);
+			sprintf(*prsp_cmd + strlen(*prsp_cmd), "\r\nOK\r\n");
+
+			// Step 6: 清理临时缓冲区
+			xy_free(tmp_data);
+		}
+	}
+	else
+	{
+		*pread_len = 0;
+		// 缓存数据为空 上报
+		sprintf(*prsp_cmd, "\r\n+QIRD:0\r\n");
+		sprintf(*prsp_cmd + strlen(*prsp_cmd), "\r\nOK\r\n");
+	}
+	xy_free(remote_ip);
+	osMutexRelease(g_socket_mux);
+}
+
 /**
  * @brief  at命令内部调用的tcp数据发送接口
  * @param  at_buf  at命令参数

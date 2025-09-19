@@ -12,7 +12,8 @@
         "osal.h": "c",
         "*.txt": "c",
         "at_ctl.h": "c",
-        "at_global_def.h": "c"
+        "at_global_def.h": "c",
+        "softap_macro.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

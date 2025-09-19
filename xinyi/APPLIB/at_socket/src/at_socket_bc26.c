@@ -899,4 +899,59 @@ int at_QISWTMD_req(char *at_buf, char **prsp_cmd)
     return AT_END;
 }
 
+/**
+ * AT+QIRD=<connectID>,<read_length>
+ * 
+ */
+int at_QIRD_req(char *at_buf, char **prsp_cmd)
+{
+    if (g_req_type == AT_CMD_REQ)
+	{
+		int sock_id = 0;
+		int req_len = 0;
+		int idx;
+		recv_data_node_t *old_data = NULL;
+
+		if (at_parse_param("%d,%d", at_buf, &sock_id, &req_len) != AT_OK || sock_id < 0 || sock_id >= SOCK_NUM || req_len <= 0)
+		{
+			*prsp_cmd = BC26_AT_ERR_BUILD();
+			return AT_END;
+		}
+
+        // 判断获取长度是否超出限制
+        if (req_len > AT_SOCKET_MAX_DATA_LEN)
+        {
+            *prsp_cmd = BC26_AT_ERR_BUILD();
+            return AT_END;
+        }
+
+		int socket_ctx_id = find_sock_ctx_id_by_sock_id(sock_id);
+		if (socket_ctx_id == -1 || sock_ctx[socket_ctx_id] == NULL)
+		{
+			*prsp_cmd = BC26_AT_ERR_BUILD();
+			return AT_END;
+		}
+
+        if (req_len == 0)
+		{
+			*prsp_cmd = BC26_AT_ERR_BUILD();
+			return AT_END;
+		}
+
+        if (sock_ctx[socket_ctx_id]->data_list == NULL || sock_ctx[socket_ctx_id]->data_list->len == 0)
+        {
+            // 没有数据可以读取
+            *prsp_cmd = xy_zalloc(32);
+            snprintf(*prsp_cmd, 32, "\r\n+QIRD:0\r\n\r\nOK\r\n");
+            return AT_END;
+        }
+
+        //从缓存buffer中读取指定长度数据
+		BC26_read_data_from_socket_buffer(socket_ctx_id, &req_len, prsp_cmd);
+	}else{
+        *prsp_cmd = BC26_AT_ERR_BUILD();
+    }
+	return AT_END;
+}
+
 #endif //AT_SOCKET

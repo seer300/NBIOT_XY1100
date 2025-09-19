@@ -172,7 +172,7 @@ void at_sock_recv_thread(void)
 			 	continue;
 			}
 
-#if VER_QUCTL260
+#if 1
             //+QIURC: "recv",<connectID>,<current_recv_length>,<data>
             //仅支持直吐模式
             if (sock_ctx[i]->accessmode == 1)
@@ -203,7 +203,26 @@ void at_sock_recv_thread(void)
 
                 xy_free(buf);
                 xy_free(remote_info);
+            }else if (sock_ctx[i]->accessmode == 0)
+            {
+                // 缓存模式
+                if (add_new_rcv_data_node(i, read_len, buf, remote_info) == XY_OK)
+                {
+                    softap_printf(USER_LOG, WARN_LOG, "socket[%d] recv %d length downlink data!!!", i, read_len);
+                    if (sock_ctx[i]->firt_recv == 0)
+					{
+                        char *mid_rsp_cmd = xy_zalloc(36);
+                        snprintf(mid_rsp_cmd, 36, "\r\n+QIURC: \"recv\",%d,%d\r\n", i, read_len);
+                        send_rsp_str_to_ext(mid_rsp_cmd);
+                        xy_free(mid_rsp_cmd);
+                        osMutexAcquire(g_socket_mux, osWaitForever);
+                        sock_ctx[i]->firt_recv = 1;
+                        osMutexRelease(g_socket_mux);
+                    }
+                }
+                
             }
+            
 #else
 			if (g_at_sck_report_mode == HINT_WITH_REMOTE_INFO)
 			{

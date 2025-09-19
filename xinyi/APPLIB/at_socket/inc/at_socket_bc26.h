@@ -23,5 +23,6 @@ int at_QICLOSE_req(char *at_buf, char **prsp_cmd);
 int at_QISEND_req(char *at_buf, char **prsp_cmd);
 int at_QISTATE_req(char *at_buf, char **prsp_cmd);
 int at_QISWTMD_req(char *at_buf, char **prsp_cmd);
+int at_QIRD_req(char *at_buf, char **prsp_cmd);
 
 #endif //AT_SOCKET
